@@ -3,14 +3,17 @@
 - **Project:** NairaBooks (`ac`) — Zero-jargon Nigerian IFRS / Tax Act 2025 / CAMA 2020 accounting & business operations platform
 - **Active Stage:** **Phase 5 & 6 Revamp: Cupertino Typography Restoration, Micro-Targeted Naira Glyph Isolation, Dark Mode & Native Mobile Bottom Bar**
 - **Wizard Skills Executed:** `128 / 128` (`100%`) — All 12 active phases verified with concrete deliverables, code, automated test suites, and documentation.
-- **Latest Milestone (2026-11-13):** **Cupertino Typography Restoration, Micro-Targeted Naira Glyph Isolation, Dark Mode & Native Mobile Bottom Bar:**
-  - **Cupertino Typography Restored:** Reverted global font overwrites in `tailwind.config.ts` and `globals.css` back to pure Apple Cupertino system fonts (`SF Pro Display`, `SF Pro Text`, `Geist Mono`, `SF Mono`). Headings, body text, and tabular digits look razor-sharp and beautiful again without generic system font pollution.
-  - **Micro-Targeted Naira Glyph Fix (`U+20A6`):** Created `<NairaAmount>` and `<NairaSign>` components that wrap `₦` in `font-sans` (guaranteed to render on Samsung Internet / Android) while keeping numeric figures strictly in tabular `font-mono`. Declared targeted `@font-face NairaGlyphFallback` for `.nb-money-cell` targeting only `unicode-range: U+20A6`.
-  - **Light & Dark Mode Switcher:** Implemented `ThemeModeProvider` (`theme-mode.tsx`), accessible `ThemeToggle` (Sun/Moon button), static anti-FOUC script (`/theme-init.js`), complete `.dark` tokens in `globals.css`, and dark-mode adaptation for `NigerianArtBackground`.
-  - **Native Mobile Bottom Navigation Bar:** Replaced awkward top capsule wrapping with an authentic native bottom navigation bar on mobile (`fixed bottom-0 inset-x-0 z-50 h-16`) featuring all 5 core tabs with icons and labels, while desktop retains the floating capsule. Added `pb-20 md:pb-6` body clearance.
-  - **Verified Clean:** 16 Vitest test suites (56 tests, 0 `axe-core` accessibility violations), 100 Python pytest test cases, 0 SAST findings, and Next.js 44-route production build compiling cleanly in 26.3s.
+- **Latest Milestone (2026-11-13):** **Dark Mode Contrast Polish, Cupertino Typography, Micro-Targeted Naira Glyph Isolation & Mobile Bottom Navigation Bar:**
+  - **High-Contrast Dark Mode Headings:** Resolved dark-on-dark conflicts where titles like "Financial Overview" and badges were dark charcoal on midnight backgrounds. In `.dark`, all headings (`h1..h6`), company badges, and text automatically adapt to `#F2F2F7` (crisp near-white) and `#A1A1AA` (readable zinc).
+  - **Vibrant Emerald & Sky Accents:** Mapped `.text-[#00582E]` and `.text-[#0F4C81]` to `#34D399` and `#60A5FA` in dark mode for vivid contrast on cards.
+  - **Protected Physical A4 Reports:** Explicitly kept `#a4-report-document` pure white (`#FFFFFF`) with pitch-black text (`#000000`) for professional board & management presentation regardless of active screen theme.
+  - **Cupertino Typography Restored:** Retained Apple Cupertino system fonts (`SF Pro Display`, `SF Pro Text`, `Geist Mono`, `SF Mono`). Headings, body text, and tabular digits look razor-sharp and beautiful.
+  - **Micro-Targeted Naira Glyph Fix (`U+20A6`):** `<NairaAmount>` and `<NairaSign>` wrap `₦` in `font-sans` (guaranteed on Samsung Internet / Android) while keeping numbers strictly in tabular `font-mono`.
+  - **Light & Dark Mode Switcher:** One-click toggle with accessible Sun/Moon button, static anti-FOUC script (`/theme-init.js`), complete `.dark` tokens in `globals.css`, and dynamic dark mode Nigerian cultural artwork.
+  - **Native Mobile Bottom Navigation Bar:** Pinned to mobile bottom (`fixed bottom-0 inset-x-0 z-50 h-16`) with 5 core tabs, icons, labels, 44px tap targets, and desktop floating capsule.
+  - **Verified Clean:** 16 Vitest test suites (56 tests, 0 `axe-core` accessibility violations), 100 Python pytest test cases, 0 SAST findings, and Next.js 44-route production build compiling cleanly in 16.4s.
 - **Baseline Verified Working:**
-  - `npm --prefix web run build`: Compiled successfully in 26.3s, all 44 routes generated cleanly.
+  - `npm --prefix web run build`: Compiled successfully in 16.4s, all 44 routes generated cleanly.
   - `uv run pytest -q`: `100 passed` across 26 test modules in 100%.
   - `uv run ruff check src tests` & `uv run mypy src tests` (`100` source files): clean (0 issues).
   - `web`: `npm run typecheck` (0 errors), `npm test` (`16` test files, `56` vitest tests, `0` axe-core violations), and Next.js 44-route production build passing cleanly.
@@ -20,4 +23,4 @@
   - `uv run python scripts/compliance_check.py`: 100% compliance gates passed.
   - `uv run python scripts/audit_dependencies.py`: 100% permissive licenses verified.
   - `uv run python scripts/verify_workflow.py --project .`: `128 / 128` wizard skills verified (`executed=128`, 100%).
-- **Project Status:** **Fully Shipped & Production Ready.** All 128 wizard skills verified, statutory invariants enforced, zero float math, authentic Nigerian cultural theme active, WCAG 2.2 AA accessibility satisfied, Cupertino aesthetics preserved, dark mode enabled, mobile bottom navigation perfected, and live on cloud.
+- **Project Status:** **Fully Shipped & Production Ready.** All 128 wizard skills verified, statutory invariants enforced, zero float math, authentic Nigerian cultural theme active, WCAG 2.2 AA accessibility satisfied, Cupertino aesthetics preserved, dark mode contrast perfected, mobile bottom navigation active, and live on cloud.

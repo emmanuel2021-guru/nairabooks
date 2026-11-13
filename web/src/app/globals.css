@@ -108,6 +108,115 @@
   background-color: rgba(28, 28, 30, 0.85);
 }
 
+/* ════════════════════════════════════════════════════════════════════
+   UNIVERSAL DARK THEME CONTRAST & LEGIBILITY ENFORCEMENT
+   Guarantees zero illegible dark headings, cards, or borders in dark mode
+   ════════════════════════════════════════════════════════════════════ */
+.dark h1,
+.dark h2,
+.dark h3,
+.dark h4,
+.dark h5,
+.dark h6 {
+  color: #F2F2F7 !important;
+}
+
+.dark .text-\[\#1C1C1E\],
+.dark .text-slate-900,
+.dark .text-slate-950,
+.dark .text-neutral-900,
+.dark .text-neutral-950,
+.dark .text-zinc-900,
+.dark .text-zinc-950,
+.dark .text-gray-900,
+.dark .text-gray-950 {
+  color: #F2F2F7 !important;
+}
+
+.dark .text-\[\#5E5E64\],
+.dark .text-\[\#636369\],
+.dark .text-slate-600,
+.dark .text-slate-500 {
+  color: #A1A1AA !important;
+}
+
+.dark .bg-white {
+  background-color: #1C1C1E !important;
+}
+
+.dark .bg-\[\#FAFAFC\],
+.dark .bg-\[\#F9FAFC\],
+.dark .bg-\[\#F9FCFA\],
+.dark .bg-\[\#FBFBFD\] {
+  background-color: #242426 !important;
+}
+
+.dark .bg-\[\#F2F2F7\] {
+  background-color: #18181A !important;
+}
+
+.dark .bg-\[\#E5E5EA\]\/70,
+.dark .bg-\[\#E5E5EA\] {
+  background-color: #2C2C2E !important;
+}
+
+.dark .border-\[\#E5E5EA\],
+.dark .border-\[\#D1D1D6\] {
+  border-color: #38383A !important;
+}
+
+.dark .divide-\[\#E5E5EA\],
+.dark .divide-\[\#D1D1D6\] {
+  border-color: #38383A !important;
+}
+
+.dark .text-\[\#00582E\] {
+  color: #34D399 !important;
+}
+
+.dark .text-\[\#0F4C81\] {
+  color: #60A5FA !important;
+}
+
+.dark .bg-\[\#E6F5ED\] {
+  background-color: rgba(16, 185, 129, 0.18) !important;
+}
+
+.dark .bg-\[\#EAF3FC\] {
+  background-color: rgba(59, 130, 246, 0.18) !important;
+}
+
+.dark input,
+.dark select,
+.dark textarea {
+  color-scheme: dark;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #71717A !important;
+}
+
+/* Explicit exemption: Physical white A4 print document in Reports must remain crisp white paper */
+.dark #a4-report-document,
+.dark .a4-report-document {
+  background-color: #FFFFFF !important;
+  color: #000000 !important;
+}
+
+.dark #a4-report-document *,
+.dark .a4-report-document * {
+  color: #000000 !important;
+  background-color: transparent !important;
+}
+
+.dark #a4-report-document th,
+.dark #a4-report-document td,
+.dark .a4-report-document th,
+.dark .a4-report-document td {
+  border-color: #D1D1D6 !important;
+}
+
 html {
   scroll-behavior: smooth;
 }

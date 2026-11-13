@@ -973,3 +973,21 @@
   - `uv run pytest -q`: **100 passed** across 26 test modules in 100%.
   - `uv run python scripts/run_sast_scan.py`: **0 vulnerabilities detected (clean pass)**.
   - `uv run python scripts/verify_workflow.py --project .`: **128 / 128 wizard skills verified (100%)**.
+
+### 2026-11-13: Dark Mode Contrast Fix & High-Contrast Typography Across All Workspaces
+- **Plain-English Summary (Non-Developers):**
+  - **High-Contrast Headings in Dark Mode:** Completely resolved dark-on-dark text conflicts where headings (such as "Financial Overview" and company badges) appeared dark charcoal on a dark green/black background. In dark mode, all page titles, section headers, badges, and card text now automatically switch to crisp, high-contrast light colors (`#F2F2F7` near-white and `#A1A1AA` secondary zinc), guaranteeing full readability.
+  - **Vibrant Accent Colors:** Elevated dark forest green and deep navy text links and badges to vibrant light emerald (`#34D399`) and bright sky blue (`#60A5FA`) so they stand out clearly against midnight surfaces.
+  - **Protected Physical A4 PDF Export:** Preserved pure white paper background (`#FFFFFF`) and rich black text (`#000000`) for the printable A4 IFRS financial report (`#a4-report-document`), ensuring official documents exported in dark mode remain 100% board-ready and printer-friendly.
+- **Files Created / Changed:**
+  - `web/src/app/globals.css`: Implemented universal dark theme contrast enforcement for `h1..h6`, `.text-[#1C1C1E]`, `.text-[#5E5E64]`, `.bg-white`, `.border-[#E5E5EA]`, `.divide-[#E5E5EA]`, `.text-[#00582E]`, `.text-[#0F4C81]`, input elements, and protected `#a4-report-document`.
+  - `web/src/components/OverviewLandingClient.tsx`: Converted header, global date filter, 4 KPI cards, Cash Flow Trend chart, Top Expense Categories chart, and Daily Actionable Alerts to semantic tokens (`text-ink`, `text-mutedInk`, `bg-surface`, `border-borderSubtle`).
+  - `web/src/__tests__/landing-auth-pages.test.tsx`: Synchronized test assertion for `<NairaSign />` rendered node.
+  - `docs/DECISIONS.md`: Logged `ADR-040`.
+  - `docs/STAGE_LOG.md`, `docs/STATE.md`, `docs/SESSION_HANDOFF.md`: Updated living documentation.
+- **Verification Commands & Results:**
+  - `npm --prefix web run build`: **Compiled successfully in 16.4s, all 44 routes generated cleanly**.
+  - `npm --prefix web test`: **16 test files / 56 Vitest tests passed** (**0 axe-core violations**).
+  - `uv run pytest -q`: **100 passed** across 26 test modules in 100%.
+  - `uv run python scripts/run_sast_scan.py`: **0 vulnerabilities detected (clean pass)**.
+  - `uv run python scripts/verify_workflow.py --project .`: **128 / 128 wizard skills verified (100%)**.

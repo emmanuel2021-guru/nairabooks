@@ -16,6 +16,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useWorkspaceMode } from "@/state/workspace-mode";
+import { NairaSign } from "@/components/ui/NairaAmount";
 import type { AuthUserSummary } from "@/types/auth";
 
 export type OverviewTimeframeId = "month" | "quarter" | "ytd";
@@ -196,10 +197,10 @@ export function OverviewLandingClient({
           className="mx-auto max-w-6xl space-y-8 px-4 py-8 pb-sticky-clearance sm:px-6 sm:py-10"
         >
           {/* Minimalist Workspace Title + Single Global Date Filter */}
-          <header className="flex flex-col gap-5 border-b border-[#E5E5EA] pb-6 md:flex-row md:items-end md:justify-between">
+          <header className="flex flex-col gap-5 border-b border-borderSubtle pb-6 md:flex-row md:items-end md:justify-between">
             <div className="space-y-2">
-              <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-[#5E5E64]">
-                <span className="inline-flex items-center gap-1.5 font-semibold text-[#1C1C1E]">
+              <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-mutedInk">
+                <span className="inline-flex items-center gap-1.5 font-semibold text-ink">
                   <span className="h-2 w-2 rounded-full bg-[#006838]" aria-hidden="true" />
                   {workspaceName}
                 </span>
@@ -213,10 +214,10 @@ export function OverviewLandingClient({
                 ) : null}
               </div>
 
-              <h1 className="text-3xl font-bold tracking-[-0.03em] text-[#1C1C1E] sm:text-4xl">
+              <h1 className="text-3xl font-bold tracking-[-0.03em] text-ink sm:text-4xl">
                 Financial Overview
               </h1>
-              <p className="text-sm text-[#5E5E64]">
+              <p className="text-sm text-mutedInk">
                 {activePeriod.rangeNote} &middot;{" "}
                 {mode === "simple"
                   ? "Real-time cash standing, profit, and daily actions at a glance."
@@ -229,7 +230,7 @@ export function OverviewLandingClient({
               <div
                 role="group"
                 aria-label="Global dashboard date filter"
-                className="inline-flex items-center rounded-full border border-[#E5E5EA] bg-[#E5E5EA]/70 p-1"
+                className="inline-flex items-center rounded-full border border-borderSubtle bg-surfaceAlt p-1"
               >
                 {(["month", "quarter", "ytd"] as const).map((tfId) => {
                   const isActive = timeframe === tfId;
@@ -242,8 +243,8 @@ export function OverviewLandingClient({
                       onClick={() => setTimeframe(tfId)}
                       className={`relative min-h-[44px] rounded-full px-4 py-2 text-xs font-semibold transition ${
                         isActive
-                          ? "bg-white text-[#1C1C1E] shadow-[0_1px_4px_rgba(0,0,0,0.08)]"
-                          : "text-[#5E5E64] hover:text-[#1C1C1E]"
+                          ? "bg-surface text-ink shadow-[0_1px_4px_rgba(0,0,0,0.08)]"
+                          : "text-mutedInk hover:text-ink"
                       }`}
                     >
                       {label}
@@ -260,19 +261,19 @@ export function OverviewLandingClient({
             className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
           >
             {/* 1. Cash on Hand */}
-            <article className="nb-crisp-card-lift group relative overflow-hidden rounded-[24px] border border-[#E5E5EA] bg-white p-6 shadow-[0_4px_16px_rgba(28,28,30,0.04)] hover:border-[#006838]/50 hover:bg-[#F9FCFA] hover:shadow-[0_12px_28px_rgba(0,104,56,0.09)]">
+            <article className="nb-crisp-card-lift group relative overflow-hidden rounded-[24px] border border-borderSubtle bg-surface p-6 shadow-[0_4px_16px_rgba(28,28,30,0.04)] hover:border-[#006838]/50">
               <div className="flex items-center justify-between gap-2">
-                <p className="text-xs font-semibold uppercase tracking-[0.06em] text-[#5E5E64]">
+                <p className="text-xs font-semibold uppercase tracking-[0.06em] text-mutedInk">
                   Cash on Hand
                 </p>
-                <span className="inline-flex h-9 w-9 items-center justify-center rounded-[12px] bg-[#E6F5ED] text-[#006838] shadow-sm transition-transform duration-200 group-hover:-translate-y-0.5">
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-[12px] bg-[#E6F5ED] dark:bg-emerald-950/40 text-[#006838] dark:text-emerald-400 shadow-sm transition-transform duration-200 group-hover:-translate-y-0.5">
                   <Wallet className="h-4 w-4" aria-hidden="true" />
                 </span>
               </div>
-              <p className="mt-4 font-mono text-2xl font-bold tracking-[-0.025em] tabular-nums text-[#1C1C1E] sm:text-[26px]">
-                ₦{bankBalanceNgn}
+              <p className="mt-4 font-mono text-2xl font-bold tracking-[-0.025em] tabular-nums text-ink sm:text-[26px]">
+                <NairaSign className="mr-0.5" />{bankBalanceNgn}
               </p>
-              <p className="mt-2 text-xs text-[#5E5E64]">
+              <p className="mt-2 text-xs text-mutedInk">
                 {mode === "pro"
                   ? `1110 Zenith, GTBank & Moniepoint POS (${accountCount} GL)`
                   : "Combined liquid balance across bank & POS"}
@@ -280,9 +281,9 @@ export function OverviewLandingClient({
             </article>
 
             {/* 2. Net Income */}
-            <article className="nb-crisp-card-lift group relative overflow-hidden rounded-[24px] border border-[#E5E5EA] bg-white p-6 shadow-[0_4px_16px_rgba(28,28,30,0.04)] hover:border-[#006838]/50 hover:bg-[#F9FCFA] hover:shadow-[0_12px_28px_rgba(0,104,56,0.09)]">
+            <article className="nb-crisp-card-lift group relative overflow-hidden rounded-[24px] border border-borderSubtle bg-surface p-6 shadow-[0_4px_16px_rgba(28,28,30,0.04)] hover:border-[#006838]/50">
               <div className="flex items-center justify-between gap-2">
-                <p className="text-xs font-semibold uppercase tracking-[0.06em] text-[#5E5E64]">
+                <p className="text-xs font-semibold uppercase tracking-[0.06em] text-mutedInk">
                   Net Income
                 </p>
                 <Badge variant="emerald" className="gap-1 px-2.5 py-0.5 font-mono text-[11px] shadow-sm transition-transform duration-200 group-hover:-translate-y-0.5">
@@ -290,10 +291,10 @@ export function OverviewLandingClient({
                   {activePeriod.netIncomeDelta}
                 </Badge>
               </div>
-              <p className="mt-4 font-mono text-2xl font-bold tracking-[-0.025em] tabular-nums text-[#1C1C1E] sm:text-[26px]">
-                ₦{activePeriod.netIncomeNgn}
+              <p className="mt-4 font-mono text-2xl font-bold tracking-[-0.025em] tabular-nums text-ink sm:text-[26px]">
+                <NairaSign className="mr-0.5" />{activePeriod.netIncomeNgn}
               </p>
-              <p className="mt-2 text-xs text-[#5E5E64]">
+              <p className="mt-2 text-xs text-mutedInk">
                 {mode === "pro"
                   ? `Net Surplus after OpEx · ${activePeriod.label}`
                   : `Revenue minus expenses · ${activePeriod.label}`}
@@ -301,19 +302,19 @@ export function OverviewLandingClient({
             </article>
 
             {/* 3. Total Receivables */}
-            <article className="nb-crisp-card-lift group relative overflow-hidden rounded-[24px] border border-[#E5E5EA] bg-white p-6 shadow-[0_4px_16px_rgba(28,28,30,0.04)] hover:border-[#0F4C81]/50 hover:bg-[#F9FAFC] hover:shadow-[0_12px_28px_rgba(15,76,129,0.09)]">
+            <article className="nb-crisp-card-lift group relative overflow-hidden rounded-[24px] border border-borderSubtle bg-surface p-6 shadow-[0_4px_16px_rgba(28,28,30,0.04)] hover:border-[#0F4C81]/50">
               <div className="flex items-center justify-between gap-2">
-                <p className="text-xs font-semibold uppercase tracking-[0.06em] text-[#5E5E64]">
+                <p className="text-xs font-semibold uppercase tracking-[0.06em] text-mutedInk">
                   Total Receivables
                 </p>
-                <span className="inline-flex h-9 w-9 items-center justify-center rounded-[12px] bg-[#EAF3FC] text-[#0F4C81] shadow-sm transition-transform duration-200 group-hover:-translate-y-0.5">
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-[12px] bg-[#EAF3FC] dark:bg-sky-950/40 text-[#0F4C81] dark:text-sky-400 shadow-sm transition-transform duration-200 group-hover:-translate-y-0.5">
                   <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
                 </span>
               </div>
-              <p className="mt-4 font-mono text-2xl font-bold tracking-[-0.025em] tabular-nums text-[#1C1C1E] sm:text-[26px]">
-                ₦{receivablesNgn}
+              <p className="mt-4 font-mono text-2xl font-bold tracking-[-0.025em] tabular-nums text-ink sm:text-[26px]">
+                <NairaSign className="mr-0.5" />{receivablesNgn}
               </p>
-              <p className="mt-2 text-xs text-[#5E5E64]">
+              <p className="mt-2 text-xs text-mutedInk">
                 {mode === "pro"
                   ? `1200 Trade AR · ${OVERDUE_INVOICES.length} past due invoices`
                   : `Open customer invoices (${OVERDUE_INVOICES.length} overdue)`}
@@ -321,19 +322,19 @@ export function OverviewLandingClient({
             </article>
 
             {/* 4. Total Payables */}
-            <article className="nb-crisp-card-lift group relative overflow-hidden rounded-[24px] border border-[#E5E5EA] bg-white p-6 shadow-[0_4px_16px_rgba(28,28,30,0.04)] hover:border-[#1C1C1E]/40 hover:bg-[#FBFBFD] hover:shadow-[0_12px_28px_rgba(28,28,30,0.08)]">
+            <article className="nb-crisp-card-lift group relative overflow-hidden rounded-[24px] border border-borderSubtle bg-surface p-6 shadow-[0_4px_16px_rgba(28,28,30,0.04)] hover:border-[#1C1C1E]/40">
               <div className="flex items-center justify-between gap-2">
-                <p className="text-xs font-semibold uppercase tracking-[0.06em] text-[#5E5E64]">
+                <p className="text-xs font-semibold uppercase tracking-[0.06em] text-mutedInk">
                   Total Payables
                 </p>
-                <span className="inline-flex h-9 w-9 items-center justify-center rounded-[12px] bg-[#F2F2F7] text-[#1C1C1E] shadow-sm transition-transform duration-200 group-hover:-translate-y-0.5">
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-[12px] bg-surfaceAlt text-ink shadow-sm transition-transform duration-200 group-hover:-translate-y-0.5">
                   <Receipt className="h-4 w-4" aria-hidden="true" />
                 </span>
               </div>
-              <p className="mt-4 font-mono text-2xl font-bold tracking-[-0.025em] tabular-nums text-[#1C1C1E] sm:text-[26px]">
-                ₦{payablesNgn}
+              <p className="mt-4 font-mono text-2xl font-bold tracking-[-0.025em] tabular-nums text-ink sm:text-[26px]">
+                <NairaSign className="mr-0.5" />{payablesNgn}
               </p>
-              <p className="mt-2 text-xs text-[#5E5E64]">
+              <p className="mt-2 text-xs text-mutedInk">
                 {mode === "pro"
                   ? "2100 Trade AP + NRS 7.5% VAT & WHT due <= 30d"
                   : "Vendor bills & taxes due within 30 days"}
@@ -347,24 +348,24 @@ export function OverviewLandingClient({
             className="grid gap-6 lg:grid-cols-12"
           >
             {/* Chart 1: Cash Flow Trend (6 Months Dual Bar) */}
-            <div className="rounded-[28px] border border-[#E5E5EA] bg-white p-6 shadow-[0_6px_20px_rgba(28,28,30,0.04)] sm:p-8 lg:col-span-7">
+            <div className="rounded-[28px] border border-borderSubtle bg-surface p-6 shadow-[0_6px_20px_rgba(28,28,30,0.04)] sm:p-8 lg:col-span-7">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                  <h2 className="text-lg font-bold tracking-[-0.02em] text-[#1C1C1E]">
+                  <h2 className="text-lg font-bold tracking-[-0.02em] text-ink">
                     Cash Flow Trend
                   </h2>
-                  <p className="mt-0.5 text-xs text-[#5E5E64]">
+                  <p className="mt-0.5 text-xs text-mutedInk">
                     {activePeriod.cashFlowSummary}
                   </p>
                 </div>
 
-                <div className="flex items-center gap-4 text-xs font-medium text-[#1C1C1E]">
+                <div className="flex items-center gap-4 text-xs font-medium text-ink">
                   <span className="inline-flex items-center gap-1.5">
                     <span className="h-2.5 w-2.5 rounded-full bg-[#006838]" aria-hidden="true" />
                     Money In
                   </span>
                   <span className="inline-flex items-center gap-1.5">
-                    <span className="h-2.5 w-2.5 rounded-full bg-[#94A3B8]" aria-hidden="true" />
+                    <span className="h-2.5 w-2.5 rounded-full bg-[#94A3B8] dark:bg-slate-500" aria-hidden="true" />
                     Money Out
                   </span>
                 </div>
@@ -373,7 +374,7 @@ export function OverviewLandingClient({
               <div
                 role="img"
                 aria-label="Six month Cash Flow Trend comparing Money In against Money Out"
-                className="mt-8 grid grid-cols-6 items-end gap-3 border-b border-[#E5E5EA] pb-3 sm:gap-5"
+                className="mt-8 grid grid-cols-6 items-end gap-3 border-b border-borderSubtle pb-3 sm:gap-5"
               >
                 {activePeriod.cashFlowBars.map((item) => (
                   <div key={item.label} className="flex flex-col items-center gap-2">
@@ -392,14 +393,14 @@ export function OverviewLandingClient({
                         animate={{ height: `${item.outflowPct}%` }}
                         transition={{ duration: 0.45, ease: "easeOut", delay: 0.05 }}
                         title={`${item.label} Money Out: ${item.outflowNgn}`}
-                        className="w-4 rounded-t-[6px] bg-[#94A3B8] sm:w-5"
+                        className="w-4 rounded-t-[6px] bg-[#94A3B8] dark:bg-slate-500 sm:w-5"
                       />
                     </div>
                     <span
                       className={`text-xs ${
                         item.isCurrent
-                          ? "font-bold text-[#1C1C1E]"
-                          : "font-medium text-[#5E5E64]"
+                          ? "font-bold text-ink"
+                          : "font-medium text-mutedInk"
                       }`}
                     >
                       {item.label}
@@ -410,12 +411,12 @@ export function OverviewLandingClient({
             </div>
 
             {/* Chart 2: Top Expense Categories (Minimal Horizontal Bars) */}
-            <div className="rounded-[28px] border border-[#E5E5EA] bg-white p-6 shadow-[0_6px_20px_rgba(28,28,30,0.04)] sm:p-8 lg:col-span-5">
+            <div className="rounded-[28px] border border-borderSubtle bg-surface p-6 shadow-[0_6px_20px_rgba(28,28,30,0.04)] sm:p-8 lg:col-span-5">
               <div>
-                <h2 className="text-lg font-bold tracking-[-0.02em] text-[#1C1C1E]">
+                <h2 className="text-lg font-bold tracking-[-0.02em] text-ink">
                   Top Expense Categories
                 </h2>
-                <p className="mt-0.5 text-xs text-[#5E5E64]">
+                <p className="mt-0.5 text-xs text-mutedInk">
                   Top 4 spending areas for {activePeriod.label}
                 </p>
               </div>
@@ -424,15 +425,15 @@ export function OverviewLandingClient({
                 {activePeriod.topExpenses.map((cat) => (
                   <div key={cat.id} className="space-y-2">
                     <div className="flex items-baseline justify-between gap-2 text-xs">
-                      <span className="font-semibold text-[#1C1C1E]">
+                      <span className="font-semibold text-ink">
                         {mode === "pro" ? cat.proCode : cat.label}
                       </span>
-                      <span className="font-mono font-semibold tabular-nums text-[#1C1C1E]">
+                      <span className="font-mono font-semibold tabular-nums text-ink">
                         {cat.amountNgn}{" "}
-                        <span className="font-normal text-[#5E5E64]">({cat.sharePct}%)</span>
+                        <span className="font-normal text-mutedInk">({cat.sharePct}%)</span>
                       </span>
                     </div>
-                    <div className="h-2.5 w-full overflow-hidden rounded-full bg-[#F2F2F7]">
+                    <div className="h-2.5 w-full overflow-hidden rounded-full bg-surfaceAlt">
                       <motion.div
                         key={`${timeframe}-${cat.id}`}
                         initial={prefersReduced ? false : { width: 0 }}
@@ -450,17 +451,17 @@ export function OverviewLandingClient({
           {/* Bottom Compact Actionable Alerts */}
           <section
             aria-labelledby="actionable-alerts-heading"
-            className="rounded-[28px] border border-[#E5E5EA] bg-white p-6 shadow-[0_6px_20px_rgba(28,28,30,0.04)] sm:p-8"
+            className="rounded-[28px] border border-borderSubtle bg-surface p-6 shadow-[0_6px_20px_rgba(28,28,30,0.04)] sm:p-8"
           >
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h2
                   id="actionable-alerts-heading"
-                  className="text-lg font-bold tracking-[-0.02em] text-[#1C1C1E]"
+                  className="text-lg font-bold tracking-[-0.02em] text-ink"
                 >
                   Daily Actionable Alerts
                 </h2>
-                <p className="mt-0.5 text-xs text-[#5E5E64]">
+                <p className="mt-0.5 text-xs text-mutedInk">
                   Clear these quick items to keep your dashboard figures 100% accurate.
                 </p>
               </div>
@@ -468,7 +469,7 @@ export function OverviewLandingClient({
                 <p
                   role="status"
                   aria-live="polite"
-                  className="rounded-full bg-[#E6F5ED] px-3.5 py-1.5 text-xs font-medium text-[#00582E]"
+                  className="rounded-full bg-[#E6F5ED] dark:bg-emerald-950/40 px-3.5 py-1.5 text-xs font-medium text-[#00582E] dark:text-emerald-400"
                 >
                   {reminderNotice}
                 </p>
@@ -477,18 +478,18 @@ export function OverviewLandingClient({
 
             <div className="mt-6 grid gap-6 lg:grid-cols-12">
               {/* Unreconciled Transactions Alert */}
-              <div className="nb-crisp-card-lift flex flex-col justify-between rounded-[20px] border border-[#E5E5EA] bg-[#FAFAFC] p-5 lg:col-span-5 hover:border-[#006838]/50 hover:bg-white hover:shadow-[0_10px_24px_rgba(0,104,56,0.06)]">
+              <div className="nb-crisp-card-lift flex flex-col justify-between rounded-[20px] border border-borderSubtle bg-surfaceAlt p-5 lg:col-span-5 hover:border-[#006838]/50 hover:bg-surface hover:shadow-[0_10px_24px_rgba(0,104,56,0.06)]">
                 <div>
                   <div className="flex items-center justify-between gap-2">
-                    <span className="inline-flex items-center gap-2 text-sm font-bold text-[#1C1C1E]">
-                      <FileWarning className="h-4 w-4 text-[#006838]" aria-hidden="true" />
+                    <span className="inline-flex items-center gap-2 text-sm font-bold text-ink">
+                      <FileWarning className="h-4 w-4 text-[#006838] dark:text-emerald-400" aria-hidden="true" />
                       Unreconciled Transactions
                     </span>
-                    <Badge variant="outline" className="font-mono text-[#1C1C1E]">
+                    <Badge variant="outline" className="font-mono text-ink border-borderSubtle">
                       {activePeriod.unreconciledCount} pending
                     </Badge>
                   </div>
-                  <p className="mt-2 text-xs leading-relaxed text-[#5E5E64]">
+                  <p className="mt-2 text-xs leading-relaxed text-mutedInk">
                     {activePeriod.unreconciledCount} Zenith Bank &amp; Moniepoint POS bank feed
                     lines are waiting for quick category match.
                   </p>
@@ -505,21 +506,21 @@ export function OverviewLandingClient({
               </div>
 
               {/* 3 Oldest Overdue Invoices */}
-              <div className="nb-crisp-card-lift rounded-[20px] border border-[#E5E5EA] bg-[#FAFAFC] p-5 lg:col-span-7 hover:border-[#0F4C81]/50 hover:bg-white hover:shadow-[0_10px_24px_rgba(15,76,129,0.06)]">
+              <div className="nb-crisp-card-lift rounded-[20px] border border-borderSubtle bg-surfaceAlt p-5 lg:col-span-7 hover:border-[#0F4C81]/50 hover:bg-surface hover:shadow-[0_10px_24px_rgba(15,76,129,0.06)]">
                 <div className="flex items-center justify-between gap-2">
-                  <h3 className="flex items-center gap-2 text-sm font-bold text-[#1C1C1E]">
-                    <BellRing className="h-4 w-4 text-[#0F4C81]" aria-hidden="true" />
+                  <h3 className="flex items-center gap-2 text-sm font-bold text-ink">
+                    <BellRing className="h-4 w-4 text-[#0F4C81] dark:text-sky-400" aria-hidden="true" />
                     Overdue Invoices (3 Oldest)
                   </h3>
                   <Link
                     href="/books/journal"
-                    className="text-xs font-semibold text-[#00582E] underline-offset-4 hover:underline"
+                    className="text-xs font-semibold text-[#00582E] dark:text-emerald-400 underline-offset-4 hover:underline"
                   >
                     Open Books &rarr;
                   </Link>
                 </div>
 
-                <div className="mt-3 divide-y divide-[#E5E5EA]">
+                <div className="mt-3 divide-y divide-borderSubtle">
                   {OVERDUE_INVOICES.map((inv) => {
                     const alreadyReminded = remindedIds.includes(inv.id);
                     return (
@@ -528,16 +529,16 @@ export function OverviewLandingClient({
                         className="flex flex-wrap items-center justify-between gap-3 py-3 first:pt-2 last:pb-0"
                       >
                         <div>
-                          <p className="text-xs font-semibold text-[#1C1C1E]">
+                          <p className="text-xs font-semibold text-ink">
                             {inv.clientName}
                           </p>
-                          <p className="text-[11px] text-[#5E5E64]">
+                          <p className="text-[11px] text-mutedInk">
                             {inv.invoiceRef} &middot; {inv.daysOverdue} days overdue
                           </p>
                         </div>
 
                         <div className="flex items-center gap-3">
-                          <span className="font-mono text-xs font-bold tabular-nums text-[#1C1C1E]">
+                          <span className="font-mono text-xs font-bold tabular-nums text-ink">
                             {inv.amountNgn}
                           </span>
                           <button
@@ -545,8 +546,8 @@ export function OverviewLandingClient({
                             onClick={() => handleSendReminder(inv)}
                             className={`inline-flex min-h-[44px] items-center gap-1 rounded-full px-3.5 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006838] ${
                               alreadyReminded
-                                ? "bg-[#E6F5ED] text-[#00582E]"
-                                : "border border-[#D1D1D6] bg-white text-[#1C1C1E] hover:bg-[#F2F2F7]"
+                                ? "bg-[#E6F5ED] dark:bg-emerald-950/40 text-[#00582E] dark:text-emerald-400"
+                                : "border border-borderSubtle bg-surface text-ink hover:bg-surfaceAlt"
                             }`}
                           >
                             {alreadyReminded ? (

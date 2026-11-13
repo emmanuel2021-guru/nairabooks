@@ -208,7 +208,7 @@ describe("Google Stitch Product Landing, Login & Create Account Flows", () => {
 
     // Global Date Filter updates metrics consistently across dashboard
     fireEvent.click(screen.getByRole("button", { name: /Year to Date/i }));
-    expect(screen.getByText(/₦58,410,000\.00/i)).toBeTruthy();
+    expect(screen.getByText(/58,410,000\.00/i)).toBeTruthy();
     expect(screen.getByText(/\+18\.4%/i)).toBeTruthy();
     expect(screen.getByText(/21 pending/i)).toBeTruthy();
 

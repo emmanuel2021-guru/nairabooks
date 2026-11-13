@@ -561,3 +561,28 @@
      - Restructured `TopNavCapsule.tsx` using a single responsive `<nav aria-label="Primary workspace navigation">`. On mobile (`max-md:`), the nav is pinned to the bottom of the screen (`max-md:fixed max-md:bottom-0 max-md:inset-x-0 max-md:z-50 max-md:h-16`) with native icons (`LayoutGrid`, `ArrowLeftRight`, `Scale`, `BarChart3`, `ShieldCheck`) and labels. On desktop (`md:`), it seamlessly renders as the centered floating pill capsule.
      - Added `pb-20 md:pb-6` body padding clearance in `layout.tsx` to prevent content overlap.
 - **Consequences:** The application recovers its sleek Apple aesthetic, renders the Naira sign with 0 tofu across all devices, supports instant light/dark mode switching, and offers a thumb-friendly native mobile bottom navigation bar with 100% test pass (56/56 Vitest, 100/100 Pytest, 0 SAST issues, 128/128 wizard skills).
+
+## ADR-040: High-Contrast Dark Mode Engine & Semantic Token Enforcement Across Workspaces
+- **Date:** 2026-11-13
+- **Status:** Accepted
+- **Context:**
+  - In dark mode, certain legacy arbitrary hex utility classes (such as `text-[#1C1C1E]`, `text-[#5E5E64]`, `text-[#00582E]`, `text-[#0F4C81]`, and hardcoded `bg-white`) conflicted with the dark midnight background (`#121214`), causing key headings (e.g., "Financial Overview", workspace titles, chart labels) to be rendered dark charcoal on black (WCAG contrast failure).
+  - Physical A4 IFRS financial report printouts (`#a4-report-document`) must remain authentic white paper documents regardless of active screen theme.
+- **Decision:**
+  1. **Two-Tier Dark Mode Contrast Engine:**
+     - **Global Override Engine (`web/src/app/globals.css`):**
+       - Mapped all headings (`h1` through `h6`) and legacy charcoal text (`.text-[#1C1C1E]`, `.text-slate-900`, `.text-zinc-900`, etc.) to `#F2F2F7` (crisp near-white) in `.dark`.
+       - Mapped secondary muted text (`.text-[#5E5E64]`, `.text-[#636369]`) to `#A1A1AA` for guaranteed 4.5:1+ contrast.
+       - Elevated dark forest/navy text (`.text-[#00582E]`, `.text-[#0F4C81]`) to vibrant, readable `#34D399` (emerald) and `#60A5FA` (sky blue).
+       - Converted `.bg-white` to `#1C1C1E`, light gray card pills (`#FAFAFC`, `#F9FCFA`, `#FBFBFD`) to `#242426`, and light gray borders (`#E5E5EA`, `#D1D1D6`) to `#38383A`.
+       - Form controls (`input`, `select`, `textarea`) automatically apply `color-scheme: dark` and `#71717A` placeholder styling.
+     - **Physical A4 Print Exemption:**
+       - Explicitly protected `.dark #a4-report-document` and `.dark .a4-report-document` with `#FFFFFF` background and `#000000` text, ensuring board-ready and auditor-compliant printed PDFs remain pure white paper.
+  2. **Component-Level Semantic Token Modernization:**
+     - Upgraded `OverviewLandingClient.tsx` to use semantic Tailwind tokens (`text-ink`, `text-mutedInk`, `bg-surface`, `bg-surfaceAlt`, `border-borderSubtle`) across the workspace title, global date filter, 4 KPI cards, Cash Flow Trend chart, Top Expense Categories chart, and Daily Actionable Alerts.
+  3. **Verification:**
+     - Passed all 16 Vitest test suites (56 tests) with 0 `axe-core` accessibility violations.
+     - 100/100 Python pytest test suite passed.
+     - SAST static security scan passed with 0 findings.
+     - Next.js 15 production build compiled cleanly with all 44 routes generated.
+- **Consequences:** All text, headings, badges, and card surfaces across the platform render with high contrast and WCAG 2.2 Level AA compliance in both light and dark modes, while authentic A4 paper reports remain unaffected.

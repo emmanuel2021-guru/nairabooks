@@ -620,3 +620,32 @@
      - Next.js 15 production build compiled all 44 routes cleanly.
      - `verify_workflow.py` verified 128/128 wizard skills (100% complete).
 - **Consequences:** The application feels like a native Flutter mobile app on phones with a docked bottom nav and FAB, renders zero Naira tofu glyphs across Android devices, synchronizes reports with live Admin records, provides grouping for operational entities, and exports immaculate A4 PDF reports for corporate management.
+
+## ADR-042: Laptop Naira Glyph Wrapping Resolution, Mobile Landing Page Optimization & Zero-Card Render Deployment
+- **Date:** 2026-11-13
+- **Status:** Accepted
+- **Context:**
+  - On laptop screens (1280px–1440px), the Naira symbol (`₦`) inside the Financial Overview KPI cards wrapped onto line 1 while numeric values (`48,250,000.00`) broke onto line 2 because `NairaSign` had `inline-block` (a browser soft line break point) and cards lacked `whitespace-nowrap` at `text-[26px]` in a 4-column grid.
+  - The public landing page (`/`) needed comprehensive phone optimization: long header buttons crowded viewports on 360px devices, the rotating gyroscope orb overlapped content or caused horizontal scroll, hero typography needed responsive mobile leading, and comparison tables needed smooth horizontal scrolling.
+  - On Render, deploying via Blueprint required entering credit card details for paid service verification, while manual web service deploy failed with `ENOENT: no such file or directory, open '/opt/render/project/src/package.json'` when the root directory was left empty.
+- **Decision:**
+  1. **Atomic Unbroken Currency Flex Binding:**
+     - Updated `NairaSign` in `web/src/components/ui/NairaAmount.tsx` to render with `inline` rather than `inline-block`, eliminating hyphenation opportunities.
+     - Wrapped KPI card currency amounts in `inline-flex items-baseline whitespace-nowrap` with responsive font sizing (`sm:text-2xl xl:text-[22px] 2xl:text-[26px]`), guaranteeing that `₦` and the full numeric string remain an atomic unit that never breaks across multiple lines on laptop displays.
+     - Changed the outer overview container from `text-[#1C1C1E]` to semantic `text-ink` for high contrast in dark mode.
+  2. **Mobile Landing Page Optimization:**
+     - **Header Bar:** Compacting action buttons with responsive labels (`<span className="hidden sm:inline">Contact &amp; </span>Start Free`) and touch-friendly padding.
+     - **Hero Section:** Added `overflow-x-clip` to section root, tuned mobile headline to `text-3xl sm:text-5xl lg:text-[3.25rem] leading-[1.08]`, scaled the floating gyroscope orb to `h-28 w-28 sm:h-40 sm:w-40` with inner button `h-20 w-20 sm:h-32 sm:w-32`, and repositioned to `bottom-16 right-0 sm:bottom-28 sm:-right-4`.
+     - **Interactive Preview Window:** Disabled pointer 3D tilt on touch devices (`if (event.pointerType === "touch") return;`) and added `whitespace-nowrap shrink-0` to transaction amount cells.
+     - **Cashflow Split Cards:** Refined split metrics to `grid-cols-3 gap-1.5 sm:gap-2 p-2 sm:p-3 text-xs sm:text-sm whitespace-nowrap`.
+     - **Direct Comparison Table:** Enclosed `<Table>` inside `<div className="overflow-x-auto -mx-1 sm:mx-0 scrollbar-thin"><Table className="min-w-[540px]">...</div>`, ensuring smooth swipe-to-scroll on mobile viewports.
+  3. **Zero-Card & Zero-Config Render Deployment:**
+     - Added root-level `package.json` with `"postinstall": "npm --prefix web install"` and `"build": "npm --prefix web install && npm --prefix web run build"`, enabling successful builds even if Render's root directory is left at default `/`.
+     - Documented zero-card manual Web Service deployment path on Render Free Tier.
+  4. **Verification:**
+     - 16 Vitest test files (56 tests) passed with 0 `axe-core` accessibility violations.
+     - 100/100 Python pytest test cases passed.
+     - SAST static application security scan passed with 0 vulnerabilities.
+     - Next.js 15 production build compiled cleanly across all 44 routes.
+     - `verify_workflow.py` verified 128/128 wizard skills (100% complete).
+- **Consequences:** The Naira symbol never wraps or breaks on laptops, the public landing page is optimized for mobile touch devices, and the repository builds without configuration errors on Render.

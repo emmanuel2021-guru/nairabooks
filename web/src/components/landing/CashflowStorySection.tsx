@@ -331,33 +331,33 @@ export function CashflowStorySection() {
                   )}
                 </div>
 
-                <div className="grid grid-cols-3 gap-2">
-                  <div className="rounded-[14px] border border-[#E5E5EA] bg-[#F2F2F7]/75 p-3">
-                    <div className="flex items-center gap-1.5 text-xs text-[#5E5E64]">
-                      <span className="h-2 w-2 rounded-full bg-[#006838]" />
-                      You keep
+                <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
+                  <div className="rounded-[14px] border border-[#E5E5EA] bg-[#F2F2F7]/75 p-2 sm:p-3">
+                    <div className="flex items-center gap-1 sm:gap-1.5 text-[11px] sm:text-xs text-[#5E5E64]">
+                      <span className="h-2 w-2 shrink-0 rounded-full bg-[#006838]" />
+                      <span className="truncate">You keep</span>
                     </div>
-                    <p className="mt-1 nb-money-cell text-left text-sm font-bold text-[#1C1C1E]">
+                    <p className="mt-1 nb-money-cell text-left text-xs sm:text-sm font-bold text-[#1C1C1E] whitespace-nowrap">
                       {activePreset.keepAmount}
                     </p>
                   </div>
 
-                  <div className="rounded-[14px] border border-[#E5E5EA] bg-[#F2F2F7]/75 p-3">
-                    <div className="flex items-center gap-1.5 text-xs text-[#5E5E64]">
-                      <span className="h-2 w-2 rounded-full bg-[#D97706]" />
-                      7.5% VAT pot
+                  <div className="rounded-[14px] border border-[#E5E5EA] bg-[#F2F2F7]/75 p-2 sm:p-3">
+                    <div className="flex items-center gap-1 sm:gap-1.5 text-[11px] sm:text-xs text-[#5E5E64]">
+                      <span className="h-2 w-2 shrink-0 rounded-full bg-[#D97706]" />
+                      <span className="truncate">7.5% VAT pot</span>
                     </div>
-                    <p className="mt-1 nb-money-cell text-left text-sm font-bold text-[#1C1C1E]">
+                    <p className="mt-1 nb-money-cell text-left text-xs sm:text-sm font-bold text-[#1C1C1E] whitespace-nowrap">
                       {activePreset.taxAmount}
                     </p>
                   </div>
 
-                  <div className="rounded-[14px] border border-[#E5E5EA] bg-[#F2F2F7]/75 p-3">
-                    <div className="flex items-center gap-1.5 text-xs text-[#5E5E64]">
-                      <span className="h-2 w-2 rounded-full bg-[#71717A]" />
-                      Fee paid
+                  <div className="rounded-[14px] border border-[#E5E5EA] bg-[#F2F2F7]/75 p-2 sm:p-3">
+                    <div className="flex items-center gap-1 sm:gap-1.5 text-[11px] sm:text-xs text-[#5E5E64]">
+                      <span className="h-2 w-2 shrink-0 rounded-full bg-[#71717A]" />
+                      <span className="truncate">Fee paid</span>
                     </div>
-                    <p className="mt-1 nb-money-cell text-left text-sm font-bold text-[#1C1C1E]">
+                    <p className="mt-1 nb-money-cell text-left text-xs sm:text-sm font-bold text-[#1C1C1E] whitespace-nowrap">
                       {activePreset.feeAmount}
                     </p>
                   </div>

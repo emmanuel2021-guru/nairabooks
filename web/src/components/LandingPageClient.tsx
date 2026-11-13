@@ -113,21 +113,23 @@ export function LandingPageClient({
               })}
             </nav>
 
-            <nav aria-label="Landing actions" className="flex items-center gap-2">
+            <nav aria-label="Landing actions" className="flex items-center gap-1.5 sm:gap-2">
               {activeSession ? (
-                <Button asChild className="rounded-full px-5">
+                <Button asChild className="rounded-full px-3.5 sm:px-5 text-xs sm:text-sm">
                   <Link href="/overview">
-                    Open Workspace
-                    <ArrowRight className="h-4 w-4" strokeWidth={2.2} aria-hidden="true" />
+                    <span className="hidden sm:inline">Open </span>Workspace
+                    <ArrowRight className="h-4 w-4 ml-1" strokeWidth={2.2} aria-hidden="true" />
                   </Link>
                 </Button>
               ) : (
                 <>
-                  <Button variant="ghost" asChild className="rounded-full px-4">
+                  <Button variant="ghost" asChild className="rounded-full px-2.5 sm:px-4 text-xs sm:text-sm">
                     <Link href="/login">Sign In</Link>
                   </Button>
-                  <Button asChild className="rounded-full px-5">
-                    <Link href="/signup">Contact &amp; Start Free</Link>
+                  <Button asChild className="rounded-full px-3.5 sm:px-5 text-xs sm:text-sm bg-[#006838] hover:bg-[#00582E]">
+                    <Link href="/signup">
+                      <span className="hidden sm:inline">Contact &amp; </span>Start Free
+                    </Link>
                   </Button>
                 </>
               )}

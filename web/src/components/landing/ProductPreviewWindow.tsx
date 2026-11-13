@@ -275,7 +275,7 @@ export function ProductPreviewWindow() {
     SCENARIOS.find((item) => item.id === scenarioId) ?? SCENARIOS[0];
 
   const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (prefersReduced) return;
+    if (prefersReduced || event.pointerType === "touch") return;
     const rect = event.currentTarget.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
     mouseX.set((event.clientX - rect.left) / rect.width - 0.5);
@@ -511,7 +511,7 @@ export function ProductPreviewWindow() {
                         )}
                       </div>
                     </div>
-                    <span className="nb-money-cell shrink-0 text-sm font-semibold text-[#1C1C1E]">
+                    <span className="nb-money-cell shrink-0 whitespace-nowrap text-sm font-semibold text-[#1C1C1E]">
                       {formatNaira(line.amountNaira)}
                     </span>
                   </motion.li>

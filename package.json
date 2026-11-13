@@ -4,6 +4,7 @@
   "private": true,
   "description": "NairaBooks: Zero-jargon Nigerian IFRS / Tax Act 2025 / CAMA 2020 accounting & business operations platform",
   "scripts": {
+    "postinstall": "npm --prefix web install",
     "build": "npm --prefix web install && npm --prefix web run build",
     "start": "npm --prefix web run start",
     "test": "npm --prefix web test",

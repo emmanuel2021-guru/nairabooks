@@ -46,7 +46,7 @@ export function HeroShowcaseSection() {
   const currentSparkAmount = SPARK_AMOUNTS[sparkIndex] ?? SPARK_AMOUNTS[0];
 
   return (
-    <section className="relative overflow-hidden bg-[#EAECEF] pt-6 sm:pt-10">
+    <section className="relative overflow-x-clip overflow-y-hidden bg-[#EAECEF] pt-6 sm:pt-10">
       {/* Drifting Ambient Studio Emerald Light Sweeps */}
       <motion.div
         aria-hidden="true"
@@ -65,7 +65,7 @@ export function HeroShowcaseSection() {
         style={prefersReduced ? undefined : { x: watermarkX }}
         className="pointer-events-none absolute inset-x-0 bottom-20 flex select-none justify-center overflow-hidden sm:bottom-24"
       >
-        <span className="whitespace-nowrap text-[6.5rem] font-black leading-none tracking-[-0.06em] text-[#006838]/[0.11] sm:text-[10.5rem] lg:text-[13.5rem]">
+        <span className="whitespace-nowrap text-[5rem] font-black leading-none tracking-[-0.06em] text-[#006838]/[0.11] sm:text-[10.5rem] lg:text-[13.5rem]">
           nairabooks
         </span>
       </motion.div>
@@ -158,7 +158,7 @@ export function HeroShowcaseSection() {
               initial={prefersReduced ? false : { scale: 0.97, y: 16 }}
               animate={{ scale: 1, y: 0 }}
               transition={{ type: "spring", stiffness: 200, damping: 22 }}
-              className="relative mx-auto w-full max-w-[400px] sm:max-w-[430px]"
+              className="relative mx-auto w-full max-w-[320px] sm:max-w-[430px]"
             >
               <div className="relative overflow-hidden">
                 <img
@@ -176,9 +176,9 @@ export function HeroShowcaseSection() {
                   repeat: Infinity,
                   ease: "easeInOut",
                 }}
-                className="absolute bottom-24 right-2 z-20 sm:bottom-28 sm:-right-4"
+                className="absolute bottom-16 right-0 z-20 sm:bottom-28 sm:-right-4"
               >
-                <div className="relative flex h-40 w-40 items-center justify-center">
+                <div className="relative flex h-28 w-28 sm:h-40 sm:w-40 items-center justify-center">
                   {/* Expanding Pulsing Halo Ping */}
                   <motion.div
                     aria-hidden="true"
@@ -192,7 +192,7 @@ export function HeroShowcaseSection() {
                       repeat: Infinity,
                       ease: "easeOut",
                     }}
-                    className="pointer-events-none absolute inset-3 rounded-full border-2 border-[#006838]/50"
+                    className="pointer-events-none absolute inset-2 sm:inset-3 rounded-full border-2 border-[#006838]/50"
                   />
 
                   {/* Outer Dashed Gyroscope Ring */}
@@ -219,7 +219,7 @@ export function HeroShowcaseSection() {
                   <motion.svg
                     aria-hidden="true"
                     viewBox="0 0 160 160"
-                    className="pointer-events-none absolute inset-1.5 h-[148px] w-[148px]"
+                    className="pointer-events-none absolute inset-1 sm:inset-1.5 h-[92%] w-[92%] sm:h-[148px] sm:w-[148px]"
                     animate={prefersReduced ? undefined : { rotate: -360 }}
                     transition={{ duration: 7.5, repeat: Infinity, ease: "linear" }}
                   >
@@ -239,21 +239,21 @@ export function HeroShowcaseSection() {
                     whileHover={prefersReduced ? undefined : { scale: 1.07 }}
                     whileTap={prefersReduced ? undefined : { scale: 0.94 }}
                     transition={{ type: "spring", stiffness: 400, damping: 22 }}
-                    className="relative z-10 h-32 w-32 rounded-full"
+                    className="relative z-10 h-20 w-20 sm:h-32 sm:w-32 rounded-full"
                   >
                     <Link
                       href="/signup"
                       aria-label="Get Started Free"
                       className="group relative flex h-full w-full items-center justify-center rounded-full bg-white text-center shadow-[0_22px_50px_-10px_rgba(28,28,30,0.28),inset_0_1px_0_rgba(255,255,255,0.95)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006838]"
                     >
-                      <span className="px-4 text-xs font-bold leading-tight tracking-[-0.015em] text-[#1C1C1E]">
+                      <span className="px-2 sm:px-4 text-[10px] sm:text-xs font-bold leading-tight tracking-[-0.015em] text-[#1C1C1E]">
                         Get started free
                       </span>
                       <span
                         aria-hidden="true"
-                        className="absolute -right-1 top-1 inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#1C1C1E] text-white shadow-lg transition-transform duration-200 group-hover:rotate-90"
+                        className="absolute -right-0.5 top-0 sm:-right-1 sm:top-1 inline-flex h-6 w-6 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-[#1C1C1E] text-white shadow-lg transition-transform duration-200 group-hover:rotate-90"
                       >
-                        <Plus className="h-4 w-4" strokeWidth={2.5} />
+                        <Plus className="h-3 w-3 sm:h-4 sm:w-4" strokeWidth={2.5} />
                       </span>
                     </Link>
                   </motion.div>
@@ -278,7 +278,7 @@ export function HeroShowcaseSection() {
               <span>🇳🇬 Nigeria Tax Act 2025 · 0% CIT Ready</span>
             </div>
 
-            <h1 className="text-4xl font-black leading-[1.05] tracking-[-0.035em] text-[#1C1C1E] sm:text-5xl lg:text-[3.25rem]">
+            <h1 className="text-3xl font-black leading-[1.08] tracking-[-0.035em] text-[#1C1C1E] sm:text-5xl lg:text-[3.25rem]">
               NairaBooks gives you{" "}
               <span className="relative inline-block bg-gradient-to-r from-[#006838] via-[#059669] to-[#C59B27] bg-clip-text text-transparent">
                 total control

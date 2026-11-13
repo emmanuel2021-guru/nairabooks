@@ -313,8 +313,9 @@ export function SectorAndFaqSections() {
         <RevealBlock delay={0.1} yOffset={36}>
           <div ref={tableRef}>
             <Card className="mt-8 overflow-hidden">
-              <Table>
-                <TableHeader className="bg-[#F2F2F7]/80">
+              <div className="overflow-x-auto -mx-1 sm:mx-0 scrollbar-thin">
+                <Table className="min-w-[540px]">
+                  <TableHeader className="bg-[#F2F2F7]/80">
                   <TableRow className="border-[#E5E5EA]">
                     <TableHead className="text-[#1C1C1E]">What matters daily</TableHead>
                     <TableHead className="text-center text-[#5E5E64]">Excel / Notes</TableHead>
@@ -396,7 +397,8 @@ export function SectorAndFaqSections() {
                   ))}
                 </TableBody>
               </Table>
-            </Card>
+            </div>
+          </Card>
           </div>
         </RevealBlock>
       </AnimatedSection>

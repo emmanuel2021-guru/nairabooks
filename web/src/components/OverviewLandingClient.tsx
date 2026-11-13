@@ -191,7 +191,7 @@ export function OverviewLandingClient({
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className="min-h-screen bg-transparent text-[#1C1C1E]">
+      <div className="min-h-screen bg-transparent text-ink">
         <main
           id="main-content"
           className="mx-auto max-w-6xl space-y-8 px-4 py-8 pb-sticky-clearance sm:px-6 sm:py-10"
@@ -270,8 +270,11 @@ export function OverviewLandingClient({
                   <Wallet className="h-4 w-4" aria-hidden="true" />
                 </span>
               </div>
-              <p className="mt-4 font-mono text-2xl font-bold tracking-[-0.025em] tabular-nums text-ink sm:text-[26px]">
-                <NairaSign className="mr-0.5" />{bankBalanceNgn}
+              <p className="mt-4 flex items-baseline whitespace-nowrap font-mono text-xl font-bold tracking-[-0.025em] tabular-nums text-ink sm:text-2xl xl:text-[22px] 2xl:text-[26px]">
+                <span className="inline-flex items-baseline whitespace-nowrap">
+                  <NairaSign className="mr-0.5 shrink-0" />
+                  <span>{bankBalanceNgn}</span>
+                </span>
               </p>
               <p className="mt-2 text-xs text-mutedInk">
                 {mode === "pro"
@@ -291,8 +294,11 @@ export function OverviewLandingClient({
                   {activePeriod.netIncomeDelta}
                 </Badge>
               </div>
-              <p className="mt-4 font-mono text-2xl font-bold tracking-[-0.025em] tabular-nums text-ink sm:text-[26px]">
-                <NairaSign className="mr-0.5" />{activePeriod.netIncomeNgn}
+              <p className="mt-4 flex items-baseline whitespace-nowrap font-mono text-xl font-bold tracking-[-0.025em] tabular-nums text-ink sm:text-2xl xl:text-[22px] 2xl:text-[26px]">
+                <span className="inline-flex items-baseline whitespace-nowrap">
+                  <NairaSign className="mr-0.5 shrink-0" />
+                  <span>{activePeriod.netIncomeNgn}</span>
+                </span>
               </p>
               <p className="mt-2 text-xs text-mutedInk">
                 {mode === "pro"
@@ -311,8 +317,11 @@ export function OverviewLandingClient({
                   <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
                 </span>
               </div>
-              <p className="mt-4 font-mono text-2xl font-bold tracking-[-0.025em] tabular-nums text-ink sm:text-[26px]">
-                <NairaSign className="mr-0.5" />{receivablesNgn}
+              <p className="mt-4 flex items-baseline whitespace-nowrap font-mono text-xl font-bold tracking-[-0.025em] tabular-nums text-ink sm:text-2xl xl:text-[22px] 2xl:text-[26px]">
+                <span className="inline-flex items-baseline whitespace-nowrap">
+                  <NairaSign className="mr-0.5 shrink-0" />
+                  <span>{receivablesNgn}</span>
+                </span>
               </p>
               <p className="mt-2 text-xs text-mutedInk">
                 {mode === "pro"
@@ -322,7 +331,7 @@ export function OverviewLandingClient({
             </article>
 
             {/* 4. Total Payables */}
-            <article className="nb-crisp-card-lift group relative overflow-hidden rounded-[24px] border border-borderSubtle bg-surface p-6 shadow-[0_4px_16px_rgba(28,28,30,0.04)] hover:border-[#1C1C1E]/40">
+            <article className="nb-crisp-card-lift group relative overflow-hidden rounded-[24px] border border-borderSubtle bg-surface p-6 shadow-[0_4px_16px_rgba(28,28,30,0.04)] hover:border-ink/40">
               <div className="flex items-center justify-between gap-2">
                 <p className="text-xs font-semibold uppercase tracking-[0.06em] text-mutedInk">
                   Total Payables
@@ -331,8 +340,11 @@ export function OverviewLandingClient({
                   <Receipt className="h-4 w-4" aria-hidden="true" />
                 </span>
               </div>
-              <p className="mt-4 font-mono text-2xl font-bold tracking-[-0.025em] tabular-nums text-ink sm:text-[26px]">
-                <NairaSign className="mr-0.5" />{payablesNgn}
+              <p className="mt-4 flex items-baseline whitespace-nowrap font-mono text-xl font-bold tracking-[-0.025em] tabular-nums text-ink sm:text-2xl xl:text-[22px] 2xl:text-[26px]">
+                <span className="inline-flex items-baseline whitespace-nowrap">
+                  <NairaSign className="mr-0.5 shrink-0" />
+                  <span>{payablesNgn}</span>
+                </span>
               </p>
               <p className="mt-2 text-xs text-mutedInk">
                 {mode === "pro"

@@ -1021,3 +1021,35 @@
   - `uv run python scripts/run_sast_scan.py`: **0 vulnerabilities (clean pass)**.
   - `npm --prefix web run build`: **Compiled successfully in 18.7s, all 44 routes generated cleanly**.
   - `uv run python scripts/verify_workflow.py --project .`: **128 / 128 wizard skills verified (100%)**.
+
+### 2026-11-13: Laptop Naira Wrapping Resolution, Landing Page Mobile Optimization & Zero-Card Render Hosting
+- **Plain-English Summary (Non-Developers):**
+  - **Laptop Screen Naira Sign Wrapping Fixed:** Resolved the issue where the Naira symbol (`₦`) broke onto line 1 while large figures (`48,250,000.00`) wrapped onto line 2 in the 4 top KPI cards on laptop displays (1280px–1440px). Changed `NairaSign` to inline rendering, bound the symbol and numeric text together using `inline-flex whitespace-nowrap`, and optimized font sizing (`xl:text-[22px] 2xl:text-[26px]`) to give 14-character balances ample room without wrapping.
+  - **Dark Mode Heading Readability:** Fixed the Financial Overview root container to use semantic `text-ink` instead of hardcoded charcoal hex values, guaranteeing bright near-white text in dark mode.
+  - **Public Landing Page Mobile Optimization:**
+    - Compacted navigation buttons ("Start Free" and "Sign In") with responsive labels to fit comfortably on 360px–390px mobile phone screens.
+    - Added `overflow-x-clip` to prevent unwanted horizontal scrolling.
+    - Scaled down the rotating gyroscope CTA orb (`h-28 w-28 sm:h-40 sm:w-40`) and repositioned it so it never obscures the founder photo or pushes beyond viewport margins.
+    - Disabled mouse 3D tilt on mobile touch devices (`if (event.pointerType === "touch") return;`) to eliminate jarring gyro shifts during mobile scrolling.
+    - Added responsive padding and `whitespace-nowrap` to cashflow split cards and transaction rows.
+    - Wrapped the Direct Comparison Table in an interactive swipe-to-scroll container (`overflow-x-auto min-w-[540px]`), keeping all 4 columns legible on mobile devices.
+  - **Zero-Card & Zero-Config Render Deployment:**
+    - Configured root `package.json` with `"postinstall": "npm --prefix web install"` and `"build": "npm --prefix web install && npm --prefix web run build"`, enabling builds to succeed automatically even if Render defaults to root `/`.
+    - Documented how to deploy on Render's 100% Free Web Service tier with zero credit card or billing information required.
+- **Files Created / Changed:**
+  - `web/src/components/ui/NairaAmount.tsx`: Inline NairaSign and whitespace-nowrap flex unit.
+  - `web/src/components/OverviewLandingClient.tsx`: Atomic inline-flex binding, responsive font scaling, and semantic `text-ink` container.
+  - `web/src/components/LandingPageClient.tsx`: Responsive button sizing in landing header.
+  - `web/src/components/landing/HeroShowcaseSection.tsx`: Responsive hero typography, scaled gyroscope orb, and horizontal overflow clipping.
+  - `web/src/components/landing/ProductPreviewWindow.tsx`: Touch event tilt bypass and whitespace-nowrap transaction amount cells.
+  - `web/src/components/landing/CashflowStorySection.tsx`: Responsive grid gap, padding, and single-line split figures on mobile.
+  - `web/src/components/landing/SectorAndFaqSections.tsx`: Responsive horizontally scrollable comparison table.
+  - `package.json`: Root build, postinstall, and test scripts for automated Render deployment.
+  - `docs/DECISIONS.md`: Logged `ADR-042`.
+- **Verification Commands & Results:**
+  - `npm --prefix web run typecheck`: **0 errors**.
+  - `npm --prefix web test`: **16 test files / 56 Vitest tests passed (0 axe-core violations)**.
+  - `uv run pytest -q`: **100 passed** in 100%.
+  - `uv run python scripts/run_sast_scan.py`: **0 vulnerabilities (clean pass)**.
+  - `npm --prefix web run build`: **Compiled successfully in 24.3s, all 44 routes generated cleanly**.
+  - `uv run python scripts/verify_workflow.py --project .`: **128 / 128 wizard skills verified (100%)**.

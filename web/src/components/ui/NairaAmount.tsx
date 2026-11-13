@@ -7,7 +7,7 @@ export function NairaSign({
 }) {
   return (
     <span
-      className={`font-sans font-medium select-none inline-block ${className}`}
+      className={`font-sans font-medium select-none inline ${className}`}
       aria-hidden="true"
     >
       ₦
@@ -32,9 +32,9 @@ export function NairaAmount({
   }).format(amount);
 
   return (
-    <span className={`inline-flex items-baseline ${className}`}>
+    <span className={`inline-flex items-baseline whitespace-nowrap ${className}`}>
       <span
-        className="font-sans font-medium text-[0.88em] mr-0.5 select-none inline-block"
+        className="font-sans font-medium text-[0.88em] mr-0.5 select-none inline"
         aria-hidden="true"
       >
         ₦

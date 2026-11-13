@@ -1,9 +1,9 @@
 # Session Handoff — NairaBooks
 
 - **Date:** 2026-11-13
-- **Current Stage:** Phase 5 & 6 Revamp: Universal Naira Glyph Isolation, Flutter Mobile Architecture, Live Linked Reports & Category Grouping
+- **Current Stage:** Phase 5 & 6 Polish: Laptop Naira Line-Wrap Resolution, Mobile Landing Page Optimization & Zero-Card Render Deployment
 - **Verified Passing Across All Suites:**
-  - `npm --prefix web run build` (`44` routes compiled cleanly in 18.7s)
+  - `npm --prefix web run build` (`44` routes compiled cleanly in 24.3s)
   - `uv run pytest -q` (`100 passed` across 26 test modules in 100%)
   - `uv run ruff check src tests` (`All checks passed!`)
   - `uv run mypy src tests` (`Success: no issues found in 100 source files`)
@@ -16,14 +16,11 @@
   - `uv run python scripts/audit_dependencies.py` (`100% permissive licenses verified`)
   - `uv run python scripts/verify_workflow.py --project .` (`128 / 128` wizard skills verified, `executed=128`, **100% Complete**)
 - **Summary of Recent Changes:**
-  1. **Universal Naira Glyph Fix (`₦`):** Eradicated missing Naira tofu boxes (`▯`) on Android and Samsung Internet across Top Expense Categories, Overdue Invoices, and Admin tables. Font stacks isolate `U+20A6` through `'NairaGlyphFallback'`, `'Roboto'`, and `'Samsung Sans'`, while `renderWithNairaSign()` ensures the currency symbol renders safely in system sans-serif while keeping numbers in tabular monospace.
-  2. **Flutter-Style Mobile App Architecture:**
-     - Fixed mobile bottom navigation bar so it is anchored to the true bottom of the phone screen (resolving the CSS containment trap where parent `backdrop-blur` held `fixed` elements at the top).
-     - Added a native Flutter-style Floating Action Button (FAB) `+` above the bottom nav (`bottom-20 right-4`). Tapping the FAB triggers an animated modal bottom sheet providing 1-tap quick actions: Record Sales Invoice, Record Vendor Bill, Record Customer Payment, Add New Customer, and Add Stock Item.
-  3. **Reports Data Linked Directly to Admin & Live Company Name:** Replaced hardcoded "NairaBooks Enterprise Limited" across all reports with the user's active company: **"Lagos Trading & Hospitality Ltd"** (RC `1482910`, TIN `23094921-0001`). Linked Aged Receivables, Invoice Register, Aged Payables, Inventory Valuation, Payroll Register, and Unbilled Tickets directly to `loadAdminRecords()`.
-  4. **Admin Record Grouping (Customers, Vendors, Employees, Stock):** Added an interactive View Mode toggle in Admin (`[Group by Category] | [Flat List]`). Grouped view displays categorized accordion cards with folder icons, category titles, item count badges, and subtotal metrics.
-  5. **Management-Grade A4 PDF Export:** Completely isolated the printable document from web application screen chrome (headings, KPI summary cards, filter buttons, export dropdowns) via `.no-print` wrappers and print CSS rules. Printed and exported PDFs render exclusively as a pristine, professional letterhead document for the Board and auditors.
-  6. **Verification & Clean Build:** All 16 Vitest test files (56 tests) passed with 0 `axe-core` accessibility violations, 100/100 Python tests passed, 0 SAST vulnerabilities, and Next.js 44-route production build succeeded in 18.7s.
+  1. **Laptop Screen Naira Sign Wrapping Fixed:** Resolved the issue where the Naira symbol (`₦`) broke onto line 1 while large figures (`48,250,000.00`) wrapped onto line 2 in the 4 top KPI cards on laptop displays (1280px–1440px). Changed `NairaSign` to inline rendering, bound the symbol and numeric text together using `inline-flex whitespace-nowrap`, and optimized font sizing (`xl:text-[22px] 2xl:text-[26px]`) to give 14-character balances ample room without wrapping.
+  2. **Dark Mode Heading Readability:** Fixed the Financial Overview root container to use semantic `text-ink` instead of hardcoded charcoal hex values, guaranteeing bright near-white text in dark mode.
+  3. **Public Landing Page Mobile Optimization:** Compacted navigation buttons ("Start Free" and "Sign In") with responsive labels to fit comfortably on 360px–390px mobile phone screens. Added `overflow-x-clip` to prevent horizontal scrolling. Scaled down the rotating gyroscope CTA orb (`h-28 w-28 sm:h-40 sm:w-40`) and repositioned it cleanly. Disabled mouse 3D tilt on mobile touch devices (`if (event.pointerType === "touch") return;`). Added responsive padding and `whitespace-nowrap` to cashflow split cards and transaction rows. Wrapped the Direct Comparison Table in an interactive swipe-to-scroll container (`overflow-x-auto min-w-[540px]`).
+  4. **Zero-Card & Zero-Config Render Deployment:** Configured root `package.json` with `"postinstall": "npm --prefix web install"` and `"build": "npm --prefix web install && npm --prefix web run build"`, enabling builds to succeed automatically even if Render defaults to root `/`. Documented zero-card manual Web Service deployment path on Render Free Tier.
+  5. **Verification & Clean Build:** All 16 Vitest test files (56 tests) passed with 0 `axe-core` accessibility violations, 100/100 Python tests passed, 0 SAST vulnerabilities, and Next.js 44-route production build succeeded in 24.3s.
 
 ## Ready Next Steps
 Push this commit to GitHub (`git push origin main`), triggering an automatic zero-downtime redeploy on Render.

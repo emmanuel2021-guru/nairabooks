@@ -1,17 +1,18 @@
 # Render Blueprint Specification for NairaBooks
-# Deploy 1-Click Full-Stack Nigerian IFRS Accounting Platform
+# 100% Free Tier Configuration (No Credit Card Required)
 # Documentation: https://render.com/docs/blueprint-spec
 
 version: "1"
 
 services:
   # --------------------------------------------------------------------------
-  # 1. NairaBooks Web App (Next.js 15 App Router Frontend & Server BFF)
+  # NairaBooks Web Application (Next.js 15 App Router & Server BFF)
+  # Runs the full Nigerian IFRS Accounting Platform on Render's 100% Free Tier
   # --------------------------------------------------------------------------
   - type: web
-    name: nairabooks-web
+    name: nairabooks
     runtime: node
-    plan: starter # Can be switched to 'free' in the Render Dashboard
+    plan: free
     region: frankfurt
     rootDir: web
     buildCommand: npm install && npm run build
@@ -24,45 +25,3 @@ services:
         value: "1"
       - key: PORT
         value: "10000"
-      - key: NAIRABOOKS_API_URL
-        fromService:
-          type: web
-          name: nairabooks-api
-          property: host
-
-  # --------------------------------------------------------------------------
-  # 2. NairaBooks API Engine (Python 3.11 Hexagonal Ledger & Statutory Core)
-  # --------------------------------------------------------------------------
-  - type: web
-    name: nairabooks-api
-    runtime: python
-    plan: starter # Can be switched to 'free' in the Render Dashboard
-    region: frankfurt
-    rootDir: .
-    buildCommand: pip install uv && uv sync --no-dev
-    startCommand: uv run python -m nairabooks.api.http_server
-    healthCheckPath: /health
-    envVars:
-      - key: HOST
-        value: "0.0.0.0"
-      - key: PORT
-        value: "8000"
-      - key: ENVIRONMENT
-        value: production
-      - key: DATABASE_URL
-        fromDatabase:
-          name: nairabooks-db
-          property: connectionString
-      - key: SECRET_KEY
-        generateValue: true
-
-databases:
-  # --------------------------------------------------------------------------
-  # 3. Managed PostgreSQL 16 (Statutory Double-Entry Ledger & Row-Level Security)
-  # --------------------------------------------------------------------------
-  - name: nairabooks-db
-    databaseName: nairabooks
-    user: nairabooks_user
-    plan: starter # Can be switched to 'free' in the Render Dashboard
-    region: frankfurt
-    postgresMajorVersion: "16"

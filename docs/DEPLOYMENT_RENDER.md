@@ -6,12 +6,13 @@ This guide explains how to deploy and host **NairaBooks** on [Render.com](https:
 
 ## 1. Deployment Strategies Overview
 
-NairaBooks supports two deployment models on Render:
+NairaBooks supports two 100% free deployment models on Render with **zero credit card required**:
 
-| Strategy | Description | Services Created | Best For |
+| Strategy | Description | Services Created | Payment Required? |
 | :--- | :--- | :--- | :--- |
-| **Strategy A: 1-Click Blueprint (Recommended)** | Uses the included `render.yaml` to deploy the entire decoupled architecture automatically. | • Next.js Web App (`nairabooks-web`)<br>• Python API (`nairabooks-api`)<br>• PostgreSQL 16 (`nairabooks-db`) | Production, multi-tenant enterprises, and teams wanting dedicated database persistence. |
-| **Strategy B: Single Web Service (Free Tier Friendly)** | Deploys only the Next.js application (`web/`), which includes the full embedded Server BFF. | • Next.js Web App (`nairabooks-web`) | Quick demos, staging environments, single-server setups, or 100% free-tier hosting. |
+| **Strategy A: Free Direct Web Service (Easiest & Fastest)** | Deploy `web/` directly as a Web Service. The Next.js Server BFF runs the full accounting app. | • Next.js Web App (`nairabooks`) | ❌ **No payment or card required (100% Free Tier)** |
+| **Strategy B: Free 1-Click Blueprint (`render.yaml`)** | Uses the updated `render.yaml` pre-configured to `plan: free`. | • Next.js Web App (`nairabooks`) | ❌ **No payment or card required (100% Free Tier)** |
+| **Strategy C: Multi-Service Dedicated Database** | Decoupled Next.js + Python API + managed PostgreSQL instance. | • Web + Python API + Postgres DB | ⚠️ Requires card on file for managed DB provisioning |
 
 ---
 

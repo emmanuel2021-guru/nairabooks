@@ -27,6 +27,7 @@ import {
 import type { FiscalPeriod, FrcnFinancialStatementPackage } from "@/types/ledger";
 import { exportTableToExcel } from "@/lib/excel-export";
 import { FrcnAnnualReportModal } from "./FrcnAnnualReportModal";
+import { renderWithNairaSign } from "@/components/ui/NairaAmount";
 import {
   formatNairaAmount,
   formatShortNaira,
@@ -46,6 +47,8 @@ interface ReportViewerProps {
   readonly isPending: boolean;
   readonly onBack: () => void;
   readonly workspaceMode: "simple" | "pro";
+  readonly workspaceName?: string;
+  readonly workspaceRc?: string;
 }
 
 export function ReportViewer({
@@ -57,6 +60,8 @@ export function ReportViewer({
   isPending,
   onBack,
   workspaceMode,
+  workspaceName = "Lagos Trading & Hospitality Ltd",
+  workspaceRc = "RC 1482910",
 }: ReportViewerProps) {
   const prefersReduced = useReducedMotion();
   const searchInputId = useId();
@@ -354,69 +359,72 @@ export function ReportViewer({
         )}
       </AnimatePresence>
 
-      {/* 1. Header & Navigation Capsule */}
-      <div className="no-print space-y-4">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <button
-            type="button"
-            onClick={onBack}
-            className="group mb-2 inline-flex items-center gap-1.5 text-xs font-bold text-[#5E5E64] transition hover:text-[#1C1C1E]"
-          >
-            <ArrowLeft className="h-3.5 w-3.5 transition group-hover:-translate-x-0.5" aria-hidden="true" />
-            <span>Back to All Reports</span>
-          </button>
-
-          <div className="flex flex-wrap items-center gap-3">
-            <ReportIconBadge
-              iconKey={categoryMeta.iconKey}
-              tintBg={categoryMeta.tintBg}
-              tintText={categoryMeta.tintText}
-              size="lg"
-            />
+      {/* Screen Chrome & Controls (Screen Only, Hidden in Print & PDF Export) */}
+      <div className="no-print space-y-6">
+        {/* 1. Header & Navigation Capsule */}
+        <div className="space-y-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-xl font-bold tracking-[-0.025em] text-[#1C1C1E] sm:text-2xl">
-                  {report.title}
-                </h1>
-                <span
-                  style={{ backgroundColor: categoryMeta.tintBg, color: categoryMeta.tintText }}
-                  className="rounded-full px-2.5 py-0.5 text-[11px] font-bold"
-                >
-                  {categoryMeta.shortLabel}
-                </span>
-                <span className="rounded-full border border-[#006838]/20 bg-[#E6F5ED] px-2.5 py-0.5 font-mono text-[10px] font-semibold text-[#006838]">
-                  Standard: {report.statutoryStandard}
-                </span>
+              <button
+                type="button"
+                onClick={onBack}
+                className="group mb-2 inline-flex items-center gap-1.5 text-xs font-bold text-[#5E5E64] transition hover:text-[#1C1C1E]"
+              >
+                <ArrowLeft className="h-3.5 w-3.5 transition group-hover:-translate-x-0.5" aria-hidden="true" />
+                <span>Back to All Reports</span>
+              </button>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <ReportIconBadge
+                  iconKey={categoryMeta.iconKey}
+                  tintBg={categoryMeta.tintBg}
+                  tintText={categoryMeta.tintText}
+                  size="lg"
+                />
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h1 className="text-xl font-bold tracking-[-0.025em] text-[#1C1C1E] sm:text-2xl">
+                      {report.title}
+                    </h1>
+                    <span
+                      style={{ backgroundColor: categoryMeta.tintBg, color: categoryMeta.tintText }}
+                      className="rounded-full px-2.5 py-0.5 text-[11px] font-bold"
+                    >
+                      {categoryMeta.shortLabel}
+                    </span>
+                    <span className="rounded-full border border-[#006838]/20 bg-[#E6F5ED] px-2.5 py-0.5 font-mono text-[10px] font-semibold text-[#006838]">
+                      Standard: {report.statutoryStandard}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-xs text-[#5E5E64] max-w-2xl">{report.summary}</p>
+                </div>
               </div>
-              <p className="mt-1 text-xs text-[#5E5E64] max-w-2xl">{report.summary}</p>
+            </div>
+
+            {/* Period Selector & Quick Actions */}
+            <div className="flex flex-wrap items-center gap-2.5 self-start">
+              <label htmlFor="report-period-select" className="sr-only">
+                Select Fiscal Period
+              </label>
+              <div className="flex items-center rounded-full border border-[#D1D1D6] bg-white px-3 py-1.5 shadow-sm">
+                <span className="mr-2 text-xs font-medium text-[#5E5E64]">Period:</span>
+                <select
+                  id="report-period-select"
+                  value={selectedPeriodId}
+                  disabled={isPending}
+                  onChange={(e) => onPeriodChange(e.target.value)}
+                  className="bg-transparent text-xs font-bold text-[#1C1C1E] focus:outline-none"
+                >
+                  {periods.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.label} ({p.status === "OPEN" ? "Open" : "CAMA Locked"})
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
         </div>
-
-        {/* Period Selector & Quick Actions */}
-        <div className="flex flex-wrap items-center gap-2.5 self-start">
-          <label htmlFor="report-period-select" className="sr-only">
-            Select Fiscal Period
-          </label>
-          <div className="flex items-center rounded-full border border-[#D1D1D6] bg-white px-3 py-1.5 shadow-sm">
-            <span className="mr-2 text-xs font-medium text-[#5E5E64]">Period:</span>
-            <select
-              id="report-period-select"
-              value={selectedPeriodId}
-              disabled={isPending}
-              onChange={(e) => onPeriodChange(e.target.value)}
-              className="bg-transparent text-xs font-bold text-[#1C1C1E] focus:outline-none"
-            >
-              {periods.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.label} ({p.status === "OPEN" ? "Open" : "CAMA Locked"})
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </div>
 
       {/* 2. Executive KPI Cards */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -1053,7 +1061,7 @@ export function ReportViewer({
             {/* A4 Sheet Header: Official Nigerian Letterhead */}
             <div className="border-b-2 border-slate-900 pb-5 mb-6 text-center">
               <div className="flex flex-wrap items-center justify-between text-[10px] font-mono text-slate-500 mb-2 border-b border-slate-200 pb-1.5">
-                <span>RC No: 1849204 · TIN: 28491048-0001</span>
+                <span>{workspaceRc} · TIN: 23094921-0001</span>
                 <span className="font-semibold text-emerald-800 uppercase tracking-wider">
                   FRCN ACCREDITED · CAMA 2020 SEC 377
                 </span>
@@ -1061,10 +1069,10 @@ export function ReportViewer({
               </div>
 
               <p className="text-lg sm:text-2xl font-serif font-bold uppercase tracking-tight text-slate-950">
-                NairaBooks Enterprise Limited
+                {workspaceName}
               </p>
               <p className="text-xs text-slate-600 mt-0.5">
-                Plot 12, Commercial Avenue, Victoria Island, Lagos State, Nigeria
+                Plot 18, Ozumba Mbadiwe Avenue, Victoria Island, Lagos State, Nigeria
               </p>
 
               <div className="mt-4 pt-3 border-t border-slate-200">
@@ -1167,6 +1175,9 @@ export function ReportViewer({
                             if (typeof val === "number" && isNumeric) {
                               displayVal =
                                 scale === "short" ? formatShortNaira(val) : formatNairaAmount(val);
+                            }
+                            if (typeof displayVal === "string" && displayVal.includes("₦")) {
+                              displayVal = renderWithNairaSign(displayVal);
                             }
 
                             // Use <th> for first column for semantic table accessibility

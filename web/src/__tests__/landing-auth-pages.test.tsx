@@ -387,8 +387,8 @@ describe("Google Stitch Product Landing, Login & Create Account Flows", () => {
 
     // Customer list shows Balance (Debit / Credit) and does NOT show Credit Limit
     expect(screen.queryByText(/Credit Limit/i)).toBeNull();
-    expect(screen.getByText(/₦1,450,000 DR/i)).toBeTruthy();
-    expect(screen.getByText(/₦150,000 CR/i)).toBeTruthy();
+    expect(screen.getByText(/1,450,000 DR/i)).toBeTruthy();
+    expect(screen.getByText(/150,000 CR/i)).toBeTruthy();
     expect(screen.getAllByText(/^Balance$/i).length).toBeGreaterThanOrEqual(1);
 
     // + New Customer and Edit rows navigate cleanly to dedicated create/edit pages
@@ -482,7 +482,7 @@ describe("Google Stitch Product Landing, Login & Create Account Flows", () => {
     expect(
       screen.getByRole("heading", { name: "Victoria Island Medical Hub" }),
     ).toBeTruthy();
-    expect(screen.getByText(/₦450,000 CR/i)).toBeTruthy();
+    expect(screen.getByText(/450,000 CR/i)).toBeTruthy();
     listRender.unmount();
 
     // 2. Edit Mode: ALWAYS locked to Full mode (no Simple Creation toggle rendered)

@@ -991,3 +991,33 @@
   - `uv run pytest -q`: **100 passed** across 26 test modules in 100%.
   - `uv run python scripts/run_sast_scan.py`: **0 vulnerabilities detected (clean pass)**.
   - `uv run python scripts/verify_workflow.py --project .`: **128 / 128 wizard skills verified (100%)**.
+
+### 2026-11-13: Universal Naira Glyph Fix, Flutter Mobile Workflow, Live Linked Reports & Admin Category Grouping
+- **Plain-English Summary (Non-Developers):**
+  - **Universal Naira Glyph Fix (`₦`):** Eradicated missing Naira tofu boxes (`▯`) on Android and Samsung Internet across all remaining areas (Top Expense Categories, Overdue Invoices, and Admin tables). Font stacks now isolate `U+20A6` through `'NairaGlyphFallback'`, `'Roboto'`, and `'Samsung Sans'`, while `renderWithNairaSign()` ensures the currency symbol renders safely in system sans-serif while keeping numbers in tabular monospace.
+  - **Flutter-Style Mobile App Architecture:**
+    - Fixed the mobile bottom navigation bar so it is anchored to the true bottom of the phone screen (resolving the CSS containment trap where parent `backdrop-blur` held `fixed` elements at the top).
+    - Added a native Flutter-style Floating Action Button (FAB) `+` above the bottom nav (`bottom-20 right-4`). Tapping the FAB triggers an animated modal bottom sheet providing 1-tap quick actions: Record Sales Invoice, Record Vendor Bill, Record Customer Payment, Add New Customer, and Add Stock Item.
+  - **Reports Data Linked Directly to Admin & Live Company Name:**
+    - Replaced hardcoded "NairaBooks Enterprise Limited" across all reports with the user's active company: **"Lagos Trading & Hospitality Ltd"** (RC `1482910`, TIN `23094921-0001`).
+    - Linked Aged Receivables, Invoice Register, Aged Payables, Inventory Valuation, Payroll Register, and Unbilled Tickets directly to `loadAdminRecords()`, ensuring all reports reflect actual customers, suppliers, inventory items, and employees.
+  - **Admin Record Grouping (Customers, Vendors, Employees, Stock):**
+    - Added an interactive View Mode toggle in Admin (`[Group by Category] | [Flat List]`). Grouped view displays categorized accordion cards with folder icons, category titles, item count badges, and subtotal metrics.
+  - **Management-Grade A4 PDF Export:**
+    - Completely isolated the printable document from web application screen chrome (headings, KPI summary cards, filter buttons, export dropdowns) via `.no-print` wrappers and print CSS rules. Printed and exported PDFs render exclusively as a pristine, professional letterhead document for the Board and auditors.
+- **Files Created / Changed:**
+  - `web/src/components/mobile/MobileQuickActionFab.tsx`: Flutter-style FAB and animated bottom action sheet.
+  - `web/src/components/TopNavCapsule.tsx`: Fixed mobile bottom nav viewport anchoring, integrated FAB, and added accessible mobile labels.
+  - `web/src/components/ui/NairaAmount.tsx`: Added `renderWithNairaSign()` helper for universal tofu prevention.
+  - `web/tailwind.config.ts` & `web/src/app/globals.css`: Added fallback font family stacks for `U+20A6` and print media chrome isolation rules.
+  - `web/src/components/AdminMaintainWorkspace.tsx`: Added category grouping view, accordion cards, and currency sign isolation.
+  - `web/src/components/reports/reports-data.ts`: Dynamically wired reports to `loadAdminRecords()` and removed fictitious entities.
+  - `web/src/components/reports/ReportViewer.tsx`, `ReportsHubWorkspace.tsx`, `FrcnAnnualReportModal.tsx`: Synchronized company name and RC number across letterheads and Excel exports.
+  - `docs/DECISIONS.md`: Logged `ADR-041`.
+- **Verification Commands & Results:**
+  - `npm --prefix web run typecheck`: **0 errors**.
+  - `npm --prefix web test`: **16 test files / 56 Vitest tests passed (0 axe-core violations)**.
+  - `uv run pytest -q`: **100 passed** in 100%.
+  - `uv run python scripts/run_sast_scan.py`: **0 vulnerabilities (clean pass)**.
+  - `npm --prefix web run build`: **Compiled successfully in 18.7s, all 44 routes generated cleanly**.
+  - `uv run python scripts/verify_workflow.py --project .`: **128 / 128 wizard skills verified (100%)**.

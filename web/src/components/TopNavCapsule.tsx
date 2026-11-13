@@ -14,6 +14,7 @@ import {
 import { useWorkspaceMode } from "@/state/workspace-mode";
 import { ThemeToggle } from "./theme/ThemeToggle";
 import { FileSettingsModal } from "./settings/FileSettingsModal";
+import { MobileQuickActionFab } from "./mobile/MobileQuickActionFab";
 
 export type NavTabId =
   | "overview"
@@ -56,7 +57,7 @@ export function TopNavCapsule({ activeTab }: { readonly activeTab: NavTabId }) {
       {/* Top Header Capsule (Sticky on all viewports, clean and uncrowded) */}
       <header className="sticky top-0 z-40 px-3 pt-2 sm:px-4 sm:pt-4 pb-2 bg-canvas/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-2.5 rounded-2xl md:rounded-full border border-borderSubtle bg-surface px-3 py-2 md:px-4 md:py-2 shadow-sm">
-          {/* Brand Logo */}
+          {/* Brand Logo & Workspace Title */}
           <div className="flex items-center gap-2">
             <Link
               href="/"
@@ -72,14 +73,13 @@ export function TopNavCapsule({ activeTab }: { readonly activeTab: NavTabId }) {
             </Link>
           </div>
 
-          {/* Primary Workspace Navigation (Mobile: Fixed Bottom Navigation Bar | Desktop: Centered Capsule) */}
+          {/* Desktop Primary Workspace Navigation (Centered Floating Capsule) */}
           <nav
             aria-label="Primary workspace navigation"
-            className="max-md:fixed max-md:bottom-0 max-md:inset-x-0 max-md:z-50 max-md:flex max-md:items-center max-md:justify-around max-md:h-16 max-md:bg-surface/95 max-md:dark:bg-[#1C1C1E]/95 max-md:backdrop-blur-lg max-md:border-t max-md:border-borderSubtle max-md:px-2 max-md:shadow-[0_-4px_24px_rgba(0,0,0,0.06)] md:flex md:items-center md:gap-1"
+            className="hidden md:flex md:items-center md:gap-1"
           >
             {NAV_ITEMS.map((item) => {
               const isActive = item.id === activeTab;
-              const Icon = item.icon;
               return (
                 <Link
                   key={item.id}
@@ -87,14 +87,11 @@ export function TopNavCapsule({ activeTab }: { readonly activeTab: NavTabId }) {
                   aria-current={isActive ? "page" : undefined}
                   className={
                     isActive
-                      ? "flex flex-col md:inline-flex items-center justify-center min-w-[56px] min-h-[44px] md:min-h-[44px] py-1 px-2 md:px-4 md:py-2 text-primary md:text-white md:bg-primary font-bold md:font-semibold md:rounded-full rounded-xl transition shadow-none md:shadow-sm shrink-0 whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                      : "flex flex-col md:inline-flex items-center justify-center min-w-[56px] min-h-[44px] md:min-h-[44px] py-1 px-2 md:px-4 md:py-2 text-mutedInk hover:text-ink md:text-ink hover:bg-surfaceAlt md:rounded-full rounded-xl font-medium transition shrink-0 whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                      ? "inline-flex items-center justify-center min-h-[44px] px-4 py-2 text-white bg-primary font-semibold rounded-full transition shadow-sm shrink-0 whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary text-sm tracking-tight"
+                      : "inline-flex items-center justify-center min-h-[44px] px-4 py-2 text-ink hover:bg-surfaceAlt rounded-full font-medium transition shrink-0 whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary text-sm tracking-tight"
                   }
                 >
-                  <Icon className="h-5 w-5 md:hidden mb-0.5" aria-hidden="true" />
-                  <span className="text-[10px] md:text-sm font-semibold tracking-tight whitespace-nowrap">
-                    {item.label}
-                  </span>
+                  <span>{item.label}</span>
                 </Link>
               );
             })}
@@ -168,6 +165,44 @@ export function TopNavCapsule({ activeTab }: { readonly activeTab: NavTabId }) {
           </div>
         </div>
       </header>
+
+      {/* Flutter-style Bottom Navigation Bar (Mobile only, rendered outside header so no backdrop-blur containment traps it) */}
+      <nav
+        aria-label="Mobile workspace navigation"
+        className="nb-mobile-bottom-nav flex md:hidden items-center justify-around h-16 bg-surface/95 dark:bg-[#1C1C1E]/95 backdrop-blur-lg border-t border-borderSubtle px-2 shadow-[0_-4px_24px_rgba(0,0,0,0.08)] pb-safe"
+      >
+        {NAV_ITEMS.map((item) => {
+          const isActive = item.id === activeTab;
+          const Icon = item.icon;
+          return (
+            <Link
+              key={item.id}
+              href={item.href}
+              aria-label={`Mobile ${item.label}`}
+              aria-current={isActive ? "page" : undefined}
+              className={
+                isActive
+                  ? "flex flex-col items-center justify-center min-w-[56px] min-h-[44px] py-1 px-2 text-primary dark:text-emerald-400 font-bold transition shrink-0 whitespace-nowrap active:scale-95"
+                  : "flex flex-col items-center justify-center min-w-[56px] min-h-[44px] py-1 px-2 text-mutedInk hover:text-ink transition shrink-0 whitespace-nowrap active:scale-95"
+              }
+            >
+              <div
+                className={`flex items-center justify-center h-7 w-12 rounded-full transition ${
+                  isActive ? "bg-emerald-100 dark:bg-emerald-950/70" : ""
+                }`}
+              >
+                <Icon className="h-5 w-5" aria-hidden="true" />
+              </div>
+              <span className="text-[10px] font-semibold tracking-tight mt-0.5">
+                {item.label}
+              </span>
+            </Link>
+          );
+        })}
+      </nav>
+
+      {/* Flutter-style Floating Action Button (Mobile only) */}
+      <MobileQuickActionFab />
 
       {/* Basic Settings & File Modal Dialog */}
       <FileSettingsModal

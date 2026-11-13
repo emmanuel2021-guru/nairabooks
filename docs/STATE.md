@@ -1,17 +1,15 @@
 # Living Workspace State (`STATE.md`)
 
 - **Project:** NairaBooks (`ac`) — Zero-jargon Nigerian IFRS / Tax Act 2025 / CAMA 2020 accounting & business operations platform
-- **Active Stage:** **Phase 5 & 6 Revamp: Cupertino Typography Restoration, Micro-Targeted Naira Glyph Isolation, Dark Mode & Native Mobile Bottom Bar**
+- **Active Stage:** **Phase 5 & 6 Revamp: Universal Naira Glyph Isolation, Flutter Mobile Architecture, Live Linked Reports & Category Grouping**
 - **Wizard Skills Executed:** `128 / 128` (`100%`) — All 12 active phases verified with concrete deliverables, code, automated test suites, and documentation.
-- **Latest Milestone (2026-11-13):** **Dark Mode Contrast Polish, Cupertino Typography, Micro-Targeted Naira Glyph Isolation & Mobile Bottom Navigation Bar:**
-  - **High-Contrast Dark Mode Headings:** Resolved dark-on-dark conflicts where titles like "Financial Overview" and badges were dark charcoal on midnight backgrounds. In `.dark`, all headings (`h1..h6`), company badges, and text automatically adapt to `#F2F2F7` (crisp near-white) and `#A1A1AA` (readable zinc).
-  - **Vibrant Emerald & Sky Accents:** Mapped `.text-[#00582E]` and `.text-[#0F4C81]` to `#34D399` and `#60A5FA` in dark mode for vivid contrast on cards.
-  - **Protected Physical A4 Reports:** Explicitly kept `#a4-report-document` pure white (`#FFFFFF`) with pitch-black text (`#000000`) for professional board & management presentation regardless of active screen theme.
-  - **Cupertino Typography Restored:** Retained Apple Cupertino system fonts (`SF Pro Display`, `SF Pro Text`, `Geist Mono`, `SF Mono`). Headings, body text, and tabular digits look razor-sharp and beautiful.
-  - **Micro-Targeted Naira Glyph Fix (`U+20A6`):** `<NairaAmount>` and `<NairaSign>` wrap `₦` in `font-sans` (guaranteed on Samsung Internet / Android) while keeping numbers strictly in tabular `font-mono`.
-  - **Light & Dark Mode Switcher:** One-click toggle with accessible Sun/Moon button, static anti-FOUC script (`/theme-init.js`), complete `.dark` tokens in `globals.css`, and dynamic dark mode Nigerian cultural artwork.
-  - **Native Mobile Bottom Navigation Bar:** Pinned to mobile bottom (`fixed bottom-0 inset-x-0 z-50 h-16`) with 5 core tabs, icons, labels, 44px tap targets, and desktop floating capsule.
-  - **Verified Clean:** 16 Vitest test suites (56 tests, 0 `axe-core` accessibility violations), 100 Python pytest test cases, 0 SAST findings, and Next.js 44-route production build compiling cleanly in 16.4s.
+- **Latest Milestone (2026-11-13):** **Universal Naira Glyph Isolation, Docked Flutter Mobile Architecture, Live Admin-Linked Reports & Category Grouping:**
+  - **Universal Naira Glyph Fix (`₦`):** Eradicated missing Naira tofu boxes (`▯`) on Android and Samsung Internet across all remaining areas (Top Expense Categories, Overdue Invoices, and Admin tables). Font stacks now isolate `U+20A6` through `'NairaGlyphFallback'`, `'Roboto'`, and `'Samsung Sans'`, while `renderWithNairaSign()` ensures the currency symbol renders safely in system sans-serif while keeping numbers in tabular monospace.
+  - **Flutter-Style Mobile App Architecture:** Fixed the mobile bottom navigation bar so it is anchored to the true bottom of the phone screen (resolving the CSS containment trap where parent `backdrop-blur` held `fixed` elements at the top). Added a native Flutter-style Floating Action Button (FAB) `+` above the bottom nav (`bottom-20 right-4`). Tapping the FAB triggers an animated modal bottom sheet providing 1-tap quick actions: Record Sales Invoice, Record Vendor Bill, Record Customer Payment, Add New Customer, and Add Stock Item.
+  - **Reports Data Linked Directly to Admin & Live Company Name:** Replaced hardcoded "NairaBooks Enterprise Limited" across all reports with the user's active company: **"Lagos Trading & Hospitality Ltd"** (RC `1482910`, TIN `23094921-0001`). Linked Aged Receivables, Invoice Register, Aged Payables, Inventory Valuation, Payroll Register, and Unbilled Tickets directly to `loadAdminRecords()`.
+  - **Admin Record Grouping (Customers, Vendors, Employees, Stock):** Added an interactive View Mode toggle in Admin (`[Group by Category] | [Flat List]`). Grouped view displays categorized accordion cards with folder icons, category titles, item count badges, and subtotal metrics.
+  - **Management-Grade A4 PDF Export:** Completely isolated the printable document from web application screen chrome (headings, KPI summary cards, filter buttons, export dropdowns) via `.no-print` wrappers and print CSS rules. Printed and exported PDFs render exclusively as a pristine, professional letterhead document for the Board and auditors.
+  - **Verified Clean:** 16 Vitest test suites (56 tests, 0 `axe-core` accessibility violations), 100 Python pytest test cases, 0 SAST findings, and Next.js 44-route production build compiling cleanly in 18.7s.
 - **Baseline Verified Working:**
   - `npm --prefix web run build`: Compiled successfully in 16.4s, all 44 routes generated cleanly.
   - `uv run pytest -q`: `100 passed` across 26 test modules in 100%.

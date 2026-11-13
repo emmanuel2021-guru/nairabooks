@@ -9,18 +9,22 @@ import {
   CheckCircle2,
   ChevronDown,
   ChevronRight,
+  Folder,
   FolderTree,
+  Layers,
   Mail,
   Pencil,
   Plus,
   Search,
   Settings2,
   Sparkles,
+  Users,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useWorkspaceMode } from "@/state/workspace-mode";
+import { renderWithNairaSign } from "@/components/ui/NairaAmount";
 import {
   ADMIN_MODULES,
   ADMIN_PILLARS,
@@ -50,7 +54,7 @@ function renderMetricWithSide(label: string, value: string, side?: "DR" | "CR") 
       <p className="text-[10px] font-medium text-[#5E5E64]">{label}</p>
       <div className="flex items-center gap-1.5 sm:justify-end">
         <p className="font-mono text-sm font-bold tabular-nums text-[#1C1C1E]">
-          {value}
+          {renderWithNairaSign(value)}
         </p>
         {detectedSide && (
           <span
@@ -93,6 +97,7 @@ export function AdminMaintainWorkspace({
 
   const [ifrsFilter, setIfrsFilter] = useState<"All" | IfrsElement>("All");
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
+  const [isGroupedView, setIsGroupedView] = useState<boolean>(true);
   const [recentlySavedId, setRecentlySavedId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -192,6 +197,34 @@ export function AdminMaintainWorkspace({
 
     return { groups, orphans };
   }, [activeModule, records, searchQuery, ifrsFilter, visibleRecords]);
+
+  const isGroupableModule = ["customers", "vendors", "employees", "inventory"].includes(activeModule);
+
+  const categoryGroups = useMemo(() => {
+    if (!isGroupableModule) return [];
+    const map: Record<string, AdminRecord[]> = {};
+    for (const rec of visibleRecords) {
+      const key = rec.category?.trim() || "General / Uncategorized";
+      if (!map[key]) map[key] = [];
+      map[key].push(rec);
+    }
+    return Object.entries(map).map(([category, items]) => {
+      let totalNumeric = 0;
+      let hasNaira = false;
+      for (const item of items) {
+        if (item.primaryMetricValue.includes("₦")) {
+          hasNaira = true;
+          totalNumeric += parseNairaNumeric(item.primaryMetricValue);
+        }
+      }
+      return {
+        category,
+        items,
+        count: items.length,
+        subtotalFormatted: hasNaira ? formatNairaAmount(totalNumeric) : null,
+      };
+    });
+  }, [visibleRecords, isGroupableModule]);
 
   function handleSelectPillar(pillarId: AdminPillarId) {
     setActivePillar(pillarId);
@@ -400,15 +433,50 @@ export function AdminMaintainWorkspace({
                 </p>
               </div>
 
-              {currentModuleMeta.mode === "records" && (
-                <Link
-                  href={`/admin/${currentModuleMeta.id}/new`}
-                  className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full bg-[#006838] px-4 py-2 text-xs font-semibold text-white shadow-[0_4px_12px_rgba(0,104,56,0.22)] transition hover:bg-[#00582E]"
-                >
-                  <Plus className="h-4 w-4" aria-hidden="true" />
-                  <span>New {currentModuleMeta.singularLabel}</span>
-                </Link>
-              )}
+              <div className="flex flex-wrap items-center gap-2">
+                {isGroupableModule && (
+                  <div
+                    role="group"
+                    aria-label="Records View Mode"
+                    className="inline-flex items-center rounded-full border border-borderSubtle bg-surfaceAlt p-0.5 text-xs"
+                  >
+                    <button
+                      type="button"
+                      aria-pressed={isGroupedView}
+                      onClick={() => setIsGroupedView(true)}
+                      className={`min-h-[36px] rounded-full px-3 py-1 text-xs font-semibold transition ${
+                        isGroupedView
+                          ? "bg-surface text-ink shadow-xs"
+                          : "text-mutedInk hover:text-ink"
+                      }`}
+                    >
+                      Group by Category
+                    </button>
+                    <button
+                      type="button"
+                      aria-pressed={!isGroupedView}
+                      onClick={() => setIsGroupedView(false)}
+                      className={`min-h-[36px] rounded-full px-3 py-1 text-xs font-semibold transition ${
+                        !isGroupedView
+                          ? "bg-surface text-ink shadow-xs"
+                          : "text-mutedInk hover:text-ink"
+                      }`}
+                    >
+                      Flat List
+                    </button>
+                  </div>
+                )}
+
+                {currentModuleMeta.mode === "records" && (
+                  <Link
+                    href={`/admin/${currentModuleMeta.id}/new`}
+                    className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full bg-[#006838] px-4 py-2 text-xs font-semibold text-white shadow-[0_4px_12px_rgba(0,104,56,0.22)] transition hover:bg-[#00582E]"
+                  >
+                    <Plus className="h-4 w-4" aria-hidden="true" />
+                    <span>New {currentModuleMeta.singularLabel}</span>
+                  </Link>
+                )}
+              </div>
             </div>
 
             {/* Mode A & B: Top-to-Down Outline List (with IFRS Group -> Individual Outline for Chart of Accounts) */}
@@ -654,6 +722,130 @@ export function AdminMaintainWorkspace({
                     <p className="mt-1 text-xs text-[#5E5E64]">
                       Clear your search filter or create a fresh {currentModuleMeta.singularLabel}.
                     </p>
+                  </div>
+                ) : isGroupableModule && isGroupedView ? (
+                  <div data-testid="admin-outline-list" className="space-y-4">
+                    {categoryGroups.map((grp) => {
+                      const isCollapsed = Boolean(collapsedGroups[grp.category]);
+                      return (
+                        <div
+                          key={grp.category}
+                          className="overflow-hidden rounded-[18px] border border-borderSubtle bg-surface shadow-xs"
+                        >
+                          <div
+                            role="button"
+                            tabIndex={0}
+                            aria-expanded={!isCollapsed}
+                            onClick={() => handleToggleGroupCollapse(grp.category)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                handleToggleGroupCollapse(grp.category);
+                              }
+                            }}
+                            className="flex cursor-pointer flex-wrap items-center justify-between gap-3 bg-surfaceAlt/60 px-4 py-3 transition hover:bg-surfaceAlt"
+                          >
+                            <div className="flex items-center gap-2.5">
+                              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-[#006838] dark:text-emerald-400">
+                                <Folder className="h-3.5 w-3.5" aria-hidden="true" />
+                              </span>
+                              <div>
+                                <h3 className="text-sm font-bold text-ink">
+                                  {grp.category}
+                                </h3>
+                                <span className="text-[11px] text-mutedInk">
+                                  {grp.count} {grp.count === 1 ? currentModuleMeta.singularLabel : currentModuleMeta.label}
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                              {grp.subtotalFormatted && (
+                                <div className="text-right">
+                                  <span className="text-[10px] uppercase font-bold text-mutedInk">Group Total</span>
+                                  <p className="font-mono text-xs font-bold text-ink tabular-nums">
+                                    {renderWithNairaSign(grp.subtotalFormatted)}
+                                  </p>
+                                </div>
+                              )}
+                              <span className="rounded-full p-1 text-mutedInk">
+                                {isCollapsed ? (
+                                  <ChevronRight className="h-4 w-4" aria-hidden="true" />
+                                ) : (
+                                  <ChevronDown className="h-4 w-4" aria-hidden="true" />
+                                )}
+                              </span>
+                            </div>
+                          </div>
+
+                          {!isCollapsed && (
+                            <ul className="divide-y divide-borderSubtle">
+                              {grp.items.map((rec) => {
+                                const isJustSaved = recentlySavedId === rec.id;
+                                return (
+                                  <li
+                                    key={rec.id}
+                                    className={`flex flex-col gap-2 px-4 py-2.5 transition sm:flex-row sm:items-center sm:justify-between ${
+                                      isJustSaved
+                                        ? "bg-[#E6F5ED]/40"
+                                        : rec.isActive
+                                          ? "bg-surface hover:bg-surfaceAlt/50"
+                                          : "bg-surfaceAlt/60 opacity-80"
+                                    }`}
+                                  >
+                                    <div className="min-w-0 space-y-0.5">
+                                      <div className="flex flex-wrap items-center gap-2">
+                                        <span className="rounded bg-surfaceAlt px-2 py-0.5 font-mono text-[11px] font-bold text-ink">
+                                          {rec.code}
+                                        </span>
+                                        <h4 className="text-sm font-bold text-ink">
+                                          {rec.name}
+                                        </h4>
+                                        <Badge variant={rec.isActive ? "emerald" : "outline"} className="text-[10px]">
+                                          {rec.isActive ? "Active" : "Inactive"}
+                                        </Badge>
+                                        {isJustSaved && (
+                                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-forest dark:text-emerald-400">
+                                            <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
+                                            Saved
+                                          </span>
+                                        )}
+                                      </div>
+                                      <p className="truncate text-xs text-mutedInk">
+                                        {rec.contactOrNote}
+                                      </p>
+                                    </div>
+
+                                    <div className="flex shrink-0 items-center justify-between gap-3 sm:justify-end">
+                                      {renderMetricWithSide(
+                                        rec.primaryMetricLabel,
+                                        rec.primaryMetricValue,
+                                        rec.balanceSide,
+                                      )}
+
+                                      <Switch
+                                        checked={rec.isActive}
+                                        onCheckedChange={() => handleToggleRecordActive(rec.id)}
+                                        aria-label={`Toggle active state for ${rec.name}`}
+                                      />
+
+                                      <Link
+                                        href={`/admin/${rec.module}/${encodeURIComponent(rec.id)}`}
+                                        aria-label={`Edit ${rec.name}`}
+                                        className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-borderSubtle bg-surface px-3.5 text-xs font-semibold text-ink transition hover:bg-surfaceAlt"
+                                      >
+                                        <Pencil className="h-3.5 w-3.5 text-[#006838] dark:text-emerald-400" aria-hidden="true" />
+                                        <span>Edit</span>
+                                      </Link>
+                                    </div>
+                                  </li>
+                                );
+                              })}
+                            </ul>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 ) : (
                   <ul

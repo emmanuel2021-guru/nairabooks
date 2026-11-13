@@ -30,6 +30,8 @@ interface FrcnAnnualReportModalProps {
   readonly currentPackage: FrcnFinancialStatementPackage;
   readonly selectedPeriodId?: string;
   readonly onYearSelect?: (periodId: string) => void;
+  readonly workspaceName?: string;
+  readonly workspaceRc?: string;
 }
 
 type TabSection =
@@ -51,6 +53,8 @@ export function FrcnAnnualReportModal({
   currentPackage,
   selectedPeriodId,
   onYearSelect,
+  workspaceName = "Lagos Trading & Hospitality Ltd",
+  workspaceRc = "RC 1482910",
 }: FrcnAnnualReportModalProps) {
   const prefersReduced = useReducedMotion();
   const [activeTab, setActiveTab] = useState<TabSection>("cover");
@@ -79,7 +83,7 @@ export function FrcnAnnualReportModal({
     exportFrcnPackageToExcel(
       currentPackage,
       selectedPeriod.label,
-      "NairaBooks Enterprise Limited",
+      workspaceName,
     );
   };
 

@@ -44,12 +44,16 @@ interface ReportsHubWorkspaceProps {
   readonly periods: readonly FiscalPeriod[];
   readonly initialPackage: FrcnFinancialStatementPackage;
   readonly defaultReportId?: string | null;
+  readonly workspaceName?: string;
+  readonly workspaceRc?: string;
 }
 
 export function ReportsHubWorkspace({
   periods,
   initialPackage,
   defaultReportId = null,
+  workspaceName = "Lagos Trading & Hospitality Ltd",
+  workspaceRc = "RC 1482910",
 }: ReportsHubWorkspaceProps) {
   const { mode } = useWorkspaceMode();
   const prefersReduced = useReducedMotion();
@@ -124,7 +128,7 @@ export function ReportsHubWorkspace({
     exportFrcnPackageToExcel(
       pkg,
       activePeriodLabel,
-      "NairaBooks Enterprise Limited",
+      workspaceName,
     );
   };
 
@@ -151,6 +155,8 @@ export function ReportsHubWorkspace({
           isPending={isPending}
           onBack={() => setActiveReportId(null)}
           workspaceMode={mode}
+          workspaceName={workspaceName}
+          workspaceRc={workspaceRc}
         />
       ) : (
         /* CATALOG MODE: Browse 15 FRCN & IFRS Reports across 10 Pillars */
@@ -483,6 +489,8 @@ export function ReportsHubWorkspace({
         currentPackage={pkg}
         selectedPeriodId={selectedPeriodId}
         onYearSelect={handlePeriodChange}
+        workspaceName={workspaceName}
+        workspaceRc={workspaceRc}
       />
     </div>
   );

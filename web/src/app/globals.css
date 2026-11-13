@@ -248,6 +248,20 @@ body {
   font-size: 0.875rem;
 }
 
+/* Flutter-Style Mobile Bottom Docked Navigation */
+.nb-mobile-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+}
+@media (min-width: 768px) {
+  .nb-mobile-bottom-nav {
+    display: none !important;
+  }
+}
+
 .nb-skip-link:focus {
   left: 1rem;
   top: 1rem;
@@ -258,14 +272,14 @@ body {
 /* Targeted Naira Glyph Fallback for Samsung Internet & Android - targets ONLY U+20A6 so all digits remain 100% SF Mono */
 @font-face {
   font-family: "NairaGlyphFallback";
-  src: local("Roboto"), local("Noto Sans"), local("-apple-system"), local("Segoe UI"), local("Arial"), sans-serif;
+  src: local("Roboto"), local("Samsung Sans"), local("Noto Sans"), local("-apple-system"), local("Segoe UI"), local("Arial"), sans-serif;
   unicode-range: U+20A6;
   font-display: swap;
 }
 
 /* Monetary cells strictly right-aligned tabular figures using Apple SF Mono / Geist Mono */
 .nb-money-cell {
-  font-family: "NairaGlyphFallback", "SF Mono", ui-monospace, SFMono-Regular, var(--font-ios-mono), monospace;
+  font-family: "NairaGlyphFallback", "SF Mono", ui-monospace, SFMono-Regular, var(--font-ios-mono), Roboto, "Samsung Sans", monospace;
   font-variant-numeric: tabular-nums;
   -webkit-font-feature-settings: "tnum";
   font-feature-settings: "tnum";
@@ -440,6 +454,7 @@ body {
   footer,
   aside,
   .no-print,
+  .no-print *,
   .nb-skip-link,
   .nb-nigerian-art-bg,
   [role="status"],
@@ -448,6 +463,10 @@ body {
   select,
   input {
     display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
   /* Expand the A4 report sheet into a full printable page */

@@ -16,7 +16,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useWorkspaceMode } from "@/state/workspace-mode";
-import { NairaSign } from "@/components/ui/NairaAmount";
+import { NairaSign, renderWithNairaSign } from "@/components/ui/NairaAmount";
 import type { AuthUserSummary } from "@/types/auth";
 
 export type OverviewTimeframeId = "month" | "quarter" | "ytd";
@@ -355,7 +355,7 @@ export function OverviewLandingClient({
                     Cash Flow Trend
                   </h2>
                   <p className="mt-0.5 text-xs text-mutedInk">
-                    {activePeriod.cashFlowSummary}
+                    {renderWithNairaSign(activePeriod.cashFlowSummary)}
                   </p>
                 </div>
 
@@ -429,7 +429,7 @@ export function OverviewLandingClient({
                         {mode === "pro" ? cat.proCode : cat.label}
                       </span>
                       <span className="font-mono font-semibold tabular-nums text-ink">
-                        {cat.amountNgn}{" "}
+                        {renderWithNairaSign(cat.amountNgn)}{" "}
                         <span className="font-normal text-mutedInk">({cat.sharePct}%)</span>
                       </span>
                     </div>
@@ -539,7 +539,7 @@ export function OverviewLandingClient({
 
                         <div className="flex items-center gap-3">
                           <span className="font-mono text-xs font-bold tabular-nums text-ink">
-                            {inv.amountNgn}
+                            {renderWithNairaSign(inv.amountNgn)}
                           </span>
                           <button
                             type="button"

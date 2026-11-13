@@ -43,3 +43,21 @@ export function NairaAmount({
     </span>
   );
 }
+
+/**
+ * Parses any string that may contain a Naira symbol (e.g. "₦5,420,000" or "Net +₦13.50M")
+ * and ensures the Naira glyph is wrapped in a guaranteed sans-serif fallback so Samsung Internet
+ * and Android web browsers never display a missing-glyph tofu box (▯).
+ */
+export function renderWithNairaSign(text: string, className = ""): React.ReactNode {
+  if (!text || !text.includes("₦")) {
+    return text;
+  }
+  const parts = text.split("₦");
+  return parts.map((part, index) => (
+    <React.Fragment key={index}>
+      {index > 0 && <NairaSign className={className} />}
+      {part}
+    </React.Fragment>
+  ));
+}

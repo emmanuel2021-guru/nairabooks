@@ -65,28 +65,37 @@ const config: Config = {
   		},
   		fontFamily: {
   			heading: [
+  				'NairaGlyphFallback',
   				'-apple-system',
   				'BlinkMacSystemFont',
   				'"SF Pro Display"',
   				'"SF Pro Text"',
   				'var(--font-ios-sans)',
   				'system-ui',
+  				'Roboto',
+  				'"Samsung Sans"',
   				'sans-serif'
   			],
   			sans: [
+  				'NairaGlyphFallback',
   				'-apple-system',
   				'BlinkMacSystemFont',
   				'"SF Pro Text"',
   				'"SF Pro Display"',
   				'var(--font-ios-sans)',
   				'system-ui',
+  				'Roboto',
+  				'"Samsung Sans"',
   				'sans-serif'
   			],
   			mono: [
+  				'NairaGlyphFallback',
   				'"SF Mono"',
   				'ui-monospace',
   				'SFMono-Regular',
   				'var(--font-ios-mono)',
+  				'Roboto',
+  				'"Samsung Sans"',
   				'monospace'
   			]
   		},

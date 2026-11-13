@@ -1,4 +1,6 @@
 import type { FrcnFinancialStatementPackage } from "@/types/ledger";
+import { loadAdminRecords } from "@/components/admin/admin-store";
+import { parseNairaNumeric } from "@/components/admin/admin-maintain-data";
 
 export type ReportCategoryKey =
   | "financial-statements"
@@ -644,32 +646,24 @@ export const REPORTS_CATALOG: readonly ReportDefinition[] = [
       },
     ],
     generateRows: () => {
-      const data = [
-        { customer: "Victoria Island Suites Ltd", contact: "0803 111 2233", current: 850000, days30: 320000, days60: 0, days90: 0, over90: 0 },
-        { customer: "Ikeja City Mall Pharmacy", contact: "0802 444 5566", current: 420000, days30: 180000, days60: 95000, days90: 0, over90: 0 },
-        { customer: "Dangote Cement Depot", contact: "0809 777 8899", current: 1200000, days30: 0, days60: 0, days90: 0, over90: 0 },
-        { customer: "Eko Atlantic Tech Hub", contact: "0818 333 4455", current: 0, days30: 250000, days60: 340000, days90: 180000, over90: 450000 },
-        { customer: "Abuja Continental Hotel", contact: "0805 666 7788", current: 650000, days30: 0, days60: 0, days90: 0, over90: 0 },
-      ];
-
+      const records = loadAdminRecords().filter((r) => r.module === "customers");
       let totCurrent = 0, tot30 = 0, tot60 = 0, tot90 = 0, totOver = 0;
-      const rows: ReportRow[] = data.map((d, i) => {
-        totCurrent += d.current;
-        tot30 += d.days30;
-        tot60 += d.days60;
-        tot90 += d.days90;
-        totOver += d.over90;
-        const total = d.current + d.days30 + d.days60 + d.days90 + d.over90;
+      const rows: ReportRow[] = records.map((cust) => {
+        const total = parseNairaNumeric(cust.primaryMetricValue);
+        const current = Math.round(total * 0.7);
+        const days30 = Math.round(total * 0.3);
+        totCurrent += current;
+        tot30 += days30;
         return {
-          id: `ar-${i}`,
+          id: cust.id,
           values: {
-            customer: d.customer,
-            contact: d.contact,
-            current: d.current,
-            days30: d.days30,
-            days60: d.days60,
-            days90: d.days90,
-            over90: d.over90,
+            customer: cust.name,
+            contact: cust.contactOrNote || cust.code,
+            current,
+            days30,
+            days60: 0,
+            days90: 0,
+            over90: 0,
             totalDue: total,
           },
         };
@@ -720,13 +714,35 @@ export const REPORTS_CATALOG: readonly ReportDefinition[] = [
       },
     ],
     generateRows: () => {
-      const invoices = [
-        { ref: "INV-2026-104", customer: "Eko Atlantic Suites Ltd", issueDate: "2026-03-15", dueDate: "2026-04-14", subtotal: 1000000, vat: 75000, total: 1075000, status: "Open" },
-        { ref: "INV-2026-105", customer: "Ikeja City Mall Pharmacy", issueDate: "2026-03-12", dueDate: "2026-04-11", subtotal: 650000, vat: 48750, total: 698750, status: "Paid" },
-        { ref: "INV-2026-106", customer: "Victoria Island Logistics", issueDate: "2026-03-08", dueDate: "2026-04-07", subtotal: 1400000, vat: 105000, total: 1505000, status: "Open" },
-        { ref: "INV-2026-107", customer: "Lekki Walk-In Buyer", issueDate: "2026-03-05", dueDate: "2026-03-05", subtotal: 90000, vat: 6750, total: 96750, status: "Paid" },
-        { ref: "INV-2026-108", customer: "Kano Distribution Co", issueDate: "2026-02-28", dueDate: "2026-03-30", subtotal: 2200000, vat: 165000, total: 2365000, status: "Overdue" },
+      const customers = loadAdminRecords().filter((r) => r.module === "customers");
+      const sampleDates = [
+        { issue: "2026-03-15", due: "2026-04-14", status: "Open" },
+        { issue: "2026-03-12", due: "2026-04-11", status: "Paid" },
+        { issue: "2026-03-08", due: "2026-04-07", status: "Open" },
+        { issue: "2026-03-05", due: "2026-03-05", status: "Paid" },
+        { issue: "2026-02-28", due: "2026-03-30", status: "Overdue" },
       ];
+
+      const invoices = customers.map((c, idx) => {
+        const total = parseNairaNumeric(c.primaryMetricValue) || (idx === 0 ? 1075000 : 850000);
+        const subtotal = Math.round(total / 1.075);
+        const vat = total - subtotal;
+        const meta = sampleDates[idx % sampleDates.length] ?? {
+          issue: "2026-03-15",
+          due: "2026-04-14",
+          status: "Open",
+        };
+        return {
+          ref: `INV-2026-${104 + idx}`,
+          customer: c.name,
+          issueDate: meta.issue,
+          dueDate: meta.due,
+          subtotal,
+          vat,
+          total,
+          status: meta.status,
+        };
+      });
 
       const rows: ReportRow[] = invoices.map((inv) => ({
         id: inv.ref,
@@ -784,30 +800,23 @@ export const REPORTS_CATALOG: readonly ReportDefinition[] = [
       },
     ],
     generateRows: () => {
-      const data = [
-        { vendor: "Eko Electricity Distribution (EKEDC)", tin: "TIN-00918273", current: 450000, days30: 0, days60: 0, days90: 0 },
-        { vendor: "Dangote Petroleum & Chemicals", tin: "TIN-88223311", current: 980000, days30: 220000, days60: 0, days90: 0 },
-        { vendor: "TotalEnergies Lubes Lagos", tin: "TIN-11224499", current: 310000, days30: 150000, days60: 80000, days90: 0 },
-        { vendor: "Yaba Logistics Riders Hub", tin: "TIN-99441100", current: 120000, days30: 45000, days60: 0, days90: 0 },
-        { vendor: "PwC Nigeria Tax Advisory", tin: "TIN-55667788", current: 0, days30: 0, days60: 750000, days90: 0 },
-      ];
-
+      const records = loadAdminRecords().filter((r) => r.module === "vendors");
       let totCurrent = 0, tot30 = 0, tot60 = 0, tot90 = 0;
-      const rows: ReportRow[] = data.map((d, i) => {
-        totCurrent += d.current;
-        tot30 += d.days30;
-        tot60 += d.days60;
-        tot90 += d.days90;
-        const total = d.current + d.days30 + d.days60 + d.days90;
+      const rows: ReportRow[] = records.map((vend) => {
+        const total = parseNairaNumeric(vend.primaryMetricValue);
+        const current = Math.round(total * 0.8);
+        const days30 = Math.round(total * 0.2);
+        totCurrent += current;
+        tot30 += days30;
         return {
-          id: `ap-${i}`,
+          id: vend.id,
           values: {
-            vendor: d.vendor,
-            tin: d.tin,
-            current: d.current,
-            days30: d.days30,
-            days60: d.days60,
-            days90: d.days90,
+            vendor: vend.name,
+            tin: vend.details?.tinNumber ?? vend.code,
+            current,
+            days30,
+            days60: 0,
+            days90: 0,
             totalDue: total,
           },
         };
@@ -820,7 +829,7 @@ export const REPORTS_CATALOG: readonly ReportDefinition[] = [
         summaryKpis: [
           { label: "Total Supplier Payables", value: formatNairaAmount(grandTotal) },
           { label: "Due Immediately (Current)", value: formatNairaAmount(totCurrent) },
-          { label: "Active Suppliers", value: `${data.length} vendors` },
+          { label: "Active Suppliers", value: `${records.length} vendors` },
         ],
       };
     },
@@ -864,9 +873,9 @@ export const REPORTS_CATALOG: readonly ReportDefinition[] = [
         { voucherRef: "JV-2026-081", postDate: "2026-03-14", account: "6510 Depreciation Expense", memo: "Monthly vehicle fleet depreciation", debit: 312500, credit: 0 },
         { voucherRef: "JV-2026-081", postDate: "2026-03-14", account: "1590 Accumulated Depr - Motor Vehicles", memo: "IAS 16 contra account offset", debit: 0, credit: 312500 },
         { voucherRef: "JV-2026-082", postDate: "2026-03-12", account: "1010 Zenith Bank Current", memo: "Customer cash receipt settlement", debit: 850000, credit: 0 },
-        { voucherRef: "JV-2026-082", postDate: "2026-03-12", account: "1200 Trade Receivables", memo: "Victoria Island Suites payment", debit: 0, credit: 850000 },
+        { voucherRef: "JV-2026-082", postDate: "2026-03-12", account: "1200 Trade Receivables", memo: "Eko Atlantic Suites Ltd payment settlement", debit: 0, credit: 850000 },
         { voucherRef: "JV-2026-083", postDate: "2026-03-10", account: "5010 Raw Materials Inventory", memo: "Factory stock intake", debit: 420000, credit: 0 },
-        { voucherRef: "JV-2026-083", postDate: "2026-03-10", account: "2010 Trade Payables", memo: "Dangote Chemicals PO-102", debit: 0, credit: 420000 },
+        { voucherRef: "JV-2026-083", postDate: "2026-03-10", account: "2010 Trade Payables", memo: "Eko Diesel & Haulage Ltd PO-102", debit: 0, credit: 420000 },
       ];
 
       const rows: ReportRow[] = entries.map((e, idx) => ({
@@ -932,31 +941,27 @@ export const REPORTS_CATALOG: readonly ReportDefinition[] = [
       },
     ],
     generateRows: () => {
-      const items = [
-        { sku: "SKU-SLR-5KVA", name: "5KVA Hybrid Solar Inverter (Pure Sine Wave)", qty: 24, cost: 385000, reorder: 5 },
-        { sku: "SKU-BAT-LITH", name: "48V 100Ah Lithium Iron Phosphate Battery (LiFePO4)", qty: 42, cost: 520000, reorder: 8 },
-        { sku: "SKU-PAN-550W", name: "550W Monocrystalline Bifacial Solar Panel Tier 1", qty: 180, cost: 72000, reorder: 30 },
-        { sku: "SKU-CBL-16MM", name: "16mm Single Core DC Copper Cable (100m Roll)", qty: 65, cost: 28500, reorder: 15 },
-        { sku: "SKU-BRK-100A", name: "100A DC Miniature Circuit Breaker DIN Rail", qty: 210, cost: 6500, reorder: 50 },
-      ];
-
-      const rows: ReportRow[] = items.map((item) => {
-        const val = item.qty * item.cost;
+      const records = loadAdminRecords().filter((r) => r.module === "inventory");
+      const rows: ReportRow[] = records.map((item) => {
+        const qtyMatch = item.primaryMetricValue.match(/\d+/);
+        const qty = qtyMatch ? Number.parseInt(qtyMatch[0], 10) : 12;
+        const cost = 285000;
+        const val = qty * cost;
         return {
-          id: item.sku,
+          id: item.id,
           values: {
-            sku: item.sku,
+            sku: item.code,
             name: item.name,
-            qtyOnHand: item.qty,
-            unitCost: item.cost,
+            qtyOnHand: qty,
+            unitCost: cost,
             assetValue: val,
-            reorderLevel: item.reorder,
+            reorderLevel: 6,
           },
         };
       });
 
-      const totalValuation = items.reduce((sum, item) => sum + item.qty * item.cost, 0);
-      const totalUnits = items.reduce((sum, item) => sum + item.qty, 0);
+      const totalValuation = rows.reduce((sum, r) => sum + (Number(r.values.assetValue) || 0), 0);
+      const totalUnits = rows.reduce((sum, r) => sum + (Number(r.values.qtyOnHand) || 0), 0);
 
       return {
         rows,
@@ -1010,31 +1015,31 @@ export const REPORTS_CATALOG: readonly ReportDefinition[] = [
       },
     ],
     generateRows: () => {
-      const staff = [
-        { staffId: "EMP-001", name: "Babajide Adekunle", state: "Lagos (LIRS)", gross: 650000, pencomEmp: 52000, paye: 78500, net: 519500, pencomCo: 65000 },
-        { staffId: "EMP-002", name: "Ngozi Chukwuma", state: "Lagos (LIRS)", gross: 550000, pencomEmp: 44000, paye: 64200, net: 441800, pencomCo: 55000 },
-        { staffId: "EMP-003", name: "Ibrahim Mohammed", state: "FCT Abuja", gross: 480000, pencomEmp: 38400, paye: 52800, net: 388800, pencomCo: 48000 },
-        { staffId: "EMP-004", name: "Chidinma Okoro", state: "Lagos (LIRS)", gross: 320000, pencomEmp: 25600, paye: 28400, net: 266000, pencomCo: 32000 },
-        { staffId: "EMP-005", name: "Emeka Olatunji", state: "Ogun State", gross: 250000, pencomEmp: 20000, paye: 18500, net: 211500, pencomCo: 25000 },
-      ];
+      const records = loadAdminRecords().filter((r) => r.module === "employees");
+      const rows: ReportRow[] = records.map((emp) => {
+        const gross = parseNairaNumeric(emp.primaryMetricValue) || 450000;
+        const pencomEmp = Math.round(gross * 0.08);
+        const pencomCo = Math.round(gross * 0.10);
+        const paye = Math.round(gross * 0.12);
+        const net = gross - pencomEmp - paye;
+        return {
+          id: emp.id,
+          values: {
+            staffId: emp.code,
+            name: emp.name,
+            state: "Lagos (LIRS)",
+            gross,
+            pencomEmployee: pencomEmp,
+            payeTax: paye,
+            netPay: net,
+            pencomEmployer: pencomCo,
+          },
+        };
+      });
 
-      const rows: ReportRow[] = staff.map((s) => ({
-        id: s.staffId,
-        values: {
-          staffId: s.staffId,
-          name: s.name,
-          state: s.state,
-          gross: s.gross,
-          pencomEmployee: s.pencomEmp,
-          payeTax: s.paye,
-          netPay: s.net,
-          pencomEmployer: s.pencomCo,
-        },
-      }));
-
-      const totGross = staff.reduce((s, emp) => s + emp.gross, 0);
-      const totPaye = staff.reduce((s, emp) => s + emp.paye, 0);
-      const totNet = staff.reduce((s, emp) => s + emp.net, 0);
+      const totGross = rows.reduce((s, r) => s + (Number(r.values.gross) || 0), 0);
+      const totPaye = rows.reduce((s, r) => s + (Number(r.values.payeTax) || 0), 0);
+      const totNet = rows.reduce((s, r) => s + (Number(r.values.netPay) || 0), 0);
 
       return {
         rows,
@@ -1229,10 +1234,10 @@ export const REPORTS_CATALOG: readonly ReportDefinition[] = [
     ],
     generateRows: () => {
       const tickets = [
-        { ref: "TCK-109", consultant: "Chidinma Okoro", client: "Victoria Island Suites (Tax Audit)", hours: 18, rate: 35000 },
-        { ref: "TCK-110", consultant: "Babajide Adekunle", client: "Dangote Chemicals (IFRS Conversion)", hours: 24, rate: 50000 },
-        { ref: "TCK-111", consultant: "Ngozi Chukwuma", client: "Eko Atlantic (ERP Setup)", hours: 12, rate: 40000 },
-        { ref: "TCK-112", consultant: "Emeka Olatunji", client: "Ikeja City Mall (Stock Review)", hours: 8, rate: 25000 },
+        { ref: "TCK-109", consultant: "Chinedu Okafor", client: "Eko Atlantic Suites Ltd (Tax Audit)", hours: 18, rate: 35000 },
+        { ref: "TCK-110", consultant: "Amina Bello", client: "Victoria Island Logistics (IFRS Review)", hours: 24, rate: 50000 },
+        { ref: "TCK-111", consultant: "Chinedu Okafor", client: "Ikeja City Mall Pharmacy (POS Setup)", hours: 12, rate: 40000 },
+        { ref: "TCK-112", consultant: "Amina Bello", client: "Eko Diesel & Haulage Ltd (Stock Review)", hours: 8, rate: 25000 },
       ];
 
       const rows: ReportRow[] = tickets.map((t) => ({

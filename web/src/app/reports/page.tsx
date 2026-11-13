@@ -1,10 +1,22 @@
+import { cookies } from "next/headers";
 import { FrcnReportsDashboard } from "@/components/FrcnReportsDashboard";
 import { TopNavCapsule } from "@/components/TopNavCapsule";
 import { fetchFiscalPeriods, fetchFrcnPackage } from "@/lib/bff-client";
+import {
+  getOptionalSessionFromToken,
+  SESSION_COOKIE_NAME,
+} from "@/lib/auth-bff";
 
 export const dynamic = "force-dynamic";
 
 export default async function FrcnReportsPage() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
+  const activeSession = getOptionalSessionFromToken(token);
+  const workspaceName =
+    activeSession?.workspace?.legalName ?? "Lagos Trading & Hospitality Ltd";
+  const workspaceRc = activeSession?.workspace?.rcNumber ?? "RC 1482910";
+
   const periods = await fetchFiscalPeriods();
   const openOrLatest = periods.find((p) => p.status === "OPEN") ?? periods[0];
   if (!openOrLatest) {
@@ -19,7 +31,12 @@ export default async function FrcnReportsPage() {
     <>
       <TopNavCapsule activeTab="reports" />
       <main id="main-content">
-        <FrcnReportsDashboard periods={periods} initialPackage={rep.body} />
+        <FrcnReportsDashboard
+          periods={periods}
+          initialPackage={rep.body}
+          workspaceName={workspaceName}
+          workspaceRc={workspaceRc}
+        />
       </main>
     </>
   );

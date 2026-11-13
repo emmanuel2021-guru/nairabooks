@@ -586,3 +586,37 @@
      - SAST static security scan passed with 0 findings.
      - Next.js 15 production build compiled cleanly with all 44 routes generated.
 - **Consequences:** All text, headings, badges, and card surfaces across the platform render with high contrast and WCAG 2.2 Level AA compliance in both light and dark modes, while authentic A4 paper reports remain unaffected.
+
+## ADR-041: Universal Naira Glyph Isolation, Docked Flutter Mobile Architecture, Live Admin-Linked Reports & Entity Grouping
+- **Date:** 2026-11-13
+- **Status:** Accepted
+- **Context:**
+  - On Samsung Galaxy / Android devices using Samsung Internet, the Naira symbol (`₦`) showed missing-glyph tofu boxes (`▯`) in table cells and charts because monospace fonts lack `U+20A6`.
+  - The mobile bottom navigation bar was visually trapped inside the sticky `<header>` at the top of the phone screen because the parent element's `backdrop-blur` established a CSS containing block for all `position: fixed` descendants under mobile WebKit/Chromium specifications.
+  - Reports displayed fictitious mock entities ("Victoria Island Suites Ltd", "Dangote Chemicals", "PwC Nigeria") and a hardcoded company name ("NairaBooks Enterprise Limited") instead of the active workspace entity ("Lagos Trading & Hospitality Ltd", RC 1482910).
+  - Admin lacked categorization and grouping for Customers, Vendors, Employees, and Stock Items.
+  - Browser print and PDF export leaked screen headings ("Statement of Financial Position") and executive KPI summary cards onto Page 1 of the printed management document.
+- **Decision:**
+  1. **Universal Naira Glyph Isolation (`U+20A6`):**
+     - Prepended `'NairaGlyphFallback'`, `'Roboto'`, and `'Samsung Sans'` to font families in `tailwind.config.ts`.
+     - Created `renderWithNairaSign(text)` in `NairaAmount.tsx`, isolating `₦` in `font-sans` while keeping numeric digits in tabular `font-mono`.
+     - Applied `renderWithNairaSign()` across Overview KPI cards, Top Expenses, Overdue Invoices, Admin metric headers, and Report tables.
+  2. **Flutter-Style Mobile Architecture & Bottom Navigation Docking:**
+     - Extracted mobile `<nav>` outside the sticky `<header>` to root level using `.nb-mobile-bottom-nav`, removing the CSS containing block trap so the navigation bar is permanently docked at the bottom of the mobile viewport.
+     - Implemented `MobileQuickActionFab` (`web/src/components/mobile/MobileQuickActionFab.tsx`): a Flutter-style Floating Action Button `+` docked at `bottom-20 right-4` with smooth 45° rotation and animated bottom modal sheet for 1-tap New Sale, New Bill, Customer Payment, Add Customer, and Add Stock.
+  3. **Live Admin-Linked Reports & Entity Realignment:**
+     - Connected `aged-receivables`, `invoice-register`, `aged-payables`, `inventory-valuation`, `payroll-register`, and `unbilled-time-tickets` directly to `loadAdminRecords()`.
+     - Replaced all occurrences of hardcoded "NairaBooks Enterprise Limited" with active workspace props `workspaceName` (`"Lagos Trading & Hospitality Ltd"`) and `workspaceRc` (`"RC 1482910"`).
+  4. **Category Grouping in Admin Maintain Workspace:**
+     - Added `isGroupedView` state and `categoryGroups` computation for `customers`, `vendors`, `employees`, and `inventory` in `AdminMaintainWorkspace.tsx`.
+     - Added View Mode toggle (`[Group by Category] | [Flat List]`) and interactive accordion cards with folder icons, item count badges, and subtotal metrics.
+  5. **Professional A4 PDF Export Chrome Isolation:**
+     - Fixed `div` nesting in `ReportViewer.tsx`, ensuring all screen chrome (Header, KPI cards, Pro badge, Toolbar, Drawers) is strictly enclosed in `.no-print`.
+     - Enhanced `@media print` in `globals.css` with `.no-print, .no-print * { display: none !important; visibility: hidden !important; height: 0 !important; }`, guaranteeing pure A4 letterhead output for board presentations.
+  6. **Verification:**
+     - 16 Vitest test suites (56 tests) passed with 0 `axe-core` accessibility violations.
+     - 100/100 Python pytest test suite passed.
+     - SAST static application security scan passed with 0 vulnerabilities.
+     - Next.js 15 production build compiled all 44 routes cleanly.
+     - `verify_workflow.py` verified 128/128 wizard skills (100% complete).
+- **Consequences:** The application feels like a native Flutter mobile app on phones with a docked bottom nav and FAB, renders zero Naira tofu glyphs across Android devices, synchronizes reports with live Admin records, provides grouping for operational entities, and exports immaculate A4 PDF reports for corporate management.

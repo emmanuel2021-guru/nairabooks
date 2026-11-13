@@ -1,0 +1,30 @@
+-- Rollback 0003: Remove observability view and custom secondary indexes
+DROP VIEW IF EXISTS v_migration_observability;
+
+DROP INDEX IF EXISTS idx_outbox_payload_gin;
+DROP INDEX IF EXISTS idx_pack_profiles_config_gin;
+DROP INDEX IF EXISTS idx_pack_profiles_primitives_gin;
+DROP INDEX IF EXISTS idx_outbox_pending;
+DROP INDEX IF EXISTS idx_tax_rule_lookup;
+DROP INDEX IF EXISTS idx_audit_workspace_keyset;
+DROP INDEX IF EXISTS idx_lines_workspace_account_created;
+DROP INDEX IF EXISTS idx_vouchers_workspace_keyset;
+DROP INDEX IF EXISTS idx_outbox_workspace;
+DROP INDEX IF EXISTS idx_audit_actor;
+DROP INDEX IF EXISTS idx_cama_cert_user;
+DROP INDEX IF EXISTS idx_cama_cert_period;
+DROP INDEX IF EXISTS idx_snapshots_account;
+DROP INDEX IF EXISTS idx_snapshots_period;
+DROP INDEX IF EXISTS idx_snapshots_workspace;
+DROP INDEX IF EXISTS idx_lines_account;
+DROP INDEX IF EXISTS idx_lines_voucher;
+DROP INDEX IF EXISTS idx_vouchers_reversed_by;
+DROP INDEX IF EXISTS idx_vouchers_approved_by;
+DROP INDEX IF EXISTS idx_vouchers_created_by;
+DROP INDEX IF EXISTS idx_vouchers_fiscal_period;
+DROP INDEX IF EXISTS idx_coa_workspace;
+DROP INDEX IF EXISTS idx_fiscal_periods_workspace;
+DROP INDEX IF EXISTS idx_pack_profiles_primary;
+DROP INDEX IF EXISTS idx_tax_profiles_workspace;
+DROP INDEX IF EXISTS idx_workspace_members_user;
+DROP INDEX IF EXISTS idx_workspace_members_workspace;

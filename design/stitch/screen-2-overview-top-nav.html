@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+
+<html class="h-full bg-[#F8FAFC]" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NairaBooks — Modern Bookkeeping for Nigerian Business</title>
+<!-- Google Fonts: Plus Jakarta Sans, Inter, JetBrains Mono for monetary tabular numerals -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@500;600;700&amp;family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;family=Public+Sans:wght@500;600&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS v3 -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "on-primary-container": "#86d5a0",
+            "on-secondary-fixed-variant": "#07497d",
+            "surface": "#f8f9ff",
+            "surface-container-low": "#eff4ff",
+            "surface-container-high": "#dde9ff",
+            "on-primary-fixed-variant": "#00522d",
+            "inverse-surface": "#233144",
+            "secondary-container": "#92c1fe",
+            "on-tertiary-container": "#ffb389",
+            "secondary": "#2d6197",
+            "inverse-primary": "#89d7a2",
+            "surface-tint": "#196c40",
+            "surface-container-highest": "#d5e3fd",
+            "surface-bright": "#f8f9ff",
+            "surface-dim": "#ccdbf4",
+            "tertiary-container": "#873b00",
+            "on-secondary": "#ffffff",
+            "outline-variant": "#bfc9be",
+            "on-primary": "#ffffff",
+            "primary-fixed-dim": "#89d7a2",
+            "primary-container": "#005e34",
+            "surface-container-lowest": "#ffffff",
+            "background": "#f8f9ff",
+            "surface-container": "#e6eeff",
+            "surface-variant": "#d5e3fd",
+            "primary-fixed": "#a4f4bd",
+            "on-primary-fixed": "#00210f",
+            "error": "#ba1a1a",
+            "on-error-container": "#93000a",
+            "secondary-fixed": "#d2e4ff",
+            "on-surface-variant": "#3f4941",
+            "secondary-fixed-dim": "#a0c9ff",
+            "on-background": "#0d1c2f",
+            "primary": "#004424",
+            "tertiary-fixed": "#ffdbca",
+            "on-tertiary-fixed": "#331200",
+            "on-secondary-fixed": "#001c37",
+            "error-container": "#ffdad6",
+            "tertiary": "#632900",
+            "tertiary-fixed-dim": "#ffb68e",
+            "on-tertiary-fixed-variant": "#763300",
+            "outline": "#6f7a70",
+            "on-secondary-container": "#144f84",
+            "inverse-on-surface": "#ebf1ff",
+            "on-surface": "#0d1c2f",
+            "on-error": "#ffffff",
+            "on-tertiary": "#ffffff"
+          },
+          fontFamily: {
+            headline: ["Plus Jakarta Sans", "sans-serif"],
+            display: ["Plus Jakarta Sans", "sans-serif"],
+            body: ["Inter", "sans-serif"],
+            mono: ["JetBrains Mono", "monospace"],
+            label: ["Public Sans", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .font-tabular {
+      font-feature-settings: "tnum" 1, "zero" 1;
+    }
+  </style>
+</head>
+<body class="min-h-full bg-[#F8FAFC] text-on-surface font-body antialiased selection:bg-on-primary-container selection:text-primary">
+<!-- Accessible Skip Link -->
+<a class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary-container focus:text-on-primary focus:rounded-lg focus:shadow-lg focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:outline-none text-sm font-medium" href="#main-content">
+    Skip to main content
+  </a>
+<!-- TOP HEADER (Clean floating daylight bar, exact shared component contract) -->
+<header class="sticky top-0 z-50 w-full bg-[#F8FAFC]/95 backdrop-blur-md border-b border-slate-200/50 transition-all duration-150">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-3">
+    <div class="flex items-center gap-3 shrink-0">
+      <a aria-label="NairaBooks Homepage" class="whitespace-nowrap font-headline font-extrabold text-xl tracking-tight text-primary-container flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-primary-container focus:ring-offset-2 rounded-lg" href="screen-2-overview-top-nav.html">
+        <span class="w-8 h-8 rounded-lg bg-primary-container flex items-center justify-center text-on-primary shadow-sm">
+          <span class="material-symbols-outlined text-[20px]" data-icon="eco">eco</span>
+        </span>
+        <span>NairaBooks</span>
+      </a>
+      <span class="text-slate-300 font-light hidden lg:inline">|</span>
+      <div class="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100/80 border border-slate-200/60 text-xs font-medium text-slate-600 whitespace-nowrap">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+        <span>Lagos Mart Ltd</span>
+      </div>
+    </div>
+    <nav aria-label="Main Navigation" class="hidden md:flex items-center gap-1 bg-white/95 border border-slate-200/80 p-1.5 rounded-full shadow-[0_2px_8px_-2px_rgba(0,0,0,0.04)] shrink-0">
+        <a aria-current="page" class="whitespace-nowrap bg-primary-container text-on-primary font-medium rounded-full px-4 py-1.5 text-sm shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-primary" href="screen-2-overview-top-nav.html">Overview</a>
+        <a class="whitespace-nowrap text-on-surface-variant font-medium text-sm px-4 py-1.5 rounded-full hover:text-on-surface hover:bg-slate-50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary" href="screen-3-books-hub.html">Books</a>
+        <a class="whitespace-nowrap text-on-surface-variant font-medium text-sm px-4 py-1.5 rounded-full hover:text-on-surface hover:bg-slate-50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary" href="screen-6-directory-create.html">People &amp; Stock</a>
+        <a class="whitespace-nowrap text-on-surface-variant font-medium text-sm px-4 py-1.5 rounded-full hover:text-on-surface hover:bg-slate-50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary" href="screen-7-pdf-bank-reconcile.html">Reconcile</a>
+        <a class="whitespace-nowrap text-on-surface-variant font-medium text-sm px-4 py-1.5 rounded-full hover:text-on-surface hover:bg-slate-50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary" href="screen-8-reports-center.html">Reports</a>
+    </nav>
+    <div class="flex items-center gap-2.5 shrink-0">
+      <div aria-label="Interface density mode" class="hidden sm:inline-flex items-center p-0.5 rounded-full bg-slate-100 border border-slate-200/80 text-xs font-medium text-slate-600" role="group" data-mode-toggle="true">
+        <button class="mode-btn-simple whitespace-nowrap px-2.5 py-1 rounded-full bg-white text-slate-900 shadow-xs focus:outline-none focus:ring-2 focus:ring-primary" type="button" data-mode="simple">Simple</button>
+        <button class="mode-btn-pro whitespace-nowrap px-2.5 py-1 rounded-full text-slate-500 hover:text-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-primary" type="button" data-mode="pro">Pro</button>
+      </div>
+      <a class="whitespace-nowrap inline-flex items-center gap-1 bg-primary-container hover:bg-primary text-on-primary font-medium text-sm px-4 py-2 rounded-full shadow-sm hover:shadow transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" href="screen-4-book-entry-form.html">
+        <span class="material-symbols-outlined text-[18px]" data-icon="add">add</span>
+        <span>New Entry</span>
+      </a>
+    </div>
+  </div>
+  <nav aria-label="Mobile Navigation" class="md:hidden px-4 pb-3 flex items-center gap-1.5 overflow-x-auto">
+      <a aria-current="page" class="whitespace-nowrap bg-primary-container text-on-primary font-medium rounded-full px-3 py-1 text-xs shadow-xs" href="screen-2-overview-top-nav.html">Overview</a>
+      <a class="whitespace-nowrap text-on-surface-variant font-medium text-xs px-3 py-1 rounded-full bg-white border border-slate-200" href="screen-3-books-hub.html">Books</a>
+      <a class="whitespace-nowrap text-on-surface-variant font-medium text-xs px-3 py-1 rounded-full bg-white border border-slate-200" href="screen-6-directory-create.html">People &amp; Stock</a>
+      <a class="whitespace-nowrap text-on-surface-variant font-medium text-xs px-3 py-1 rounded-full bg-white border border-slate-200" href="screen-7-pdf-bank-reconcile.html">Reconcile</a>
+      <a class="whitespace-nowrap text-on-surface-variant font-medium text-xs px-3 py-1 rounded-full bg-white border border-slate-200" href="screen-8-reports-center.html">Reports</a>
+  </nav>
+</header>
+<!-- MAIN CANVAS (Max 6xl, spacious breathing room, serene light aesthetic) -->
+<main class="max-w-6xl mx-auto px-6 py-10" id="main-content">
+<!-- Greeting & Header Space -->
+<header class="mb-10">
+<h1 class="font-headline text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 mb-2">
+        Good morning, Lagos Mart
+      </h1>
+<p class="text-base text-slate-500 font-normal">
+        Here is your business at a glance today
+      </p>
+</header>
+<!-- ROW 1: Calm 3-Step Flow Guide Strip -->
+<section aria-label="Quick setup guide" class="mb-10 bg-white/80 border border-slate-200/70 rounded-2xl p-4 sm:p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] backdrop-blur-xs">
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+<div class="flex items-center gap-2.5 text-slate-700">
+<span class="material-symbols-outlined text-primary-container text-xl" data-icon="spa">spa</span>
+<span class="font-headline font-semibold text-sm tracking-tight text-slate-800">
+            How NairaBooks works in 3 calm steps
+          </span>
+</div>
+<!-- Connected Step Pills -->
+<ol class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm font-medium">
+<li class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 text-primary-container border border-emerald-100">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+<span>1. Add Customers &amp; Stock</span>
+</li>
+<span class="material-symbols-outlined text-slate-300 text-sm hidden sm:inline" data-icon="arrow_forward">arrow_forward</span>
+<li class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-50 text-slate-700 border border-slate-200/80">
+<span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+<span>2. Record Sales &amp; Purchases</span>
+</li>
+<span class="material-symbols-outlined text-slate-300 text-sm hidden sm:inline" data-icon="arrow_forward">arrow_forward</span>
+<li class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-50 text-slate-700 border border-slate-200/80">
+<span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+<span>3. Drop Bank PDF to Match</span>
+</li>
+</ol>
+</div>
+</section>
+<!-- ROW 2: Exactly 3 Spacious Clean White Metric Cards (Max 2 lines per card, zero clutter) -->
+<section aria-label="Key financial metrics" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+<!-- Card 1: Money in Bank -->
+<article class="bg-white border border-slate-200/80 rounded-2xl p-7 shadow-[0_1px_4px_rgba(0,0,0,0.03)] hover:border-slate-300 transition-all">
+<h2 class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">
+          Money in Bank
+        </h2>
+<div class="flex flex-col gap-1.5">
+<div class="font-mono text-2xl sm:text-[28px] font-bold tracking-tight text-slate-900 font-tabular">
+            ₦48,250,000.00
+          </div>
+<p class="text-sm text-slate-500 font-medium">
+            Zenith &amp; GTBank
+          </p>
+</div>
+</article>
+<!-- Card 2: Waiting from Customers -->
+<article class="bg-white border border-slate-200/80 rounded-2xl p-7 shadow-[0_1px_4px_rgba(0,0,0,0.03)] hover:border-slate-300 transition-all">
+<h2 class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">
+          Waiting from Customers
+        </h2>
+<div class="flex flex-col gap-1.5">
+<div class="font-mono text-2xl sm:text-[28px] font-bold tracking-tight text-slate-900 font-tabular">
+            ₦12,480,000.00
+          </div>
+<p class="text-sm text-slate-500 font-medium">
+            14 open invoices
+          </p>
+</div>
+</article>
+<!-- Card 3: Bills Due Soon -->
+<article class="bg-white border border-slate-200/80 rounded-2xl p-7 shadow-[0_1px_4px_rgba(0,0,0,0.03)] hover:border-slate-300 transition-all">
+<h2 class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">
+          Bills Due Soon
+        </h2>
+<div class="flex flex-col gap-1.5">
+<div class="font-mono text-2xl sm:text-[28px] font-bold tracking-tight text-slate-900 font-tabular">
+            ₦4,920,000.00
+          </div>
+<p class="text-sm text-slate-500 font-medium">
+            6 supplier bills
+          </p>
+</div>
+</article>
+</section>
+<!-- ROW 3: Wide Clean Comparison Card (Money In vs. Money Out - Last 6 Months) -->
+<section aria-labelledby="cashflow-heading" class="bg-white border border-slate-200/80 rounded-2xl p-8 sm:p-10 shadow-[0_1px_4px_rgba(0,0,0,0.03)]">
+<!-- Top header with Legend -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between pb-8 border-b border-slate-100 gap-4">
+<div>
+<h2 class="font-headline text-lg sm:text-xl font-bold tracking-tight text-slate-900" id="cashflow-heading">
+            Money In vs. Money Out (Last 6 Months)
+          </h2>
+<p class="text-sm text-slate-500 mt-0.5">
+            May 2024 — October 2024 cashflow cadence
+          </p>
+</div>
+<!-- Minimal Legend -->
+<div class="flex items-center gap-5 text-xs font-medium text-slate-600">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-xs bg-[#005E34]"></span>
+<span>Money In</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-xs bg-[#94A3B8]"></span>
+<span>Money Out</span>
+</div>
+</div>
+</div>
+<!-- Minimal 6-Month Bar Comparison Chart -->
+<div class="pt-10 pb-6">
+<div class="h-60 sm:h-72 w-full flex items-end justify-between gap-3 sm:gap-8 px-2 sm:px-6">
+<!-- Month 1: May -->
+<div class="flex-1 flex flex-col items-center h-full justify-end group">
+<div class="w-full flex items-end justify-center gap-1.5 sm:gap-2.5 h-[80%] pb-3 border-b border-slate-200">
+<div class="w-full max-w-[24px] bg-[#005E34] rounded-t-sm transition-all duration-300 hover:opacity-90" style="height: 65%;" title="May In: ₦24.2M"></div>
+<div class="w-full max-w-[24px] bg-[#94A3B8] rounded-t-sm transition-all duration-300 hover:opacity-90" style="height: 48%;" title="May Out: ₦17.8M"></div>
+</div>
+<span class="text-xs font-medium text-slate-500 mt-3">May</span>
+</div>
+<!-- Month 2: Jun -->
+<div class="flex-1 flex flex-col items-center h-full justify-end group">
+<div class="w-full flex items-end justify-center gap-1.5 sm:gap-2.5 h-[80%] pb-3 border-b border-slate-200">
+<div class="w-full max-w-[24px] bg-[#005E34] rounded-t-sm transition-all duration-300 hover:opacity-90" style="height: 72%;" title="Jun In: ₦27.5M"></div>
+<div class="w-full max-w-[24px] bg-[#94A3B8] rounded-t-sm transition-all duration-300 hover:opacity-90" style="height: 52%;" title="Jun Out: ₦19.4M"></div>
+</div>
+<span class="text-xs font-medium text-slate-500 mt-3">Jun</span>
+</div>
+<!-- Month 3: Jul -->
+<div class="flex-1 flex flex-col items-center h-full justify-end group">
+<div class="w-full flex items-end justify-center gap-1.5 sm:gap-2.5 h-[80%] pb-3 border-b border-slate-200">
+<div class="w-full max-w-[24px] bg-[#005E34] rounded-t-sm transition-all duration-300 hover:opacity-90" style="height: 80%;" title="Jul In: ₦31.0M"></div>
+<div class="w-full max-w-[24px] bg-[#94A3B8] rounded-t-sm transition-all duration-300 hover:opacity-90" style="height: 58%;" title="Jul Out: ₦22.1M"></div>
+</div>
+<span class="text-xs font-medium text-slate-500 mt-3">Jul</span>
+</div>
+<!-- Month 4: Aug -->
+<div class="flex-1 flex flex-col items-center h-full justify-end group">
+<div class="w-full flex items-end justify-center gap-1.5 sm:gap-2.5 h-[80%] pb-3 border-b border-slate-200">
+<div class="w-full max-w-[24px] bg-[#005E34] rounded-t-sm transition-all duration-300 hover:opacity-90" style="height: 70%;" title="Aug In: ₦26.8M"></div>
+<div class="w-full max-w-[24px] bg-[#94A3B8] rounded-t-sm transition-all duration-300 hover:opacity-90" style="height: 45%;" title="Aug Out: ₦16.9M"></div>
+</div>
+<span class="text-xs font-medium text-slate-500 mt-3">Aug</span>
+</div>
+<!-- Month 5: Sep -->
+<div class="flex-1 flex flex-col items-center h-full justify-end group">
+<div class="w-full flex items-end justify-center gap-1.5 sm:gap-2.5 h-[80%] pb-3 border-b border-slate-200">
+<div class="w-full max-w-[24px] bg-[#005E34] rounded-t-sm transition-all duration-300 hover:opacity-90" style="height: 88%;" title="Sep In: ₦34.6M"></div>
+<div class="w-full max-w-[24px] bg-[#94A3B8] rounded-t-sm transition-all duration-300 hover:opacity-90" style="height: 61%;" title="Sep Out: ₦23.7M"></div>
+</div>
+<span class="text-xs font-medium text-slate-500 mt-3">Sep</span>
+</div>
+<!-- Month 6: Oct -->
+<div class="flex-1 flex flex-col items-center h-full justify-end group">
+<div class="w-full flex items-end justify-center gap-1.5 sm:gap-2.5 h-[80%] pb-3 border-b border-slate-200">
+<div class="w-full max-w-[24px] bg-[#005E34] rounded-t-sm transition-all duration-300 hover:opacity-90" style="height: 94%;" title="Oct In: ₦38.2M"></div>
+<div class="w-full max-w-[24px] bg-[#94A3B8] rounded-t-sm transition-all duration-300 hover:opacity-90" style="height: 50%;" title="Oct Out: ₦20.1M"></div>
+</div>
+<span class="text-xs font-semibold text-slate-900 mt-3">Oct</span>
+</div>
+</div>
+</div>
+<!-- Quiet Summary Note (Wave/Linear serene style) -->
+<footer class="mt-4 pt-5 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between text-xs text-slate-500 gap-2">
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+<span>Consistent positive net inflow over the last 6 consecutive cycles.</span>
+</div>
+<span class="text-slate-400 font-normal">All values verified through dual ledger reconciliation.</span>
+</footer>
+</section>
+</main>
+
+<script>
+  (function () {
+    const modeBannerId = 'nb-pro-mode-strip';
+    function applyMode(mode) {
+      try { localStorage.setItem('nb_mode', mode); } catch (_) {}
+      const simpleBtn = document.querySelector('.mode-btn-simple');
+      const proBtn = document.querySelector('.mode-btn-pro');
+      if (simpleBtn && proBtn) {
+        if (mode === 'pro') {
+          proBtn.className = 'mode-btn-pro whitespace-nowrap px-2.5 py-1 rounded-full bg-slate-900 text-white shadow-xs focus:outline-none focus:ring-2 focus:ring-primary';
+          simpleBtn.className = 'mode-btn-simple whitespace-nowrap px-2.5 py-1 rounded-full text-slate-500 hover:text-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-primary';
+        } else {
+          simpleBtn.className = 'mode-btn-simple whitespace-nowrap px-2.5 py-1 rounded-full bg-white text-slate-900 shadow-xs focus:outline-none focus:ring-2 focus:ring-primary';
+          proBtn.className = 'mode-btn-pro whitespace-nowrap px-2.5 py-1 rounded-full text-slate-500 hover:text-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-primary';
+        }
+      }
+      let strip = document.getElementById(modeBannerId);
+      if (mode === 'pro') {
+        if (!strip) {
+          strip = document.createElement('div');
+          strip.id = modeBannerId;
+          strip.className = 'max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4';
+          strip.innerHTML = '<div class="rounded-xl bg-slate-900 text-slate-100 px-4 py-2.5 text-xs flex flex-wrap items-center justify-between gap-2 shadow-sm"><span><strong class="font-semibold text-emerald-300">Accountant (Pro) Mode Active:</strong> IFRS codes (#1010–#6150), VAT/WHT tax columns &amp; Double-Entry controls enabled.</span><a href="screen-5-journal-adjustments.html?tab=journal" class="font-semibold text-emerald-300 hover:underline whitespace-nowrap">Open Double-Entry Journal →</a></div>';
+          const main = document.getElementById('main-content');
+          if (main && main.parentNode) main.parentNode.insertBefore(strip, main);
+        }
+        strip.classList.remove('hidden');
+      } else if (strip) {
+        strip.classList.add('hidden');
+      }
+    }
+    let saved = 'simple';
+    try { saved = localStorage.getItem('nb_mode') || 'simple'; } catch (_) {}
+    document.querySelectorAll('[data-mode-toggle] button').forEach((btn) => {
+      btn.addEventListener('click', () => applyMode(btn.dataset.mode || 'simple'));
+    });
+    if (saved === 'pro') applyMode('pro');
+  })();
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('li').forEach((li) => {
+      const t = li.textContent;
+      if (t.includes('Add Customers')) {
+        li.style.cursor = 'pointer';
+        li.addEventListener('click', () => { window.location.href = 'screen-6-directory-create.html'; });
+      } else if (t.includes('Record Sales')) {
+        li.style.cursor = 'pointer';
+        li.addEventListener('click', () => { window.location.href = 'screen-3-books-hub.html'; });
+      } else if (t.includes('Drop Bank PDF')) {
+        li.style.cursor = 'pointer';
+        li.addEventListener('click', () => { window.location.href = 'screen-7-pdf-bank-reconcile.html'; });
+      }
+    });
+  });
+</script>
+
+</body></html>

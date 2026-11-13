@@ -1,0 +1,127 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * NairaBooks Semantic Design System Tokens & WCAG 2.2 AA Accessibility Primitives
+ * Synced with design/tokens/nairabooks.tokens.json and Stitch assets/8475106491343804798
+ */
+:root {
+  --nb-background: 248 250 252;
+  --nb-surface: 255 255 255;
+  --nb-surface-muted: 241 245 249;
+  --nb-foreground: 15 23 42;
+  --nb-foreground-muted: 71 85 105;
+
+  --nb-primary: 0 94 52;
+  --nb-primary-hover: 0 68 36;
+  --nb-primary-foreground: 255 255 255;
+  --nb-primary-soft-bg: 236 253 245;
+  --nb-primary-soft-foreground: 6 95 70;
+
+  --nb-secondary: 15 76 129;
+  --nb-secondary-foreground: 255 255 255;
+  --nb-secondary-soft-bg: 239 246 255;
+  --nb-secondary-soft-foreground: 30 58 138;
+
+  --nb-warning: 180 83 9;
+  --nb-warning-foreground: 255 255 255;
+  --nb-warning-soft-bg: 254 243 199;
+  --nb-warning-soft-foreground: 120 53 15;
+
+  --nb-destructive: 185 28 28;
+  --nb-destructive-foreground: 255 255 255;
+  --nb-destructive-soft-bg: 254 242 242;
+  --nb-destructive-soft-foreground: 153 27 27;
+
+  --nb-border-subtle: 203 213 225;
+  --nb-border-interactive: 100 116 139;
+  --nb-focus-ring: 0 94 52;
+
+  --nb-font-heading: 'Plus Jakarta Sans';
+  --nb-font-body: 'Inter';
+  --nb-font-mono: 'JetBrains Mono';
+}
+
+.dark {
+  --nb-background: 11 17 32;
+  --nb-surface: 17 24 39;
+  --nb-surface-muted: 30 41 59;
+  --nb-foreground: 248 250 252;
+  --nb-foreground-muted: 203 213 225;
+
+  --nb-primary: 52 211 153;
+  --nb-primary-hover: 110 231 183;
+  --nb-primary-foreground: 2 44 34;
+  --nb-primary-soft-bg: 6 78 59;
+  --nb-primary-soft-foreground: 236 253 245;
+
+  --nb-secondary: 147 197 253;
+  --nb-secondary-foreground: 8 47 73;
+  --nb-secondary-soft-bg: 30 58 138;
+  --nb-secondary-soft-foreground: 239 246 255;
+
+  --nb-warning: 251 191 36;
+  --nb-warning-foreground: 69 26 3;
+  --nb-warning-soft-bg: 120 53 15;
+  --nb-warning-soft-foreground: 254 243 199;
+
+  --nb-destructive: 252 165 165;
+  --nb-destructive-foreground: 69 10 10;
+  --nb-destructive-soft-bg: 127 29 29;
+  --nb-destructive-soft-foreground: 254 242 242;
+
+  --nb-border-subtle: 51 65 85;
+  --nb-border-interactive: 148 163 184;
+  --nb-focus-ring: 52 211 153;
+}
+
+@layer base {
+  body {
+    background-color: rgb(var(--nb-background));
+    color: rgb(var(--nb-foreground));
+    font-family: var(--nb-font-body), system-ui, sans-serif;
+  }
+
+  /* WCAG 2.4.7 / 2.4.11 Focus Visible & Unobscured (>= 3:1 contrast) */
+  :focus-visible {
+    outline: 2px solid rgb(var(--nb-focus-ring));
+    outline-offset: 2px;
+  }
+}
+
+/* Keyboard-first Skip Navigation Link */
+.nb-skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0.75rem;
+  z-index: 60;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  background-color: rgb(var(--nb-primary));
+  color: rgb(var(--nb-primary-foreground));
+  font-weight: 600;
+}
+
+.nb-skip-link:focus {
+  left: 1rem;
+}
+
+/* Precision Naira & FX tabular numeric cell alignment */
+.nb-money-cell {
+  font-family: var(--nb-font-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

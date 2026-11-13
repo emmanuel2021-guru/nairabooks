@@ -1,0 +1,16 @@
+{
+  "id": "composable-pack-engine_20261112",
+  "title": "Two-Layer Declarative Industry Profile & Hybrid Pack Composer",
+  "type": "feature",
+  "status": "completed",
+  "created": "2026-11-12T01:48:00+01:00",
+  "updated": "2026-11-12T09:57:00+01:00",
+  "phases": {
+    "total": 2,
+    "completed": 2
+  },
+  "tasks": {
+    "total": 4,
+    "completed": 4
+  }
+}

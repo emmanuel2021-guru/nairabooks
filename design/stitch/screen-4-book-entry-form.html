@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+
+<html class="h-full bg-surface" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Record Transaction / Sales Invoice — NairaBooks</title>
+<!-- Material Symbols & Typography -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;family=Public+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS with custom configuration -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "inverse-surface": "#233144",
+            "primary-fixed": "#a4f4bd",
+            "primary-container": "#005e34",
+            "surface-container-low": "#eff4ff",
+            "surface-container": "#e6eeff",
+            "on-surface": "#0d1c2f",
+            "on-tertiary": "#ffffff",
+            "secondary-fixed-dim": "#a0c9ff",
+            "on-secondary-fixed-variant": "#07497d",
+            "background": "#f8f9ff",
+            "tertiary-fixed": "#ffdbca",
+            "on-primary-fixed": "#00210f",
+            "outline-variant": "#bfc9be",
+            "on-tertiary-fixed": "#331200",
+            "surface": "#f8f9ff",
+            "secondary": "#2d6197",
+            "primary-fixed-dim": "#89d7a2",
+            "surface-variant": "#d5e3fd",
+            "on-tertiary-container": "#ffb389",
+            "primary": "#004424",
+            "error-container": "#ffdad6",
+            "on-error-container": "#93000a",
+            "on-background": "#0d1c2f",
+            "surface-tint": "#196c40",
+            "secondary-container": "#92c1fe",
+            "error": "#ba1a1a",
+            "inverse-primary": "#89d7a2",
+            "surface-bright": "#f8f9ff",
+            "on-primary": "#ffffff",
+            "surface-container-high": "#dde9ff",
+            "on-primary-container": "#86d5a0",
+            "surface-container-highest": "#d5e3fd",
+            "on-secondary-fixed": "#001c37",
+            "inverse-on-surface": "#ebf1ff",
+            "on-primary-fixed-variant": "#00522d",
+            "surface-container-lowest": "#ffffff",
+            "outline": "#6f7a70",
+            "on-error": "#ffffff",
+            "tertiary-fixed-dim": "#ffb68e",
+            "secondary-fixed": "#d2e4ff",
+            "tertiary-container": "#873b00",
+            "on-surface-variant": "#3f4941",
+            "on-secondary-container": "#144f84",
+            "on-tertiary-fixed-variant": "#763300",
+            "surface-dim": "#ccdbf4",
+            "on-secondary": "#ffffff",
+            "tertiary": "#632900"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "fontFamily": {
+            "headline": ["Plus Jakarta Sans", "sans-serif"],
+            "display": ["Plus Jakarta Sans", "sans-serif"],
+            "body": ["Inter", "sans-serif"],
+            "label": ["Public Sans", "sans-serif"],
+            "mono": ["JetBrains Mono", "monospace"]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .num-mono {
+      font-family: 'JetBrains Mono', monospace;
+      font-feature-settings: 'tnum' on, 'lnum' on;
+    }
+  </style>
+</head>
+<body class="min-h-full bg-[#f8fafc] text-on-surface font-body antialiased selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- Accessible Skip Link -->
+<a class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-4 z-50 px-4 py-2 bg-primary text-white font-medium rounded-lg shadow-md focus:ring-2 focus:ring-primary focus:outline-none" href="#main-content">
+    Skip to main content
+  </a>
+<!-- TOP HEADER (Shared Component Shell) -->
+<header class="sticky top-0 z-50 w-full bg-[#F8FAFC]/95 backdrop-blur-md border-b border-slate-200/50 transition-all duration-150">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-3">
+    <div class="flex items-center gap-3 shrink-0">
+      <a aria-label="NairaBooks Homepage" class="whitespace-nowrap font-headline font-extrabold text-xl tracking-tight text-primary-container flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-primary-container focus:ring-offset-2 rounded-lg" href="screen-2-overview-top-nav.html">
+        <span class="w-8 h-8 rounded-lg bg-primary-container flex items-center justify-center text-on-primary shadow-sm">
+          <span class="material-symbols-outlined text-[20px]" data-icon="eco">eco</span>
+        </span>
+        <span>NairaBooks</span>
+      </a>
+      <span class="text-slate-300 font-light hidden lg:inline">|</span>
+      <div class="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100/80 border border-slate-200/60 text-xs font-medium text-slate-600 whitespace-nowrap">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+        <span>Lagos Mart Ltd</span>
+      </div>
+    </div>
+    <nav aria-label="Main Navigation" class="hidden md:flex items-center gap-1 bg-white/95 border border-slate-200/80 p-1.5 rounded-full shadow-[0_2px_8px_-2px_rgba(0,0,0,0.04)] shrink-0">
+        <a class="whitespace-nowrap text-on-surface-variant font-medium text-sm px-4 py-1.5 rounded-full hover:text-on-surface hover:bg-slate-50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary" href="screen-2-overview-top-nav.html">Overview</a>
+        <a aria-current="page" class="whitespace-nowrap bg-primary-container text-on-primary font-medium rounded-full px-4 py-1.5 text-sm shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-primary" href="screen-3-books-hub.html">Books</a>
+        <a class="whitespace-nowrap text-on-surface-variant font-medium text-sm px-4 py-1.5 rounded-full hover:text-on-surface hover:bg-slate-50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary" href="screen-6-directory-create.html">People &amp; Stock</a>
+        <a class="whitespace-nowrap text-on-surface-variant font-medium text-sm px-4 py-1.5 rounded-full hover:text-on-surface hover:bg-slate-50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary" href="screen-7-pdf-bank-reconcile.html">Reconcile</a>
+        <a class="whitespace-nowrap text-on-surface-variant font-medium text-sm px-4 py-1.5 rounded-full hover:text-on-surface hover:bg-slate-50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary" href="screen-8-reports-center.html">Reports</a>
+    </nav>
+    <div class="flex items-center gap-2.5 shrink-0">
+      <div aria-label="Interface density mode" class="hidden sm:inline-flex items-center p-0.5 rounded-full bg-slate-100 border border-slate-200/80 text-xs font-medium text-slate-600" role="group" data-mode-toggle="true">
+        <button class="mode-btn-simple whitespace-nowrap px-2.5 py-1 rounded-full bg-white text-slate-900 shadow-xs focus:outline-none focus:ring-2 focus:ring-primary" type="button" data-mode="simple">Simple</button>
+        <button class="mode-btn-pro whitespace-nowrap px-2.5 py-1 rounded-full text-slate-500 hover:text-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-primary" type="button" data-mode="pro">Pro</button>
+      </div>
+      <a class="whitespace-nowrap inline-flex items-center gap-1 bg-primary-container hover:bg-primary text-on-primary font-medium text-sm px-4 py-2 rounded-full shadow-sm hover:shadow transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" href="screen-4-book-entry-form.html">
+        <span class="material-symbols-outlined text-[18px]" data-icon="add">add</span>
+        <span>New Entry</span>
+      </a>
+    </div>
+  </div>
+  <nav aria-label="Mobile Navigation" class="md:hidden px-4 pb-3 flex items-center gap-1.5 overflow-x-auto">
+      <a class="whitespace-nowrap text-on-surface-variant font-medium text-xs px-3 py-1 rounded-full bg-white border border-slate-200" href="screen-2-overview-top-nav.html">Overview</a>
+      <a aria-current="page" class="whitespace-nowrap bg-primary-container text-on-primary font-medium rounded-full px-3 py-1 text-xs shadow-xs" href="screen-3-books-hub.html">Books</a>
+      <a class="whitespace-nowrap text-on-surface-variant font-medium text-xs px-3 py-1 rounded-full bg-white border border-slate-200" href="screen-6-directory-create.html">People &amp; Stock</a>
+      <a class="whitespace-nowrap text-on-surface-variant font-medium text-xs px-3 py-1 rounded-full bg-white border border-slate-200" href="screen-7-pdf-bank-reconcile.html">Reconcile</a>
+      <a class="whitespace-nowrap text-on-surface-variant font-medium text-xs px-3 py-1 rounded-full bg-white border border-slate-200" href="screen-8-reports-center.html">Reports</a>
+  </nav>
+</header>
+<!-- MAIN CANVAS: Daylight whitespace (>=45%), calm hierarchy -->
+<main class="max-w-4xl mx-auto px-4 sm:px-6 py-8" id="main-content">
+<!-- 1. Workflow & Breadcrumb Bar -->
+<section class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex items-center gap-3">
+<a class="inline-flex items-center gap-1 text-sm font-medium text-secondary hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded py-1 px-1.5" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="arrow_back">arrow_back</span>
+<span>← Back to All Books</span>
+</a>
+</div>
+<!-- Switching Book Select -->
+<div class="flex items-center self-end md:self-auto gap-2">
+<span class="text-xs text-on-surface-variant font-medium">Switching book:</span>
+<button class="inline-flex items-center gap-1.5 text-xs font-semibold text-primary-container bg-surface-container-low border border-outline-variant/30 rounded-lg px-2.5 py-1.5 hover:bg-surface-container focus:outline-none focus:ring-2 focus:ring-primary" type="button">
+<span>Sales Invoice ▾</span>
+</button>
+</div>
+</section>
+<!-- Workflow Step Strip -->
+<nav aria-label="Transaction Lifecycle" class="mb-8 overflow-x-auto pb-1">
+<div class="inline-flex items-center gap-2 text-xs font-medium text-on-surface-variant min-w-max">
+<span class="px-2.5 py-1 rounded bg-surface-container-low text-on-surface-variant border border-outline-variant/20">1. Sales Order / Quote</span>
+<span class="material-symbols-outlined text-outline-variant text-[16px]" data-icon="chevron_right">chevron_right</span>
+<span class="px-3 py-1 rounded-full bg-primary-container text-white font-semibold shadow-xs flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-fixed"></span>
+          [2. Sales Invoice (Current)]
+        </span>
+<span class="material-symbols-outlined text-outline-variant text-[16px]" data-icon="chevron_right">chevron_right</span>
+<span class="px-2.5 py-1 rounded text-outline hover:text-on-surface-variant transition-colors">3. Customer Receipt</span>
+<span class="material-symbols-outlined text-outline-variant text-[16px]" data-icon="chevron_right">chevron_right</span>
+<span class="px-2.5 py-1 rounded text-outline hover:text-on-surface-variant transition-colors">Credit Note</span>
+</div>
+</nav>
+<!-- 2. Page Title Header -->
+<header class="mb-8">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+<div>
+<div class="flex items-center gap-2.5">
+<h1 class="text-2xl sm:text-3xl font-headline font-bold text-on-surface tracking-tight">New Sales Invoice #INV-2026-094</h1>
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-tertiary-fixed text-on-tertiary-fixed border border-tertiary-fixed-dim">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-container animate-pulse"></span>
+              Draft · Unposted
+            </span>
+</div>
+<p class="mt-1.5 text-sm text-on-surface-variant leading-relaxed">
+            Issue standard IFRS &amp; FIRS-compliant tax invoice. Stock &amp; accounts receivable update automatically.
+          </p>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-xs font-mono font-medium text-secondary bg-surface-container-low px-2 py-1 rounded border border-secondary-fixed">
+            FRCN: GAAP/NRS-2026
+          </span>
+</div>
+</div>
+</header>
+<!-- 3. Single White Paper-Receipt Card -->
+<section class="bg-surface-container-lowest rounded-2xl border border-outline-variant/30 shadow-sm p-6 sm:p-10 transition-shadow">
+<!-- Top Header Grid (Customer & Terms) -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-8 border-b border-outline-variant/20">
+<!-- Customer Selector Block -->
+<div class="space-y-2">
+<label class="block text-xs font-semibold text-on-surface-variant tracking-wide uppercase font-label">Bill To Customer</label>
+<div class="p-3.5 bg-surface-container-low/50 rounded-xl border border-outline-variant/40 hover:border-primary-container/40 transition-colors">
+<div class="flex items-start justify-between">
+<div>
+<p class="text-sm font-bold text-on-surface font-headline">Adeola Enterprises · Lagos</p>
+<div class="flex items-center gap-2 mt-1">
+<span class="text-xs font-mono font-medium text-secondary">TIN: 23819034-0001</span>
+<span class="inline-flex items-center text-[10px] font-semibold text-primary bg-primary-fixed/40 px-1.5 py-0.2 rounded">
+<span class="material-symbols-outlined text-[12px] mr-0.5" data-icon="check_circle">check_circle</span>
+                    Verified
+                  </span>
+</div>
+<p class="text-xs text-on-surface-variant mt-1">billing@adeola.ng</p>
+</div>
+<button class="text-xs text-secondary hover:text-primary font-medium focus:outline-none focus:ring-1 focus:ring-primary rounded p-1" type="button">
+                Change
+              </button>
+</div>
+</div>
+</div>
+<!-- Invoice Terms Metadata Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div>
+<label class="block text-xs font-semibold text-on-surface-variant font-label mb-1">Invoice Issue Date</label>
+<div class="relative">
+<input class="w-full text-xs font-medium text-on-surface bg-surface-container-lowest rounded-lg border border-outline-variant/50 pl-3 pr-9 py-2 focus:ring-2 focus:ring-primary focus:border-primary" readonly="" type="text" value="Oct 24, 2026"/>
+<span class="material-symbols-outlined absolute right-2.5 top-2 text-outline text-[18px]" data-icon="calendar_today">calendar_today</span>
+</div>
+</div>
+<div>
+<label class="block text-xs font-semibold text-on-surface-variant font-label mb-1">Due Date / Terms</label>
+<div class="relative">
+<input class="w-full text-xs font-medium text-on-surface bg-surface-container-lowest rounded-lg border border-outline-variant/50 pl-3 pr-9 py-2 focus:ring-2 focus:ring-primary focus:border-primary" readonly="" type="text" value="Nov 07, 2026 · 14D"/>
+<span class="material-symbols-outlined absolute right-2.5 top-2 text-outline text-[18px]" data-icon="schedule">schedule</span>
+</div>
+</div>
+<div class="sm:col-span-2">
+<label class="block text-xs font-semibold text-on-surface-variant font-label mb-1">Invoice Ref / Customer PO</label>
+<input class="w-full text-xs font-mono font-medium text-on-surface bg-surface-container-lowest rounded-lg border border-outline-variant/50 pl-3 pr-9 py-2 focus:ring-2 focus:ring-primary focus:border-primary" type="text" value="PO-ADE-2026-88"/>
+</div>
+</div>
+</div>
+<!-- Spacious Line-Item Table / Rows -->
+<div class="mt-8">
+<div class="border-b border-outline-variant/20 pb-3 flex items-center justify-between text-xs font-semibold text-on-surface-variant font-label uppercase">
+<div class="w-7/12">Item Description &amp; Classification</div>
+<div class="w-1/12 text-center">Qty</div>
+<div class="w-2/12 text-right">Unit Price</div>
+<div class="w-2/12 text-right">Line Total</div>
+<div class="w-8"></div>
+</div>
+<!-- Row 1 -->
+<div class="py-4 border-b border-outline-variant/15 flex items-center justify-between text-sm hover:bg-surface-container-low/30 rounded-lg px-1 transition-colors">
+<div class="w-7/12 pr-4">
+<p class="font-semibold text-on-surface">50kVA Inverter Battery Bank</p>
+<span class="inline-block text-[11px] text-outline font-medium mt-0.5">Cat: Solar &amp; Power Systems · SKU: INV-BAT-50</span>
+</div>
+<div class="w-1/12 text-center">
+<span class="num-mono font-medium text-on-surface">2</span>
+</div>
+<div class="w-2/12 text-right">
+<span class="num-mono text-on-surface-variant">₦650,000.00</span>
+</div>
+<div class="w-2/12 text-right">
+<span class="num-mono font-bold text-on-surface">₦1,300,000.00</span>
+</div>
+<div class="w-8 text-right">
+<button aria-label="Remove item" class="text-outline hover:text-error transition-colors focus:outline-none focus:ring-2 focus:ring-error rounded p-1" type="button">
+<span class="material-symbols-outlined text-[18px]" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+<!-- Row 2 -->
+<div class="py-4 border-b border-outline-variant/15 flex items-center justify-between text-sm hover:bg-surface-container-low/30 rounded-lg px-1 transition-colors">
+<div class="w-7/12 pr-4">
+<p class="font-semibold text-on-surface">Delivery &amp; Installation</p>
+<span class="inline-block text-[11px] text-outline font-medium mt-0.5">Cat: Technical Services · Onsite Victoria Island</span>
+</div>
+<div class="w-1/12 text-center">
+<span class="num-mono font-medium text-on-surface">1</span>
+</div>
+<div class="w-2/12 text-right">
+<span class="num-mono text-on-surface-variant">₦85,000.00</span>
+</div>
+<div class="w-2/12 text-right">
+<span class="num-mono font-bold text-on-surface">₦85,000.00</span>
+</div>
+<div class="w-8 text-right">
+<button aria-label="Remove item" class="text-outline hover:text-error transition-colors focus:outline-none focus:ring-2 focus:ring-error rounded p-1" type="button">
+<span class="material-symbols-outlined text-[18px]" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+<!-- + Add another line -->
+<div class="pt-4 pb-2">
+<button class="inline-flex items-center gap-1.5 text-xs font-semibold text-primary-container hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded py-1 px-2" type="button">
+<span class="material-symbols-outlined text-[18px]" data-icon="add_circle">add_circle</span>
+<span>+ Add another line</span>
+</button>
+</div>
+</div>
+<!-- 4. Financial Summary Block -->
+<div class="mt-8 pt-6 border-t border-outline-variant/30 flex flex-col md:flex-row justify-between gap-8">
+<!-- Settlement & Bank Info (Left block) -->
+<div class="w-full md:w-1/2 space-y-3">
+<div class="p-4 bg-surface-container-low/60 rounded-xl border border-outline-variant/30">
+<div class="flex items-center gap-2 mb-1.5 text-xs font-semibold text-secondary font-label">
+<span class="material-symbols-outlined text-[18px]" data-icon="account_balance">account_balance</span>
+              Settlement Account
+            </div>
+<p class="text-xs text-on-surface font-semibold leading-relaxed">
+              Payable to Zenith Bank Corporate · A/C <span class="num-mono font-bold">1012388410</span>
+</p>
+<p class="text-xs text-on-surface-variant mt-0.5">Account Name: Lagos Mart Ltd</p>
+<div class="mt-2.5 pt-2 border-t border-outline-variant/20 flex items-center justify-between text-[11px] text-outline">
+<span>Automatic NIBSS instant match enabled</span>
+<span class="text-primary font-semibold">Active</span>
+</div>
+</div>
+</div>
+<!-- Calculated Totals (Right block) -->
+<div class="w-full md:w-5/12 space-y-3 self-end">
+<div class="flex justify-between items-center text-xs">
+<span class="text-on-surface-variant font-medium">Subtotal</span>
+<span class="num-mono font-semibold text-on-surface">₦1,385,000.00</span>
+</div>
+<div class="flex items-center justify-between text-xs py-1">
+<label class="inline-flex items-center gap-2 cursor-pointer text-on-surface-variant">
+<input checked="" class="rounded border-outline-variant text-primary focus:ring-primary h-4 w-4" type="checkbox"/>
+<span class="font-medium">Add 7.5% Nigerian VAT (FIRS standard)</span>
+</label>
+<span class="num-mono font-semibold text-on-surface">₦103,875.00</span>
+</div>
+<div class="h-[1px] bg-outline-variant/40 my-2"></div>
+<div class="flex justify-between items-baseline pt-1">
+<span class="text-sm font-bold text-on-surface font-headline">Total Due</span>
+<span class="num-mono text-2xl font-bold text-primary-container tracking-tight">₦1,488,875.00</span>
+</div>
+<p class="text-[11px] text-right text-outline">All figures quoted in Nigerian Naira (NGN)</p>
+</div>
+</div>
+</section>
+<!-- 5. Plain-English Double-Entry Dropdown / Collapsible -->
+<section class="mt-6">
+<details class="group bg-surface-container-lowest border border-outline-variant/30 rounded-xl shadow-xs overflow-hidden transition-all">
+<summary class="cursor-pointer p-4 list-none flex items-center justify-between select-none hover:bg-surface-container-low/40 focus:outline-none focus:ring-2 focus:ring-primary">
+<div class="flex items-center gap-2 text-xs font-semibold text-secondary">
+<span class="material-symbols-outlined transition-transform duration-200 group-open:rotate-90 text-[18px]" data-icon="chevron_right">chevron_right</span>
+<span>Preview automatic Debit &amp; Credit entries (Plain English IFRS view)</span>
+</div>
+<span class="text-[11px] font-mono font-semibold text-primary bg-primary-fixed/40 px-2 py-0.5 rounded">
+            Balanced: ₦1,488,875.00
+          </span>
+</summary>
+<div class="p-4 pt-1 bg-surface-container-low/30 border-t border-outline-variant/20 text-xs">
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+<!-- Debit entry -->
+<div class="p-3 bg-surface-container-lowest rounded-lg border border-outline-variant/30">
+<div class="text-[11px] font-bold text-primary uppercase tracking-wider font-label">Debit (Assets ↑)</div>
+<p class="font-semibold text-on-surface mt-1">Accounts Receivable</p>
+<p class="text-[11px] text-outline mt-0.5">Adeola Enterprises</p>
+<p class="num-mono font-bold text-on-surface mt-2">₦1,488,875.00</p>
+</div>
+<!-- Credit entry 1 -->
+<div class="p-3 bg-surface-container-lowest rounded-lg border border-outline-variant/30">
+<div class="text-[11px] font-bold text-secondary uppercase tracking-wider font-label">Credit (Revenue ↑)</div>
+<p class="font-semibold text-on-surface mt-1">Sales Revenue</p>
+<p class="text-[11px] text-outline mt-0.5">Solar &amp; Technical Svcs</p>
+<p class="num-mono font-bold text-on-surface mt-2">₦1,385,000.00</p>
+</div>
+<!-- Credit entry 2 -->
+<div class="p-3 bg-surface-container-lowest rounded-lg border border-outline-variant/30">
+<div class="text-[11px] font-bold text-secondary uppercase tracking-wider font-label">Credit (Liability ↑)</div>
+<p class="font-semibold text-on-surface mt-1">Output VAT Payable</p>
+<p class="text-[11px] text-outline mt-0.5">FIRS Tax Ledger</p>
+<p class="num-mono font-bold text-on-surface mt-2">₦103,875.00</p>
+</div>
+</div>
+<div class="mt-3 flex items-center justify-between text-[11px] text-outline px-1">
+<span>IFRS 15 Revenue from Contracts with Customers</span>
+<span>Formula: Net Dr (₦1,488,875) = Net Cr (₦1,488,875)</span>
+</div>
+</div>
+</details>
+</section>
+<!-- 6. Document Actions Flow (Normal Document Flow, No Sticky Dock!) -->
+<footer class="mt-10 mb-16 pt-6 border-t border-outline-variant/20 flex flex-col sm:flex-row items-center justify-between gap-4">
+<div class="flex items-center gap-2">
+<button class="px-5 py-2.5 rounded-lg border border-outline-variant/50 text-xs font-semibold text-on-surface hover:bg-surface-container transition-colors focus:outline-none focus:ring-2 focus:ring-primary shadow-xs" type="button">
+          Save Draft
+        </button>
+<button class="px-4 py-2.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors focus:outline-none focus:ring-2 focus:ring-primary" type="button">
+          Preview PDF
+        </button>
+</div>
+<div class="flex items-center gap-3 w-full sm:w-auto">
+<button class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#005E34] hover:bg-[#004727] text-white font-semibold text-sm rounded-lg px-6 py-3 shadow-sm transition-all duration-150 active:scale-98 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary" type="button">
+<span>Save &amp; Issue Invoice</span>
+<span class="material-symbols-outlined text-[18px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</footer>
+<!-- Subtle Regulatory Footnote in document flow -->
+<div class="text-center text-[11px] text-outline pb-12">
+<p>NairaBooks adheres to Nigerian Financial Reporting Council (FRCN) and Federal Inland Revenue Service (FIRS) e-invoicing standards.</p>
+</div>
+</main>
+
+<script>
+  (function () {
+    const modeBannerId = 'nb-pro-mode-strip';
+    function applyMode(mode) {
+      try { localStorage.setItem('nb_mode', mode); } catch (_) {}
+      const simpleBtn = document.querySelector('.mode-btn-simple');
+      const proBtn = document.querySelector('.mode-btn-pro');
+      if (simpleBtn && proBtn) {
+        if (mode === 'pro') {
+          proBtn.className = 'mode-btn-pro whitespace-nowrap px-2.5 py-1 rounded-full bg-slate-900 text-white shadow-xs focus:outline-none focus:ring-2 focus:ring-primary';
+          simpleBtn.className = 'mode-btn-simple whitespace-nowrap px-2.5 py-1 rounded-full text-slate-500 hover:text-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-primary';
+        } else {
+          simpleBtn.className = 'mode-btn-simple whitespace-nowrap px-2.5 py-1 rounded-full bg-white text-slate-900 shadow-xs focus:outline-none focus:ring-2 focus:ring-primary';
+          proBtn.className = 'mode-btn-pro whitespace-nowrap px-2.5 py-1 rounded-full text-slate-500 hover:text-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-primary';
+        }
+      }
+      let strip = document.getElementById(modeBannerId);
+      if (mode === 'pro') {
+        if (!strip) {
+          strip = document.createElement('div');
+          strip.id = modeBannerId;
+          strip.className = 'max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4';
+          strip.innerHTML = '<div class="rounded-xl bg-slate-900 text-slate-100 px-4 py-2.5 text-xs flex flex-wrap items-center justify-between gap-2 shadow-sm"><span><strong class="font-semibold text-emerald-300">Accountant (Pro) Mode Active:</strong> IFRS codes (#1010–#6150), VAT/WHT tax columns &amp; Double-Entry controls enabled.</span><a href="screen-5-journal-adjustments.html?tab=journal" class="font-semibold text-emerald-300 hover:underline whitespace-nowrap">Open Double-Entry Journal →</a></div>';
+          const main = document.getElementById('main-content');
+          if (main && main.parentNode) main.parentNode.insertBefore(strip, main);
+        }
+        strip.classList.remove('hidden');
+      } else if (strip) {
+        strip.classList.add('hidden');
+      }
+    }
+    let saved = 'simple';
+    try { saved = localStorage.getItem('nb_mode') || 'simple'; } catch (_) {}
+    document.querySelectorAll('[data-mode-toggle] button').forEach((btn) => {
+      btn.addEventListener('click', () => applyMode(btn.dataset.mode || 'simple'));
+    });
+    if (saved === 'pro') applyMode('pro');
+  })();
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const BOOK_CONFIG = {
+      'sales-order': { label: 'Sales Order / Quote', h1: 'New Sales Order / Quote #SQ-2026-019', cta: 'Send Quote to Customer →', role: 'Quote To Customer' },
+      'sales-invoice': { label: 'Sales Invoice', h1: 'New Sales Invoice #INV-2026-094', cta: 'Save & Issue Invoice →', role: 'Bill To Customer' },
+      'receipt': { label: 'Receipt', h1: 'New Customer Receipt #RCT-2026-112', cta: 'Record Money Received →', role: 'Received From Customer' },
+      'credit-note': { label: 'Credit Note', h1: 'New Customer Credit Note #CRN-2026-008', cta: 'Issue Credit Note →', role: 'Credit To Customer' },
+      'purchase-order': { label: 'Purchase Order', h1: 'New Purchase Order #PO-2026-044', cta: 'Send PO to Vendor →', role: 'Order From Vendor / Supplier' },
+      'purchase-invoice': { label: 'Purchase Invoice', h1: 'New Purchase Invoice #BILL-2026-061', cta: 'Save Supplier Bill →', role: 'Vendor / Supplier' },
+      'payment': { label: 'Payment', h1: 'New Supplier Payment #PAY-2026-042', cta: 'Record Payment Sent →', role: 'Pay To Vendor / Expense' },
+      'debit-note': { label: 'Debit Note', h1: 'New Supplier Debit Note #DBN-2026-005', cta: 'Issue Debit Note →', role: 'Return / Debit To Vendor' },
+    };
+    const h1 = document.querySelector('h1');
+    document.querySelectorAll('a').forEach((a) => {
+      if (a.textContent.includes('Back to All Books')) a.href = 'screen-3-books-hub.html';
+    });
+    document.querySelectorAll('button').forEach((btn) => {
+      if (btn.textContent.includes('Sales Invoice')) {
+        const sel = document.createElement('select');
+        sel.setAttribute('aria-label', 'Switch active accounting book');
+        sel.className = 'text-xs font-semibold text-primary-container bg-white border border-outline-variant/40 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer';
+        for (const [k, v] of Object.entries(BOOK_CONFIG)) {
+          const opt = document.createElement('option');
+          opt.value = k;
+          opt.textContent = v.label;
+          sel.appendChild(opt);
+        }
+        const adjOpt = document.createElement('option');
+        adjOpt.value = 'inventory-adj';
+        adjOpt.textContent = 'Inventory Adjustment Journal →';
+        sel.appendChild(adjOpt);
+        const jOpt = document.createElement('option');
+        jOpt.value = 'journal';
+        jOpt.textContent = 'Double-Entry Journal →';
+        sel.appendChild(jOpt);
+
+        const params = new URLSearchParams(window.location.search);
+        const initial = params.get('book') || 'sales-invoice';
+        if (BOOK_CONFIG[initial]) sel.value = initial;
+
+        function syncBook(key) {
+          if (key === 'inventory-adj') { window.location.href = 'screen-5-journal-adjustments.html?tab=inventory'; return; }
+          if (key === 'journal') { window.location.href = 'screen-5-journal-adjustments.html?tab=journal'; return; }
+          const cfg = BOOK_CONFIG[key] || BOOK_CONFIG['sales-invoice'];
+          if (h1) h1.textContent = cfg.h1;
+          document.querySelectorAll('button').forEach((b) => {
+            if (b.textContent.includes('Save & Issue') || b.textContent.includes('Send ') || b.textContent.includes('Record ') || b.textContent.includes('Save Supplier') || b.textContent.includes('Issue ')) {
+              b.textContent = cfg.cta;
+            }
+          });
+          document.querySelectorAll('label').forEach((lb) => {
+            if (lb.textContent.includes('Customer') || lb.textContent.includes('Vendor') || lb.textContent.includes('Received') || lb.textContent.includes('Pay To') || lb.textContent.includes('Order From') || lb.textContent.includes('Return')) {
+              lb.textContent = cfg.role;
+            }
+          });
+        }
+        sel.addEventListener('change', () => syncBook(sel.value));
+        btn.replaceWith(sel);
+        syncBook(sel.value);
+      }
+      if (btn.textContent.includes('Preview automatic Debit')) {
+        const panel = document.createElement('div');
+        panel.className = 'hidden mt-3 pt-3 border-t border-slate-200 grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs font-mono text-slate-700';
+        panel.innerHTML = '<div class="p-2 rounded bg-slate-50 border border-slate-200">Dr #1100 Accounts Receivable: <strong>₦1,488,875.00</strong></div><div class="p-2 rounded bg-slate-50 border border-slate-200">Cr #4000 Sales Revenue: <strong>₦1,385,000.00</strong></div><div class="p-2 rounded bg-slate-50 border border-slate-200">Cr #2110 Output VAT (7.5%): <strong>₦103,875.00</strong></div>';
+        btn.parentNode.parentNode.appendChild(panel);
+        btn.addEventListener('click', () => panel.classList.toggle('hidden'));
+      }
+    });
+  });
+</script>
+
+</body></html>

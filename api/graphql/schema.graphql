@@ -1,0 +1,476 @@
+"""
+NairaBooks Canonical GraphQL Schema (Schema-First Contract — Phase 3)
+
+Conventions:
+- Monetary amounts, tax rates, and exchange rates MUST use `DecimalMoney` or `DecimalRate`
+  (serialized as exact decimal strings, never IEEE-754 GraphQL `Float`).
+- Lists returning unbounded business entities follow Relay Cursor Pagination (`*Connection`).
+- Domain-level business failures return typed union payloads implementing `MutationError`.
+- Multi-tenant isolation is derived strictly from the authenticated server session/token
+  context (`workspaceId`), never spoofable from raw headers or unverified arguments.
+"""
+
+directive @requireRole(roles: [ActorRole!]!) on FIELD_DEFINITION
+directive @cost(complexity: Int!, multipliers: [String!]) on FIELD_DEFINITION
+
+"""Exact fixed-precision decimal monetary string (e.g., "125000.50"). Never JSON float."""
+scalar DecimalMoney
+
+"""Exact fixed-precision decimal rate/quantity string (e.g., "0.0750"). Never JSON float."""
+scalar DecimalRate
+
+"""ISO-8601 UTC timestamp string."""
+scalar DateTime
+
+"""ISO-8601 calendar date string (YYYY-MM-DD)."""
+scalar Date
+
+"""RFC-4122 UUID string."""
+scalar UUID
+
+"""Validated JSON configuration object for declarative industry pack overrides."""
+scalar JSONConfig
+
+enum CurrencyCode {
+  NGN
+  USD
+  GBP
+  EUR
+}
+
+enum NigerianLegalForm {
+  PRIVATE_LIMITED
+  PUBLIC_LIMITED
+  BUSINESS_NAME
+  LIMITED_LIABILITY_PARTNERSHIP
+  INCORPORATED_TRUSTEE_NGO
+}
+
+enum ActorRole {
+  OWNER_MANAGING_DIRECTOR
+  CHARTERED_ACCOUNTANT_CFO
+  BOOKKEEPER
+  BRANCH_OUTLET_CASHIER
+  EXTERNAL_AUDITOR_READONLY
+}
+
+enum OperationalPrimitive {
+  POS_DAILY_CASHUP
+  SKU_INVENTORY_COGS
+  MULTI_TIER_WAREHOUSE_PO
+  BILL_OF_MATERIALS_WIP
+  JOB_COSTING_RETENTION
+  TIME_RETAINER_BILLING
+  FUND_GRANT_ACCOUNTING
+  HOSPITALITY_FOLIO_USALI
+  DINER_RECIPE_TABLE
+  LOGISTICS_FLEET_TRIP
+}
+
+enum FlagshipPackCode {
+  RETAIL_ECOMMERCE
+  WHOLESALE_DISTRIBUTION
+  MANUFACTURING_LIGHT
+  CONSTRUCTION_TRADES
+  PROFESSIONAL_SERVICES
+  NON_PROFIT
+  CUSTOM_COMPOSABLE
+}
+
+enum TaxRegimeType {
+  VAT_STANDARD_7_5
+  VAT_ZERO_RATED
+  VAT_EXEMPT
+  WHT_CORPORATE_AND_UNINCORPORATED
+  CIT_NIGERIA_TAX_ACT_2025
+  STATE_HOSPITALITY_CONSUMPTION
+}
+
+enum PeriodStatus {
+  OPEN
+  SOFT_LOCKED
+  CLOSED_CAMA_CERTIFIED
+}
+
+enum VoucherStatus {
+  DRAFT
+  POSTED
+  REVERSED
+}
+
+enum AccountCategory {
+  ASSET
+  LIABILITY
+  EQUITY
+  REVENUE
+  EXPENSE
+  RESTRICTED_FUND
+}
+
+interface MutationError {
+  code: String!
+  message: String!
+  field: String
+}
+
+type ValidationError implements MutationError {
+  code: String!
+  message: String!
+  field: String
+}
+
+type UnbalancedJournalError implements MutationError {
+  code: String!
+  message: String!
+  field: String
+  debitTotal: DecimalMoney!
+  creditTotal: DecimalMoney!
+}
+
+type ClosedPeriodError implements MutationError {
+  code: String!
+  message: String!
+  field: String
+  fiscalPeriodId: UUID!
+  periodStatus: PeriodStatus!
+}
+
+type SegregationOfDutiesError implements MutationError {
+  code: String!
+  message: String!
+  field: String
+  requiredRole: ActorRole!
+}
+
+type CrossTenantAccessError implements MutationError {
+  code: String!
+  message: String!
+  field: String
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+type MoneyAmount {
+  amount: DecimalMoney!
+  currency: CurrencyCode!
+  functionalAmountNgn: DecimalMoney!
+  exchangeRateToNgn: DecimalRate!
+}
+
+type NigerianTaxProfile {
+  id: UUID!
+  legalForm: NigerianLegalForm!
+  tinNumber: String
+  vatRegistered: Boolean!
+  annualTurnoverNgn: DecimalMoney!
+  fixedAssetsNgn: DecimalMoney!
+  stateOfOperation: String!
+  isProfessionalServicesExcludedFromSmallExempt: Boolean!
+  isSmallBusinessCitExempt: Boolean!
+  effectiveFrom: Date!
+}
+
+type PackModuleDescriptor {
+  primitive: OperationalPrimitive!
+  enabled: Boolean!
+  customLabels: JSONConfig
+}
+
+type WorkspaceIndustryProfile {
+  id: UUID!
+  primaryPack: FlagshipPackCode!
+  isHybridMultiUnit: Boolean!
+  activePrimitives: [PackModuleDescriptor!]!
+  kpiWidgets: [String!]!
+  terminologyMap: JSONConfig
+}
+
+type Workspace {
+  id: UUID!
+  name: String!
+  baseCurrency: CurrencyCode!
+  taxProfile: NigerianTaxProfile!
+  industryProfile: WorkspaceIndustryProfile!
+  createdAt: DateTime!
+}
+
+type ChartOfAccount {
+  id: UUID!
+  code: String!
+  name: String!
+  category: AccountCategory!
+  ifrsTag: String!
+  sourcePrimitive: OperationalPrimitive
+  isSystemLocked: Boolean!
+  isActive: Boolean!
+}
+
+type FiscalPeriod {
+  id: UUID!
+  label: String!
+  startDate: Date!
+  endDate: Date!
+  status: PeriodStatus!
+  camaCertification: CamaSec405Certification
+}
+
+type CamaSec405Certification {
+  id: UUID!
+  certifiedByName: String!
+  professionalBody: String!
+  frcRegNumber: String!
+  certifiedAt: DateTime!
+  statementSnapshotHash: String!
+}
+
+type JournalLine {
+  id: UUID!
+  accountId: UUID!
+  accountCode: String!
+  accountName: String!
+  debit: MoneyAmount!
+  credit: MoneyAmount!
+  fundOrDepartmentCode: String
+  projectOrSiteCode: String
+  memo: String
+}
+
+type JournalVoucher {
+  id: UUID!
+  voucherNumber: String!
+  postingDate: Date!
+  status: VoucherStatus!
+  reference: String!
+  sourceModule: String!
+  lines: [JournalLine!]!
+  totalDebitNgn: DecimalMoney!
+  totalCreditNgn: DecimalMoney!
+  createdByUserId: UUID!
+  approvedByUserId: UUID
+  reversedByVoucherId: UUID
+  createdAt: DateTime!
+}
+
+type JournalVoucherEdge {
+  cursor: String!
+  node: JournalVoucher!
+}
+
+type JournalVoucherConnection {
+  edges: [JournalVoucherEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type TaxComputationPreview {
+  effectiveDate: Date!
+  regime: TaxRegimeType!
+  ruleVersionCode: String!
+  taxableBaseNgn: DecimalMoney!
+  appliedRate: DecimalRate!
+  computedTaxNgn: DecimalMoney!
+  vatNrsCategoryCode: String
+  whtHigherNoTinApplied: Boolean!
+}
+
+type TrialBalanceRow {
+  accountCode: String!
+  accountName: String!
+  category: AccountCategory!
+  debitBalanceNgn: DecimalMoney!
+  creditBalanceNgn: DecimalMoney!
+}
+
+type ValueAddedStatementRow {
+  lineLabel: String!
+  amountNgn: DecimalMoney!
+  percentageShare: DecimalRate!
+}
+
+type FiveYearMetricColumn {
+  fiscalYearLabel: String!
+  revenueNgn: DecimalMoney!
+  profitBeforeTaxNgn: DecimalMoney!
+  totalAssetsNgn: DecimalMoney!
+  netEquityNgn: DecimalMoney!
+}
+
+type FrcnFinancialStatementPackage {
+  fiscalPeriodId: UUID!
+  statementCurrency: CurrencyCode!
+  trialBalance: [TrialBalanceRow!]!
+  valueAddedStatement: [ValueAddedStatementRow!]!
+  fiveYearSummary: [FiveYearMetricColumn!]!
+  isBalanced: Boolean!
+  generatedAt: DateTime!
+}
+
+type AuditEvent {
+  id: UUID!
+  sequenceNumber: Int!
+  actorUserId: UUID!
+  actorRole: ActorRole!
+  action: String!
+  entityType: String!
+  entityId: UUID!
+  payloadHash: String!
+  previousEventHash: String!
+  occurredAt: DateTime!
+}
+
+type AuditEventEdge {
+  cursor: String!
+  node: AuditEvent!
+}
+
+type AuditEventConnection {
+  edges: [AuditEventEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+input JournalLineInput {
+  accountId: UUID!
+  debitAmount: DecimalMoney!
+  creditAmount: DecimalMoney!
+  currency: CurrencyCode!
+  exchangeRateToNgn: DecimalRate!
+  fundOrDepartmentCode: String
+  projectOrSiteCode: String
+  memo: String
+}
+
+input PostJournalVoucherInput {
+  idempotencyKey: UUID!
+  postingDate: Date!
+  reference: String!
+  sourceModule: String!
+  lines: [JournalLineInput!]!
+}
+
+input ReverseJournalVoucherInput {
+  idempotencyKey: UUID!
+  originalVoucherId: UUID!
+  reversalDate: Date!
+  reason: String!
+}
+
+input ConfigureIndustryPackInput {
+  primaryPack: FlagshipPackCode!
+  isHybridMultiUnit: Boolean!
+  primitives: [OperationalPrimitive!]!
+  terminologyOverrides: JSONConfig
+}
+
+input UpdateTaxProfileInput {
+  legalForm: NigerianLegalForm!
+  tinNumber: String
+  vatRegistered: Boolean!
+  annualTurnoverNgn: DecimalMoney!
+  fixedAssetsNgn: DecimalMoney!
+  stateOfOperation: String!
+}
+
+input CertifyCamaSec405Input {
+  fiscalPeriodId: UUID!
+  certifiedByName: String!
+  professionalBody: String!
+  frcRegNumber: String!
+}
+
+input PreviewNigerianTaxInput {
+  transactionDate: Date!
+  regime: TaxRegimeType!
+  grossAmountNgn: DecimalMoney!
+  counterpartyHasValidTin: Boolean!
+  supplyCategoryCode: String!
+}
+
+union PostJournalVoucherResult =
+    JournalVoucher
+  | ValidationError
+  | UnbalancedJournalError
+  | ClosedPeriodError
+  | CrossTenantAccessError
+
+union ConfigureIndustryPackResult =
+    WorkspaceIndustryProfile
+  | ValidationError
+  | CrossTenantAccessError
+
+union CertifyCamaSec405Result =
+    FiscalPeriod
+  | ValidationError
+  | SegregationOfDutiesError
+  | ClosedPeriodError
+  | CrossTenantAccessError
+
+type Query {
+  workspace: Workspace!
+  chartOfAccounts(category: AccountCategory, activeOnly: Boolean = true): [ChartOfAccount!]!
+  fiscalPeriods: [FiscalPeriod!]!
+  journalVouchers(
+    first: Int = 25
+    after: String
+    status: VoucherStatus
+    fromDate: Date
+    toDate: Date
+  ): JournalVoucherConnection! @cost(complexity: 5, multipliers: ["first"])
+  previewNigerianTax(input: PreviewNigerianTaxInput!): TaxComputationPreview!
+  frcnFinancialPackage(fiscalPeriodId: UUID!): FrcnFinancialStatementPackage!
+    @requireRole(
+      roles: [
+        OWNER_MANAGING_DIRECTOR
+        CHARTERED_ACCOUNTANT_CFO
+        BOOKKEEPER
+        EXTERNAL_AUDITOR_READONLY
+      ]
+    )
+    @cost(complexity: 25)
+  auditEvents(first: Int = 50, after: String): AuditEventConnection!
+    @requireRole(
+      roles: [
+        OWNER_MANAGING_DIRECTOR
+        CHARTERED_ACCOUNTANT_CFO
+        EXTERNAL_AUDITOR_READONLY
+      ]
+    )
+    @cost(complexity: 5, multipliers: ["first"])
+}
+
+type Mutation {
+  configureIndustryPack(input: ConfigureIndustryPackInput!): ConfigureIndustryPackResult!
+    @requireRole(roles: [OWNER_MANAGING_DIRECTOR, CHARTERED_ACCOUNTANT_CFO])
+  updateTaxProfile(input: UpdateTaxProfileInput!): NigerianTaxProfile!
+    @requireRole(roles: [OWNER_MANAGING_DIRECTOR, CHARTERED_ACCOUNTANT_CFO])
+  postJournalVoucher(input: PostJournalVoucherInput!): PostJournalVoucherResult!
+    @requireRole(
+      roles: [
+        OWNER_MANAGING_DIRECTOR
+        CHARTERED_ACCOUNTANT_CFO
+        BOOKKEEPER
+        BRANCH_OUTLET_CASHIER
+      ]
+    )
+  reverseJournalVoucher(input: ReverseJournalVoucherInput!): PostJournalVoucherResult!
+    @requireRole(roles: [OWNER_MANAGING_DIRECTOR, CHARTERED_ACCOUNTANT_CFO])
+  certifyCamaSec405(input: CertifyCamaSec405Input!): CertifyCamaSec405Result!
+    @requireRole(roles: [OWNER_MANAGING_DIRECTOR, CHARTERED_ACCOUNTANT_CFO])
+}
+
+type Subscription {
+  voucherPosted: JournalVoucher!
+    @requireRole(
+      roles: [
+        OWNER_MANAGING_DIRECTOR
+        CHARTERED_ACCOUNTANT_CFO
+        BOOKKEEPER
+        EXTERNAL_AUDITOR_READONLY
+      ]
+    )
+}

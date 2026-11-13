@@ -1,0 +1,309 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --nb-background: 242 242 247;
+  --nb-surface: 255 255 255;
+  --nb-surface-muted: 229 229 234;
+  --nb-ink: 28 28 30;
+  --nb-ink-muted: 94 94 100;
+  --nb-border: 229 229 234;
+  --nb-border-interactive: 174 174 178;
+  --nb-primary: 0 104 56;
+  --nb-primary-hover: 0 85 45;
+  --nb-primary-soft-bg: 230 245 237;
+  --nb-primary-soft-foreground: 0 88 46;
+  --nb-secondary: 15 76 129;
+  --nb-secondary-soft-bg: 234 243 252;
+  --nb-secondary-soft-foreground: 15 76 129;
+  --nb-warning: 161 98 7;
+  --nb-warning-soft-bg: 254 249 230;
+  --nb-warning-soft-foreground: 120 69 7;
+  --nb-destructive: 215 0 21;
+  --nb-destructive-soft-bg: 254 242 242;
+  --nb-destructive-soft-foreground: 185 28 28;
+  --nb-focus-ring: 0 104 56;
+
+  /* iOS 18 Cupertino Grouped System + Nigerian Emerald Accent */
+  --background: 240 16% 96%;
+  --foreground: 240 3.4% 11.4%;
+  --card: 0 0% 100%;
+  --card-foreground: 240 3.4% 11.4%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 240 3.4% 11.4%;
+  --primary: 152 100% 20.4%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 240 14% 92%;
+  --secondary-foreground: 240 3.4% 11.4%;
+  --muted: 240 14% 92%;
+  --muted-foreground: 240 3.2% 38%;
+  --accent: 240 14% 92%;
+  --accent-foreground: 240 3.4% 11.4%;
+  --destructive: 0 84% 46%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 240 12% 90%;
+  --input: 240 8% 82%;
+  --ring: 152 100% 20.4%;
+  --radius: 0.875rem;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #f2f2f7;
+  color: #1c1c1e;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* A11Y-01 Skip Link */
+.nb-skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 60;
+  background-color: #1c1c1e;
+  color: #ffffff;
+  padding: 0.625rem 1.25rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.nb-skip-link:focus {
+  left: 1rem;
+  top: 1rem;
+  outline: 2px solid #006838;
+  outline-offset: 2px;
+}
+
+/* Monetary cells strictly right-aligned tabular figures using SF Mono / Geist Mono */
+.nb-money-cell {
+  font-family: "SF Mono", ui-monospace, SFMono-Regular, var(--font-ios-mono), monospace;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* iOS Vibrancy Translucent Material */
+.nb-ios-glass {
+  background-color: rgba(255, 255, 255, 0.78);
+  backdrop-filter: saturate(180%) blur(22px);
+  -webkit-backdrop-filter: saturate(180%) blur(22px);
+}
+
+/* Zero-blur hardware-composited tile lift (smooth 4px motion with razor-sharp text) */
+.nb-crisp-card-lift {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  will-change: transform, box-shadow;
+  transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 150ms ease-out, background-color 150ms ease-out;
+}
+
+.nb-crisp-card-lift:hover {
+  transform: translate3d(0, -4px, 0);
+  -webkit-transform: translate3d(0, -4px, 0);
+}
+
+/* Zero-blur tactile button/pill lift (smooth 2px motion) */
+.nb-crisp-pill-lift {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  will-change: transform, box-shadow;
+  transition: transform 140ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 140ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nb-crisp-pill-lift:hover {
+  transform: translate3d(0, -2px, 0);
+  -webkit-transform: translate3d(0, -2px, 0);
+}
+
+.nb-crisp-pill-lift:active {
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+}
+
+@keyframes nb-ticker-scroll {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.nb-ticker-track {
+  display: flex;
+  width: max-content;
+  animation: nb-ticker-scroll 26s linear infinite;
+}
+
+.nb-ticker-wrap:hover .nb-ticker-track,
+.nb-ticker-wrap:focus-within .nb-ticker-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .nb-ticker-track {
+    animation: none !important;
+  }
+
+  .nb-crisp-card-lift,
+  .nb-crisp-card-lift:hover,
+  .nb-crisp-pill-lift,
+  .nb-crisp-pill-lift:hover,
+  .nb-crisp-pill-lift:active {
+    transform: none !important;
+    -webkit-transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* A11Y-04 natural footer clearance without fixed bottom overlays */
+.pb-sticky-clearance {
+  padding-bottom: 2.5rem;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   NIGERIAN CULTURAL CANVAS KINETIC AMBIENT ANIMATIONS
+   ════════════════════════════════════════════════════════════════════ */
+@keyframes nb-spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.nb-animate-spin-slow {
+  animation: nb-spin-slow 140s linear infinite;
+  transform-origin: center;
+}
+
+@keyframes nb-pulse-slow {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+}
+
+.nb-animate-pulse-slow {
+  animation: nb-pulse-slow 10s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nb-animate-spin-slow,
+  .nb-animate-pulse-slow {
+    animation: none !important;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   PRINT MEDIA STYLES: AUTHENTIC A4 IFRS PAPER PRINTING & PDF EXPORT
+   ════════════════════════════════════════════════════════════════════ */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 8mm 10mm;
+  }
+
+  *,
+  *::before,
+  *::after {
+    background: transparent !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  html,
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    font-size: 10pt;
+    line-height: 1.35;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Hide navigation, buttons, drawers, artwork backgrounds, notifications, and web application shell */
+  header,
+  nav,
+  footer,
+  aside,
+  .no-print,
+  .nb-skip-link,
+  .nb-nigerian-art-bg,
+  [role="status"],
+  [aria-live="polite"]:not(#a4-report-document *),
+  button,
+  select,
+  input {
+    display: none !important;
+  }
+
+  /* Expand the A4 report sheet into a full printable page */
+  #a4-report-document,
+  .a4-report-document {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  /* Prevent awkward page break splits inside financial statement rows and signatures */
+  .a4-avoid-break,
+  tr,
+  blockquote,
+  .a4-sign-off-block {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    page-break-inside: auto;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  tfoot {
+    display: table-footer-group;
+  }
+
+  /* Force links to not display URLs in print */
+  a[href]::after {
+    content: none !important;
+  }
+}
+

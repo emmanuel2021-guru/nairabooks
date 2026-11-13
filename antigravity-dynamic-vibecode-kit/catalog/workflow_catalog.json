@@ -1,0 +1,1085 @@
+{
+  "version": "1.0",
+  "defaultSkillsSource": "skills",
+  "stages": [
+    {
+      "stageOrder": 0,
+      "stageId": "phase-0-setup",
+      "title": "Phase 0: Skill Catalog & Agent Setup",
+      "plainGoal": "Prepare your toolset and agent prompts before starting.",
+      "mode": "once",
+      "docs": [
+        "docs/STAGE_LOG.md",
+        "docs/SKILL_COVERAGE.md"
+      ]
+    },
+    {
+      "stageOrder": 1,
+      "stageId": "phase-1-discovery",
+      "title": "Phase 1: Idea, Market & Business Validation",
+      "plainGoal": "Check user demand, competitors, and business viability before writing specs.",
+      "mode": "once",
+      "docs": [
+        "docs/PRD.md",
+        "docs/DECISIONS.md",
+        "docs/STAGE_LOG.md"
+      ]
+    },
+    {
+      "stageOrder": 2,
+      "stageId": "phase-2-foundation",
+      "title": "Phase 2: Project Spec, Context Memory & Starter Files",
+      "plainGoal": "Lock what the product does, set up Conductor tracking, and create the starter folder.",
+      "mode": "once",
+      "docs": [
+        "docs/PRD.md",
+        "docs/STATE.md",
+        "docs/SESSION_HANDOFF.md",
+        "docs/STAGE_LOG.md"
+      ]
+    },
+    {
+      "stageOrder": 3,
+      "stageId": "phase-3-architecture",
+      "title": "Phase 3: System Architecture, APIs & Safety Design",
+      "plainGoal": "Plan how screens, server endpoints, and safety checks fit together.",
+      "mode": "once",
+      "docs": [
+        "docs/ARCHITECTURE.md",
+        "docs/DECISIONS.md",
+        "docs/STAGE_LOG.md"
+      ]
+    },
+    {
+      "stageOrder": 4,
+      "stageId": "phase-4-database",
+      "title": "Phase 4: Database & Data Persistence",
+      "plainGoal": "Design how data is saved cleanly and updated without losing user records.",
+      "mode": "once",
+      "docs": [
+        "docs/ARCHITECTURE.md",
+        "docs/DECISIONS.md",
+        "docs/STAGE_LOG.md"
+      ]
+    },
+    {
+      "stageOrder": 5,
+      "stageId": "phase-5-design",
+      "title": "Phase 5: Visual Design System & Accessibility",
+      "plainGoal": "Choose layout, colors, fonts, and keyboard/screen-reader accessibility first.",
+      "mode": "once",
+      "docs": [
+        "docs/ARCHITECTURE.md",
+        "docs/DECISIONS.md",
+        "docs/USER_GUIDE.md",
+        "docs/STAGE_LOG.md"
+      ]
+    },
+    {
+      "stageOrder": 6,
+      "stageId": "phase-6-core-build",
+      "title": "Phase 6: Core Build Loop (Tests + Language Stack)",
+      "plainGoal": "Build your core app features slice-by-slice with test safety nets.",
+      "mode": "per_slice",
+      "docs": [
+        "docs/STATE.md",
+        "docs/STAGE_LOG.md",
+        "docs/USER_GUIDE.md"
+      ]
+    },
+    {
+      "stageOrder": 7,
+      "stageId": "phase-7-modules",
+      "title": "Phase 7: Product Features (Auth, Billing, AI, Specialty)",
+      "plainGoal": "Wire login, payments, AI/OCR, or specialized engines into working slices.",
+      "mode": "per_slice",
+      "docs": [
+        "docs/PRD.md",
+        "docs/ARCHITECTURE.md",
+        "docs/STAGE_LOG.md",
+        "docs/USER_GUIDE.md"
+      ]
+    },
+    {
+      "stageOrder": 8,
+      "stageId": "phase-8-verification",
+      "title": "Phase 8: Testing, Bug Fixing & Code Quality Gate",
+      "plainGoal": "Verify features end-to-end, squash failures (if red), and clean code (when green).",
+      "mode": "per_slice",
+      "docs": [
+        "docs/STAGE_LOG.md",
+        "docs/SKILL_COVERAGE.md",
+        "docs/STATE.md"
+      ]
+    },
+    {
+      "stageOrder": 9,
+      "stageId": "phase-9-security",
+      "title": "Phase 9: Security Audit, Package Safety & Privacy Rules",
+      "plainGoal": "Scan code/dependencies for vulnerabilities and check legal/GDPR rules.",
+      "mode": "pre_launch",
+      "docs": [
+        "docs/DECISIONS.md",
+        "docs/STAGE_LOG.md",
+        "docs/SKILL_COVERAGE.md"
+      ]
+    },
+    {
+      "stageOrder": 10,
+      "stageId": "phase-10-deploy",
+      "title": "Phase 10: Git Workflow, CI/CD & Cloud Deployment",
+      "plainGoal": "Set up version control, automated checks, and deploy your app online.",
+      "mode": "pre_launch",
+      "docs": [
+        "docs/ARCHITECTURE.md",
+        "docs/STAGE_LOG.md",
+        "docs/SESSION_HANDOFF.md"
+      ]
+    },
+    {
+      "stageOrder": 11,
+      "stageId": "phase-11-ops",
+      "title": "Phase 11: Live Monitoring, Alerts & Crash Recovery",
+      "plainGoal": "Add uptime charts, error alerts, and playbooks for live production issues.",
+      "mode": "pre_launch",
+      "docs": [
+        "docs/USER_GUIDE.md",
+        "docs/STAGE_LOG.md",
+        "docs/STATE.md"
+      ]
+    },
+    {
+      "stageOrder": 12,
+      "stageId": "phase-12-launch",
+      "title": "Phase 12: User Docs, Launch Copy & SEO Growth",
+      "plainGoal": "Write clear guides, landing page messaging, and search-friendly content.",
+      "mode": "pre_launch",
+      "docs": [
+        "docs/USER_GUIDE.md",
+        "docs/STAGE_LOG.md",
+        "docs/SKILL_COVERAGE.md"
+      ]
+    }
+  ],
+  "blocks": {
+    "N0_A": {
+      "blockId": "N0_A",
+      "label": "Catalog & DX Init",
+      "stagePrefix": "N0",
+      "stageOrder": 0,
+      "stageId": "phase-0-setup",
+      "conditionalOnFailure": false,
+      "skills": [
+        "antigravity-skills-manager",
+        "dx-optimizer"
+      ]
+    },
+    "N0_B": {
+      "blockId": "N0_B",
+      "label": "Agent Tuning",
+      "stagePrefix": "N0",
+      "stageOrder": 0,
+      "stageId": "phase-0-setup",
+      "conditionalOnFailure": false,
+      "skills": [
+        "agent-orchestration-improve-agent",
+        "agent-orchestration-multi-agent-optimize"
+      ]
+    },
+    "N1_A": {
+      "blockId": "N1_A",
+      "label": "Market & Competitor Validation",
+      "stagePrefix": "N1",
+      "stageOrder": 1,
+      "stageId": "phase-1-discovery",
+      "conditionalOnFailure": false,
+      "skills": [
+        "search-specialist",
+        "competitive-landscape",
+        "market-sizing-analysis",
+        "startup-analyst",
+        "business-analyst",
+        "startup-metrics-framework"
+      ]
+    },
+    "N1_B": {
+      "blockId": "N1_B",
+      "label": "Business Case & Financials",
+      "stagePrefix": "N1",
+      "stageOrder": 1,
+      "stageId": "phase-1-discovery",
+      "conditionalOnFailure": false,
+      "skills": [
+        "startup-business-analyst-market-opportunity",
+        "startup-business-analyst-business-case",
+        "startup-business-analyst-financial-projections",
+        "startup-financial-modeling",
+        "team-composition-analysis",
+        "data-storytelling"
+      ]
+    },
+    "N2_A": {
+      "blockId": "N2_A",
+      "label": "Conductor Project Init",
+      "stagePrefix": "N2",
+      "stageOrder": 2,
+      "stageId": "phase-2-foundation",
+      "conditionalOnFailure": false,
+      "skills": [
+        "conductor-setup",
+        "context-driven-development"
+      ]
+    },
+    "N2_B": {
+      "blockId": "N2_B",
+      "label": "Thread Context Save / Restore",
+      "stagePrefix": "N2",
+      "stageOrder": 2,
+      "stageId": "phase-2-foundation",
+      "conditionalOnFailure": false,
+      "skills": [
+        "context-manager",
+        "context-management-context-save",
+        "context-management-context-restore",
+        "code-refactoring-context-restore",
+        "conductor-status"
+      ]
+    },
+    "N2_C": {
+      "blockId": "N2_C",
+      "label": "Spec Gate & Track Creation",
+      "stagePrefix": "N2",
+      "stageOrder": 2,
+      "stageId": "phase-2-foundation",
+      "conditionalOnFailure": false,
+      "skills": [
+        "conductor-validator",
+        "conductor-new-track",
+        "track-management",
+        "conductor-manage"
+      ]
+    },
+    "N2_E_TS": {
+      "blockId": "N2_E_TS",
+      "label": "TS/JS Project Scaffold",
+      "stagePrefix": "N2",
+      "stageOrder": 2,
+      "stageId": "phase-2-foundation",
+      "conditionalOnFailure": false,
+      "skills": [
+        "javascript-typescript-typescript-scaffold"
+      ]
+    },
+    "N2_E_PY": {
+      "blockId": "N2_E_PY",
+      "label": "Python Project Scaffold",
+      "stagePrefix": "N2",
+      "stageOrder": 2,
+      "stageId": "phase-2-foundation",
+      "conditionalOnFailure": false,
+      "skills": [
+        "python-development-python-scaffold",
+        "uv-package-manager"
+      ]
+    },
+    "N2_E_RS": {
+      "blockId": "N2_E_RS",
+      "label": "Rust Project Scaffold",
+      "stagePrefix": "N2",
+      "stageOrder": 2,
+      "stageId": "phase-2-foundation",
+      "conditionalOnFailure": false,
+      "skills": [
+        "systems-programming-rust-project"
+      ]
+    },
+    "N3_A": {
+      "blockId": "N3_A",
+      "label": "Core Backend Architecture",
+      "stagePrefix": "N3",
+      "stageOrder": 3,
+      "stageId": "phase-3-architecture",
+      "conditionalOnFailure": false,
+      "skills": [
+        "architect-review",
+        "architecture-patterns",
+        "backend-architect",
+        "microservices-patterns",
+        "architecture-decision-records"
+      ]
+    },
+    "N3_B": {
+      "blockId": "N3_B",
+      "label": "Monorepo & Build Caching",
+      "stagePrefix": "N3",
+      "stageOrder": 3,
+      "stageId": "phase-3-architecture",
+      "conditionalOnFailure": false,
+      "skills": [
+        "monorepo-architect",
+        "monorepo-management",
+        "turborepo-caching",
+        "nx-workspace-patterns",
+        "bazel-build-optimization"
+      ]
+    },
+    "N3_C": {
+      "blockId": "N3_C",
+      "label": "C4 & Mermaid Diagrams",
+      "stagePrefix": "N3",
+      "stageOrder": 3,
+      "stageId": "phase-3-architecture",
+      "conditionalOnFailure": false,
+      "skills": [
+        "mermaid-expert",
+        "c4-context",
+        "c4-container",
+        "c4-component",
+        "c4-code",
+        "c4-architecture-c4-architecture"
+      ]
+    },
+    "N3_D1": {
+      "blockId": "N3_D1",
+      "label": "REST / OpenAPI Contracts",
+      "stagePrefix": "N3",
+      "stageOrder": 3,
+      "stageId": "phase-3-architecture",
+      "conditionalOnFailure": false,
+      "skills": [
+        "api-design-principles",
+        "openapi-spec-generation",
+        "api-documenter"
+      ]
+    },
+    "N3_D2": {
+      "blockId": "N3_D2",
+      "label": "GraphQL Contracts",
+      "stagePrefix": "N3",
+      "stageOrder": 3,
+      "stageId": "phase-3-architecture",
+      "conditionalOnFailure": false,
+      "skills": [
+        "api-design-principles",
+        "graphql-architect",
+        "api-documenter"
+      ]
+    },
+    "N3_E": {
+      "blockId": "N3_E",
+      "label": "Threat Modeling (Security by Design)",
+      "stagePrefix": "N3",
+      "stageOrder": 3,
+      "stageId": "phase-3-architecture",
+      "conditionalOnFailure": false,
+      "skills": [
+        "threat-modeling-expert",
+        "stride-analysis-patterns",
+        "attack-tree-construction",
+        "security-requirement-extraction",
+        "threat-mitigation-mapping"
+      ]
+    },
+    "N4_A": {
+      "blockId": "N4_A",
+      "label": "Relational SQL & Postgres",
+      "stagePrefix": "N4",
+      "stageOrder": 4,
+      "stageId": "phase-4-database",
+      "conditionalOnFailure": false,
+      "skills": [
+        "database-architect",
+        "postgresql",
+        "sql-pro",
+        "sql-optimization-patterns",
+        "database-optimizer",
+        "database-admin"
+      ]
+    },
+    "N4_C": {
+      "blockId": "N4_C",
+      "label": "Event Sourcing & CQRS",
+      "stagePrefix": "N4",
+      "stageOrder": 4,
+      "stageId": "phase-4-database",
+      "conditionalOnFailure": false,
+      "skills": [
+        "event-sourcing-architect",
+        "event-store-design",
+        "cqrs-implementation",
+        "projection-patterns",
+        "saga-orchestration"
+      ]
+    },
+    "N4_B": {
+      "blockId": "N4_B",
+      "label": "Zero-Downtime Migrations & CDC",
+      "stagePrefix": "N4",
+      "stageOrder": 4,
+      "stageId": "phase-4-database",
+      "conditionalOnFailure": false,
+      "skills": [
+        "database-migrations-sql-migrations",
+        "database-migration",
+        "database-migrations-migration-observability"
+      ]
+    },
+    "N5_A": {
+      "blockId": "N5_A",
+      "label": "UI/UX & Tailwind Design System",
+      "stagePrefix": "N5",
+      "stageOrder": 5,
+      "stageId": "phase-5-design",
+      "conditionalOnFailure": false,
+      "skills": [
+        "ui-ux-designer",
+        "tailwind-design-system",
+        "kpi-dashboard-design",
+        "article-illustrations"
+      ]
+    },
+    "N5_B": {
+      "blockId": "N5_B",
+      "label": "WCAG & Screen Reader Audits",
+      "stagePrefix": "N5",
+      "stageOrder": 5,
+      "stageId": "phase-5-design",
+      "conditionalOnFailure": false,
+      "skills": [
+        "wcag-audit-patterns",
+        "accessibility-compliance-accessibility-audit",
+        "screen-reader-testing"
+      ]
+    },
+    "N6_A": {
+      "blockId": "N6_A",
+      "label": "Conductor Outer Loop",
+      "stagePrefix": "N6",
+      "stageOrder": 6,
+      "stageId": "phase-6-core-build",
+      "conditionalOnFailure": false,
+      "skills": [
+        "conductor-implement",
+        "workflow-patterns",
+        "full-stack-orchestration-full-stack-feature",
+        "backend-development-feature-development"
+      ]
+    },
+    "N6_B": {
+      "blockId": "N6_B",
+      "label": "Strict TDD Inner Loop",
+      "stagePrefix": "N6",
+      "stageOrder": 6,
+      "stageId": "phase-6-core-build",
+      "conditionalOnFailure": false,
+      "skills": [
+        "tdd-orchestrator",
+        "tdd-workflows-tdd-cycle",
+        "tdd-workflows-tdd-red",
+        "tdd-workflows-tdd-green",
+        "tdd-workflows-tdd-refactor"
+      ]
+    },
+    "N6_C": {
+      "blockId": "N6_C",
+      "label": "Web / Next.js / TypeScript",
+      "stagePrefix": "N6",
+      "stageOrder": 6,
+      "stageId": "phase-6-core-build",
+      "conditionalOnFailure": false,
+      "skills": [
+        "typescript-pro",
+        "typescript-advanced-types",
+        "javascript-pro",
+        "modern-javascript-patterns",
+        "nextjs-app-router-patterns",
+        "frontend-developer",
+        "frontend-mobile-development-component-scaffold",
+        "react-state-management",
+        "react-modernization",
+        "nodejs-backend-patterns"
+      ]
+    },
+    "N6_D": {
+      "blockId": "N6_D",
+      "label": "Mobile & Cross-Platform",
+      "stagePrefix": "N6",
+      "stageOrder": 6,
+      "stageId": "phase-6-core-build",
+      "conditionalOnFailure": false,
+      "skills": [
+        "multi-platform-apps-multi-platform",
+        "mobile-developer",
+        "react-native-architecture",
+        "flutter-expert",
+        "ios-developer"
+      ]
+    },
+    "N6_E": {
+      "blockId": "N6_E",
+      "label": "Python Backend (FastAPI / Django)",
+      "stagePrefix": "N6",
+      "stageOrder": 6,
+      "stageId": "phase-6-core-build",
+      "conditionalOnFailure": false,
+      "skills": [
+        "python-pro",
+        "async-python-patterns",
+        "fastapi-pro",
+        "fastapi-templates",
+        "django-pro",
+        "python-performance-optimization",
+        "python-packaging"
+      ]
+    },
+    "N6_F": {
+      "blockId": "N6_F",
+      "label": "Go / Rust / Java / .NET / Systems",
+      "stagePrefix": "N6",
+      "stageOrder": 6,
+      "stageId": "phase-6-core-build",
+      "conditionalOnFailure": false,
+      "skills": [
+        "golang-pro",
+        "go-concurrency-patterns",
+        "rust-pro",
+        "rust-async-patterns",
+        "memory-safety-patterns",
+        "c-pro",
+        "cpp-pro",
+        "java-pro",
+        "dotnet-architect",
+        "dotnet-backend-patterns",
+        "csharp-pro",
+        "ruby-pro",
+        "php-pro",
+        "elixir-pro",
+        "scala-pro",
+        "haskell-pro",
+        "julia-pro"
+      ]
+    },
+    "N6_G1": {
+      "blockId": "N6_G1",
+      "label": "Resilient Error Handling",
+      "stagePrefix": "N6",
+      "stageOrder": 6,
+      "stageId": "phase-6-core-build",
+      "conditionalOnFailure": false,
+      "skills": [
+        "error-handling-patterns"
+      ]
+    },
+    "N6_G2": {
+      "blockId": "N6_G2",
+      "label": "Legacy Modernization & Upgrades",
+      "stagePrefix": "N6",
+      "stageOrder": 6,
+      "stageId": "phase-6-core-build",
+      "conditionalOnFailure": false,
+      "skills": [
+        "angular-migration",
+        "framework-migration-code-migrate",
+        "framework-migration-deps-upgrade",
+        "framework-migration-legacy-modernize",
+        "legacy-modernizer",
+        "dependency-upgrade"
+      ]
+    },
+    "N7_A1": {
+      "blockId": "N7_A1",
+      "label": "Auth & RBAC",
+      "stagePrefix": "N7",
+      "stageOrder": 7,
+      "stageId": "phase-7-modules",
+      "conditionalOnFailure": false,
+      "skills": [
+        "auth-implementation-patterns"
+      ]
+    },
+    "N7_A2": {
+      "blockId": "N7_A2",
+      "label": "Payments, Subscriptions & PCI",
+      "stagePrefix": "N7",
+      "stageOrder": 7,
+      "stageId": "phase-7-modules",
+      "conditionalOnFailure": false,
+      "skills": [
+        "payment-integration",
+        "stripe-integration",
+        "paypal-integration",
+        "billing-automation",
+        "pci-compliance"
+      ]
+    },
+    "N7_B": {
+      "blockId": "N7_B",
+      "label": "AI, Prompts, RAG & Evals",
+      "stagePrefix": "N7",
+      "stageOrder": 7,
+      "stageId": "phase-7-modules",
+      "conditionalOnFailure": false,
+      "skills": [
+        "ai-engineer",
+        "prompt-engineer",
+        "prompt-engineering-patterns",
+        "llm-application-dev-prompt-optimize",
+        "llm-application-dev-ai-assistant",
+        "langchain-architecture",
+        "llm-application-dev-langchain-agent",
+        "rag-implementation",
+        "embedding-strategies",
+        "vector-database-engineer",
+        "vector-index-tuning",
+        "similarity-search-patterns",
+        "hybrid-search-implementation",
+        "llm-evaluation"
+      ]
+    },
+    "N7_C": {
+      "blockId": "N7_C",
+      "label": "Data Pipelines, ML, Temporal & Quant",
+      "stagePrefix": "N7",
+      "stageOrder": 7,
+      "stageId": "phase-7-modules",
+      "conditionalOnFailure": false,
+      "skills": [
+        "data-engineer",
+        "data-engineering-data-pipeline",
+        "data-engineering-data-driven-feature",
+        "data-quality-frameworks",
+        "airflow-dag-patterns",
+        "dbt-transformation-patterns",
+        "spark-optimization",
+        "data-scientist",
+        "ml-engineer",
+        "mlops-engineer",
+        "ml-pipeline-workflow",
+        "machine-learning-ops-ml-pipeline",
+        "workflow-orchestration-patterns",
+        "temporal-python-pro",
+        "quant-analyst",
+        "backtesting-frameworks",
+        "risk-manager",
+        "risk-metrics-calculation"
+      ]
+    },
+    "N7_D1": {
+      "blockId": "N7_D1",
+      "label": "Web3 & Smart Contracts",
+      "stagePrefix": "N7",
+      "stageOrder": 7,
+      "stageId": "phase-7-modules",
+      "conditionalOnFailure": false,
+      "skills": [
+        "blockchain-developer",
+        "solidity-security",
+        "defi-protocol-templates",
+        "nft-standards",
+        "web3-testing"
+      ]
+    },
+    "N7_D2": {
+      "blockId": "N7_D2",
+      "label": "Game Development",
+      "stagePrefix": "N7",
+      "stageOrder": 7,
+      "stageId": "phase-7-modules",
+      "conditionalOnFailure": false,
+      "skills": [
+        "godot-gdscript-patterns",
+        "unity-developer",
+        "unity-ecs-patterns",
+        "minecraft-bukkit-pro"
+      ]
+    },
+    "N7_D3": {
+      "blockId": "N7_D3",
+      "label": "Embedded, Firmware & Reverse Eng.",
+      "stagePrefix": "N7",
+      "stageOrder": 7,
+      "stageId": "phase-7-modules",
+      "conditionalOnFailure": false,
+      "skills": [
+        "arm-cortex-expert",
+        "firmware-analyst",
+        "binary-analysis-patterns",
+        "anti-reversing-techniques",
+        "protocol-reverse-engineering",
+        "reverse-engineer",
+        "malware-analyst",
+        "memory-forensics"
+      ]
+    },
+    "N8_A1": {
+      "blockId": "N8_A1",
+      "label": "JS/TS Testing & API Mocks",
+      "stagePrefix": "N8",
+      "stageOrder": 8,
+      "stageId": "phase-8-verification",
+      "conditionalOnFailure": false,
+      "skills": [
+        "javascript-testing-patterns",
+        "unit-testing-test-generate",
+        "test-automator",
+        "api-testing-observability-api-mock"
+      ]
+    },
+    "N8_A2": {
+      "blockId": "N8_A2",
+      "label": "Python & Temporal Testing",
+      "stagePrefix": "N8",
+      "stageOrder": 8,
+      "stageId": "phase-8-verification",
+      "conditionalOnFailure": false,
+      "skills": [
+        "python-testing-patterns",
+        "temporal-python-testing",
+        "unit-testing-test-generate",
+        "test-automator",
+        "api-testing-observability-api-mock"
+      ]
+    },
+    "N8_B": {
+      "blockId": "N8_B",
+      "label": "E2E & Visual QA",
+      "stagePrefix": "N8",
+      "stageOrder": 8,
+      "stageId": "phase-8-verification",
+      "conditionalOnFailure": false,
+      "skills": [
+        "e2e-testing-patterns",
+        "ui-visual-validator"
+      ]
+    },
+    "N8_C": {
+      "blockId": "N8_C",
+      "label": "Debug & Track Rollback",
+      "stagePrefix": "N8",
+      "stageOrder": 8,
+      "stageId": "phase-8-verification",
+      "conditionalOnFailure": true,
+      "skills": [
+        "debugger",
+        "debugging-strategies",
+        "error-detective",
+        "debugging-toolkit-smart-debug",
+        "error-diagnostics-smart-debug",
+        "error-debugging-error-analysis",
+        "error-diagnostics-error-analysis",
+        "distributed-debugging-debug-trace",
+        "conductor-revert"
+      ]
+    },
+    "N8_D": {
+      "blockId": "N8_D",
+      "label": "Code Review, Refactor & Perf",
+      "stagePrefix": "N8",
+      "stageOrder": 8,
+      "stageId": "phase-8-verification",
+      "conditionalOnFailure": false,
+      "skills": [
+        "code-reviewer",
+        "code-review-excellence",
+        "code-review-ai-ai-review",
+        "comprehensive-review-full-review",
+        "error-debugging-multi-agent-review",
+        "performance-testing-review-ai-review",
+        "performance-testing-review-multi-agent-review",
+        "code-refactoring-refactor-clean",
+        "codebase-cleanup-refactor-clean",
+        "code-refactoring-tech-debt",
+        "codebase-cleanup-tech-debt",
+        "application-performance-performance-optimization",
+        "performance-engineer"
+      ]
+    },
+    "N9_A": {
+      "blockId": "N9_A",
+      "label": "App Security, SAST & Supply Chain",
+      "stagePrefix": "N9",
+      "stageOrder": 9,
+      "stageId": "phase-9-security",
+      "conditionalOnFailure": false,
+      "skills": [
+        "security-auditor",
+        "backend-security-coder",
+        "frontend-security-coder",
+        "frontend-mobile-security-xss-scan",
+        "mobile-security-coder",
+        "security-scanning-security-hardening",
+        "security-scanning-security-sast",
+        "sast-configuration",
+        "secrets-management",
+        "dependency-management-deps-audit",
+        "codebase-cleanup-deps-audit",
+        "security-scanning-security-dependencies"
+      ]
+    },
+    "N9_C1": {
+      "blockId": "N9_C1",
+      "label": "Legal & GDPR Privacy",
+      "stagePrefix": "N9",
+      "stageOrder": 9,
+      "stageId": "phase-9-security",
+      "conditionalOnFailure": false,
+      "skills": [
+        "legal-advisor",
+        "gdpr-data-handling",
+        "security-compliance-compliance-check"
+      ]
+    },
+    "N9_C2": {
+      "blockId": "N9_C2",
+      "label": "HR & Employment Contracts",
+      "stagePrefix": "N9",
+      "stageOrder": 9,
+      "stageId": "phase-9-security",
+      "conditionalOnFailure": false,
+      "skills": [
+        "hr-pro",
+        "employment-contract-templates"
+      ]
+    },
+    "N10_A": {
+      "blockId": "N10_A",
+      "label": "Git, PRs & Team Sync",
+      "stagePrefix": "N10",
+      "stageOrder": 10,
+      "stageId": "phase-10-deploy",
+      "conditionalOnFailure": false,
+      "skills": [
+        "git-pr-workflows-git-workflow",
+        "git-advanced-workflows",
+        "git-pr-workflows-pr-enhance",
+        "comprehensive-review-pr-enhance",
+        "changelog-automation",
+        "team-collaboration-issue",
+        "team-collaboration-standup-notes"
+      ]
+    },
+    "N10_B1": {
+      "blockId": "N10_B1",
+      "label": "CI/CD Pipelines & Deployment",
+      "stagePrefix": "N10",
+      "stageOrder": 10,
+      "stageId": "phase-10-deploy",
+      "conditionalOnFailure": false,
+      "skills": [
+        "github-actions-templates",
+        "gitlab-ci-patterns",
+        "cicd-automation-workflow-automate",
+        "deployment-engineer",
+        "deployment-pipeline-design",
+        "deployment-validation-config-validate"
+      ]
+    },
+    "N10_B2": {
+      "blockId": "N10_B2",
+      "label": "Bash & Shell Automation",
+      "stagePrefix": "N10",
+      "stageOrder": 10,
+      "stageId": "phase-10-deploy",
+      "conditionalOnFailure": false,
+      "skills": [
+        "bash-pro",
+        "bash-defensive-patterns",
+        "bats-testing-patterns",
+        "posix-shell-pro",
+        "shellcheck-configuration"
+      ]
+    },
+    "N10_C": {
+      "blockId": "N10_C",
+      "label": "Cloud, Terraform & Kubernetes",
+      "stagePrefix": "N10",
+      "stageOrder": 10,
+      "stageId": "phase-10-deploy",
+      "conditionalOnFailure": false,
+      "skills": [
+        "cloud-architect",
+        "multi-cloud-architecture",
+        "hybrid-cloud-architect",
+        "hybrid-cloud-networking",
+        "network-engineer",
+        "cost-optimization",
+        "database-cloud-optimization-cost-optimize",
+        "terraform-specialist",
+        "terraform-module-library",
+        "kubernetes-architect",
+        "k8s-manifest-generator",
+        "k8s-security-policies",
+        "helm-chart-scaffolding",
+        "gitops-workflow",
+        "istio-traffic-management",
+        "linkerd-patterns",
+        "service-mesh-expert",
+        "mtls-configuration"
+      ]
+    },
+    "N11_A": {
+      "blockId": "N11_A",
+      "label": "Monitoring, Tracing & SLOs",
+      "stagePrefix": "N11",
+      "stageOrder": 11,
+      "stageId": "phase-11-ops",
+      "conditionalOnFailure": false,
+      "skills": [
+        "observability-engineer",
+        "observability-monitoring-monitor-setup",
+        "observability-monitoring-slo-implement",
+        "slo-implementation",
+        "error-debugging-error-trace",
+        "error-diagnostics-error-trace",
+        "distributed-tracing",
+        "prometheus-configuration",
+        "grafana-dashboards",
+        "service-mesh-observability"
+      ]
+    },
+    "N11_B": {
+      "blockId": "N11_B",
+      "label": "SRE Incidents & Postmortems",
+      "stagePrefix": "N11",
+      "stageOrder": 11,
+      "stageId": "phase-11-ops",
+      "conditionalOnFailure": true,
+      "skills": [
+        "devops-troubleshooter",
+        "incident-responder",
+        "incident-response-incident-response",
+        "incident-response-smart-fix",
+        "incident-runbook-templates",
+        "on-call-handoff-patterns",
+        "postmortem-writing"
+      ]
+    },
+    "N12_A": {
+      "blockId": "N12_A",
+      "label": "Docs, Tutorials & Onboarding",
+      "stagePrefix": "N12",
+      "stageOrder": 12,
+      "stageId": "phase-12-launch",
+      "conditionalOnFailure": false,
+      "skills": [
+        "docs-architect",
+        "code-documentation-doc-generate",
+        "documentation-generation-doc-generate",
+        "code-documentation-code-explain",
+        "tutorial-engineer",
+        "reference-builder",
+        "git-pr-workflows-onboard"
+      ]
+    },
+    "N12_B": {
+      "blockId": "N12_B",
+      "label": "Launch Marketing & Support",
+      "stagePrefix": "N12",
+      "stageOrder": 12,
+      "stageId": "phase-12-launch",
+      "conditionalOnFailure": false,
+      "skills": [
+        "content-marketer",
+        "sales-automator",
+        "customer-support"
+      ]
+    },
+    "N12_C": {
+      "blockId": "N12_C",
+      "label": "SEO Content & Technical Flywheel",
+      "stagePrefix": "N12",
+      "stageOrder": 12,
+      "stageId": "phase-12-launch",
+      "conditionalOnFailure": false,
+      "skills": [
+        "seo-content-planner",
+        "seo-structure-architect",
+        "seo-keyword-strategist",
+        "seo-meta-optimizer",
+        "seo-content-writer",
+        "seo-snippet-hunter",
+        "seo-content-auditor",
+        "seo-authority-builder",
+        "seo-cannibalization-detector",
+        "seo-content-refresher"
+      ]
+    }
+  },
+  "redundantDuplicates": [
+    "code-refactoring-context-restore",
+    "codebase-cleanup-refactor-clean",
+    "codebase-cleanup-tech-debt",
+    "codebase-cleanup-deps-audit",
+    "security-scanning-security-dependencies",
+    "documentation-generation-doc-generate",
+    "comprehensive-review-pr-enhance",
+    "error-diagnostics-error-analysis",
+    "error-diagnostics-error-trace",
+    "error-diagnostics-smart-debug",
+    "performance-testing-review-ai-review",
+    "performance-testing-review-multi-agent-review",
+    "database-cloud-optimization-cost-optimize",
+    "observability-monitoring-slo-implement"
+  ],
+  "presets": {
+    "billSplit": {
+      "Q0": 0,
+      "Q1": 0,
+      "Q2": 0,
+      "Q2_SCAF": 1,
+      "Q3": 1,
+      "Q3_API": 0,
+      "Q4": 2,
+      "Q5": 0,
+      "Q6": 0,
+      "Q6_STACK": 0,
+      "Q7_AUTH": 0,
+      "Q7_AI": 1,
+      "Q7_EXTRA": 0,
+      "Q8": 0,
+      "Q9": 1,
+      "Q10": 1,
+      "Q11": 0,
+      "Q12": 1
+    },
+    "saas": {
+      "Q0": 0,
+      "Q1": 1,
+      "Q2": 0,
+      "Q2_SCAF": 1,
+      "Q3": 1,
+      "Q3_API": 0,
+      "Q4": 2,
+      "Q5": 0,
+      "Q6": 0,
+      "Q6_STACK": 0,
+      "Q7_AUTH": 2,
+      "Q7_AI": 0,
+      "Q7_EXTRA": 0,
+      "Q8": 0,
+      "Q9": 2,
+      "Q10": 1,
+      "Q11": 1,
+      "Q12": 2
+    },
+    "script": {
+      "Q0": 0,
+      "Q1": 0,
+      "Q2": 0,
+      "Q2_SCAF": 2,
+      "Q3": 0,
+      "Q4": 0,
+      "Q5": 2,
+      "Q6": 1,
+      "Q6_STACK": 2,
+      "Q7_AUTH": 0,
+      "Q7_AI": 0,
+      "Q7_EXTRA": 0,
+      "Q8": 1,
+      "Q9": 0,
+      "Q10": 0,
+      "Q11": 0,
+      "Q12": 0
+    }
+  }
+}

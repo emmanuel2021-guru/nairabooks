@@ -1,0 +1,545 @@
+{
+  "version": "1.0",
+  "projectName": "ac",
+  "mode": "wizard_path",
+  "dedupApplied": true,
+  "totalSkills": 128,
+  "selectedSkills": [
+    "antigravity-skills-manager",
+    "dx-optimizer",
+    "agent-orchestration-improve-agent",
+    "agent-orchestration-multi-agent-optimize",
+    "search-specialist",
+    "competitive-landscape",
+    "market-sizing-analysis",
+    "startup-analyst",
+    "business-analyst",
+    "startup-metrics-framework",
+    "conductor-setup",
+    "context-driven-development",
+    "conductor-validator",
+    "conductor-new-track",
+    "track-management",
+    "conductor-manage",
+    "python-development-python-scaffold",
+    "uv-package-manager",
+    "architect-review",
+    "architecture-patterns",
+    "backend-architect",
+    "microservices-patterns",
+    "architecture-decision-records",
+    "api-design-principles",
+    "graphql-architect",
+    "api-documenter",
+    "threat-modeling-expert",
+    "stride-analysis-patterns",
+    "attack-tree-construction",
+    "security-requirement-extraction",
+    "threat-mitigation-mapping",
+    "database-architect",
+    "postgresql",
+    "sql-pro",
+    "sql-optimization-patterns",
+    "database-optimizer",
+    "database-admin",
+    "database-migrations-sql-migrations",
+    "database-migration",
+    "database-migrations-migration-observability",
+    "ui-ux-designer",
+    "tailwind-design-system",
+    "kpi-dashboard-design",
+    "article-illustrations",
+    "wcag-audit-patterns",
+    "accessibility-compliance-accessibility-audit",
+    "screen-reader-testing",
+    "conductor-implement",
+    "workflow-patterns",
+    "full-stack-orchestration-full-stack-feature",
+    "backend-development-feature-development",
+    "tdd-orchestrator",
+    "tdd-workflows-tdd-cycle",
+    "tdd-workflows-tdd-red",
+    "tdd-workflows-tdd-green",
+    "tdd-workflows-tdd-refactor",
+    "typescript-pro",
+    "typescript-advanced-types",
+    "javascript-pro",
+    "modern-javascript-patterns",
+    "nextjs-app-router-patterns",
+    "frontend-developer",
+    "frontend-mobile-development-component-scaffold",
+    "react-state-management",
+    "react-modernization",
+    "nodejs-backend-patterns",
+    "error-handling-patterns",
+    "auth-implementation-patterns",
+    "javascript-testing-patterns",
+    "unit-testing-test-generate",
+    "test-automator",
+    "api-testing-observability-api-mock",
+    "e2e-testing-patterns",
+    "ui-visual-validator",
+    "debugger",
+    "debugging-strategies",
+    "error-detective",
+    "debugging-toolkit-smart-debug",
+    "error-debugging-error-analysis",
+    "distributed-debugging-debug-trace",
+    "conductor-revert",
+    "code-reviewer",
+    "code-review-excellence",
+    "code-review-ai-ai-review",
+    "comprehensive-review-full-review",
+    "error-debugging-multi-agent-review",
+    "code-refactoring-refactor-clean",
+    "code-refactoring-tech-debt",
+    "application-performance-performance-optimization",
+    "performance-engineer",
+    "security-auditor",
+    "backend-security-coder",
+    "frontend-security-coder",
+    "frontend-mobile-security-xss-scan",
+    "mobile-security-coder",
+    "security-scanning-security-hardening",
+    "security-scanning-security-sast",
+    "sast-configuration",
+    "secrets-management",
+    "dependency-management-deps-audit",
+    "legal-advisor",
+    "gdpr-data-handling",
+    "security-compliance-compliance-check",
+    "git-pr-workflows-git-workflow",
+    "git-advanced-workflows",
+    "git-pr-workflows-pr-enhance",
+    "changelog-automation",
+    "team-collaboration-issue",
+    "team-collaboration-standup-notes",
+    "docs-architect",
+    "code-documentation-doc-generate",
+    "code-documentation-code-explain",
+    "tutorial-engineer",
+    "reference-builder",
+    "git-pr-workflows-onboard",
+    "content-marketer",
+    "sales-automator",
+    "customer-support",
+    "seo-content-planner",
+    "seo-structure-architect",
+    "seo-keyword-strategist",
+    "seo-meta-optimizer",
+    "seo-content-writer",
+    "seo-snippet-hunter",
+    "seo-content-auditor",
+    "seo-authority-builder",
+    "seo-cannibalization-detector",
+    "seo-content-refresher"
+  ],
+  "blocks": [
+    {
+      "blockId": "N0_A",
+      "label": "Catalog & DX Init",
+      "skills": [
+        "antigravity-skills-manager",
+        "dx-optimizer"
+      ]
+    },
+    {
+      "blockId": "N0_B",
+      "label": "Agent Tuning",
+      "skills": [
+        "agent-orchestration-improve-agent",
+        "agent-orchestration-multi-agent-optimize"
+      ]
+    },
+    {
+      "blockId": "N1_A",
+      "label": "Market & Competitor Validation",
+      "skills": [
+        "search-specialist",
+        "competitive-landscape",
+        "market-sizing-analysis",
+        "startup-analyst",
+        "business-analyst",
+        "startup-metrics-framework"
+      ]
+    },
+    {
+      "blockId": "N2_A",
+      "label": "Conductor Project Init",
+      "skills": [
+        "conductor-setup",
+        "context-driven-development"
+      ]
+    },
+    {
+      "blockId": "N2_C",
+      "label": "Spec Gate & Track Creation",
+      "skills": [
+        "conductor-validator",
+        "conductor-new-track",
+        "track-management",
+        "conductor-manage"
+      ]
+    },
+    {
+      "blockId": "N2_E_PY",
+      "label": "Python Project Scaffold",
+      "skills": [
+        "python-development-python-scaffold",
+        "uv-package-manager"
+      ]
+    },
+    {
+      "blockId": "N3_A",
+      "label": "Core Backend Architecture",
+      "skills": [
+        "architect-review",
+        "architecture-patterns",
+        "backend-architect",
+        "microservices-patterns",
+        "architecture-decision-records"
+      ]
+    },
+    {
+      "blockId": "N3_D2",
+      "label": "GraphQL Contracts",
+      "skills": [
+        "api-design-principles",
+        "graphql-architect",
+        "api-documenter"
+      ]
+    },
+    {
+      "blockId": "N3_E",
+      "label": "Threat Modeling (Security by Design)",
+      "skills": [
+        "threat-modeling-expert",
+        "stride-analysis-patterns",
+        "attack-tree-construction",
+        "security-requirement-extraction",
+        "threat-mitigation-mapping"
+      ]
+    },
+    {
+      "blockId": "N4_A",
+      "label": "Relational SQL & Postgres",
+      "skills": [
+        "database-architect",
+        "postgresql",
+        "sql-pro",
+        "sql-optimization-patterns",
+        "database-optimizer",
+        "database-admin"
+      ]
+    },
+    {
+      "blockId": "N4_B",
+      "label": "Zero-Downtime Migrations & CDC",
+      "skills": [
+        "database-migrations-sql-migrations",
+        "database-migration",
+        "database-migrations-migration-observability"
+      ]
+    },
+    {
+      "blockId": "N5_A",
+      "label": "UI/UX & Tailwind Design System",
+      "skills": [
+        "ui-ux-designer",
+        "tailwind-design-system",
+        "kpi-dashboard-design",
+        "article-illustrations"
+      ]
+    },
+    {
+      "blockId": "N5_B",
+      "label": "WCAG & Screen Reader Audits",
+      "skills": [
+        "wcag-audit-patterns",
+        "accessibility-compliance-accessibility-audit",
+        "screen-reader-testing"
+      ]
+    },
+    {
+      "blockId": "N6_A",
+      "label": "Conductor Outer Loop",
+      "skills": [
+        "conductor-implement",
+        "workflow-patterns",
+        "full-stack-orchestration-full-stack-feature",
+        "backend-development-feature-development"
+      ]
+    },
+    {
+      "blockId": "N6_B",
+      "label": "Strict TDD Inner Loop",
+      "skills": [
+        "tdd-orchestrator",
+        "tdd-workflows-tdd-cycle",
+        "tdd-workflows-tdd-red",
+        "tdd-workflows-tdd-green",
+        "tdd-workflows-tdd-refactor"
+      ]
+    },
+    {
+      "blockId": "N6_C",
+      "label": "Web / Next.js / TypeScript",
+      "skills": [
+        "typescript-pro",
+        "typescript-advanced-types",
+        "javascript-pro",
+        "modern-javascript-patterns",
+        "nextjs-app-router-patterns",
+        "frontend-developer",
+        "frontend-mobile-development-component-scaffold",
+        "react-state-management",
+        "react-modernization",
+        "nodejs-backend-patterns"
+      ]
+    },
+    {
+      "blockId": "N6_G1",
+      "label": "Resilient Error Handling",
+      "skills": [
+        "error-handling-patterns"
+      ]
+    },
+    {
+      "blockId": "N7_A1",
+      "label": "Auth & RBAC",
+      "skills": [
+        "auth-implementation-patterns"
+      ]
+    },
+    {
+      "blockId": "N8_A1",
+      "label": "JS/TS Testing & API Mocks",
+      "skills": [
+        "javascript-testing-patterns",
+        "unit-testing-test-generate",
+        "test-automator",
+        "api-testing-observability-api-mock"
+      ]
+    },
+    {
+      "blockId": "N8_B",
+      "label": "E2E & Visual QA",
+      "skills": [
+        "e2e-testing-patterns",
+        "ui-visual-validator"
+      ]
+    },
+    {
+      "blockId": "N8_C",
+      "label": "Debug & Track Rollback",
+      "skills": [
+        "debugger",
+        "debugging-strategies",
+        "error-detective",
+        "debugging-toolkit-smart-debug",
+        "error-debugging-error-analysis",
+        "distributed-debugging-debug-trace",
+        "conductor-revert"
+      ]
+    },
+    {
+      "blockId": "N8_D",
+      "label": "Code Review, Refactor & Perf",
+      "skills": [
+        "code-reviewer",
+        "code-review-excellence",
+        "code-review-ai-ai-review",
+        "comprehensive-review-full-review",
+        "error-debugging-multi-agent-review",
+        "code-refactoring-refactor-clean",
+        "code-refactoring-tech-debt",
+        "application-performance-performance-optimization",
+        "performance-engineer"
+      ]
+    },
+    {
+      "blockId": "N9_A",
+      "label": "App Security, SAST & Supply Chain",
+      "skills": [
+        "security-auditor",
+        "backend-security-coder",
+        "frontend-security-coder",
+        "frontend-mobile-security-xss-scan",
+        "mobile-security-coder",
+        "security-scanning-security-hardening",
+        "security-scanning-security-sast",
+        "sast-configuration",
+        "secrets-management",
+        "dependency-management-deps-audit"
+      ]
+    },
+    {
+      "blockId": "N9_C1",
+      "label": "Legal & GDPR Privacy",
+      "skills": [
+        "legal-advisor",
+        "gdpr-data-handling",
+        "security-compliance-compliance-check"
+      ]
+    },
+    {
+      "blockId": "N10_A",
+      "label": "Git, PRs & Team Sync",
+      "skills": [
+        "git-pr-workflows-git-workflow",
+        "git-advanced-workflows",
+        "git-pr-workflows-pr-enhance",
+        "changelog-automation",
+        "team-collaboration-issue",
+        "team-collaboration-standup-notes"
+      ]
+    },
+    {
+      "blockId": "N12_A",
+      "label": "Docs, Tutorials & Onboarding",
+      "skills": [
+        "docs-architect",
+        "code-documentation-doc-generate",
+        "code-documentation-code-explain",
+        "tutorial-engineer",
+        "reference-builder",
+        "git-pr-workflows-onboard"
+      ]
+    },
+    {
+      "blockId": "N12_B",
+      "label": "Launch Marketing & Support",
+      "skills": [
+        "content-marketer",
+        "sales-automator",
+        "customer-support"
+      ]
+    },
+    {
+      "blockId": "N12_C",
+      "label": "SEO Content & Technical Flywheel",
+      "skills": [
+        "seo-content-planner",
+        "seo-structure-architect",
+        "seo-keyword-strategist",
+        "seo-meta-optimizer",
+        "seo-content-writer",
+        "seo-snippet-hunter",
+        "seo-content-auditor",
+        "seo-authority-builder",
+        "seo-cannibalization-detector",
+        "seo-content-refresher"
+      ]
+    }
+  ],
+  "answers": [
+    {
+      "qId": "Q0",
+      "stage": "Step 1: Tool Setup",
+      "question": "Are you setting up your AI coding tools or agent prompts first?",
+      "chosenLabel": "Yes \u2014 also tune AI agent prompts"
+    },
+    {
+      "qId": "Q1",
+      "stage": "Step 2: Idea Check",
+      "question": "Do you already know what your app should do, or do you want research first?",
+      "chosenLabel": "Check competitors & market demand first"
+    },
+    {
+      "qId": "Q2",
+      "stage": "Step 3: Project Plan & Memory",
+      "question": "Are you starting fresh today, or continuing work from earlier sessions?",
+      "chosenLabel": "Brand new project today"
+    },
+    {
+      "qId": "Q2_SCAF",
+      "stage": "Step 4: Starter Files",
+      "question": "Do you need an empty starter code folder created for you?",
+      "chosenLabel": "Yes \u2014 Python starter (uv)"
+    },
+    {
+      "qId": "Q3",
+      "stage": "Step 5: App Size & Structure",
+      "question": "How big is the project you're building?",
+      "chosenLabel": "Standard web or mobile app"
+    },
+    {
+      "qId": "Q3_API",
+      "stage": "Step 6: Server APIs & Input Safety",
+      "question": "Will users submit forms, log in, or upload files/photos to your backend?",
+      "chosenLabel": "Yes \u2014 GraphQL API + safety checks"
+    },
+    {
+      "qId": "Q4",
+      "stage": "Step 7: Saving Data",
+      "question": "Does your app need to save data in a database (users, bills, orders, posts)?",
+      "chosenLabel": "Yes \u2014 database + safe live updates (Recommended)"
+    },
+    {
+      "qId": "Q5",
+      "stage": "Step 8: Screens & Design",
+      "question": "Will users tap buttons on a screen, or is it backend / command-line only?",
+      "chosenLabel": "Yes \u2014 screens + accessibility check (Recommended)"
+    },
+    {
+      "qId": "Q6",
+      "stage": "Step 9: Coding Style & Tests",
+      "question": "How strictly should the AI write tests while coding features?",
+      "chosenLabel": "Write tests first, then code (TDD \u2014 Safest)"
+    },
+    {
+      "qId": "Q6_STACK",
+      "stage": "Step 10: Language / Platform",
+      "question": "What coding language or platform are you building with?",
+      "chosenLabel": "Website / Web App (Next.js / React / TS)"
+    },
+    {
+      "qId": "Q7_AUTH",
+      "stage": "Step 11: Accounts & Payments",
+      "question": "Do users need to log in or pay money inside your app?",
+      "chosenLabel": "Login / user accounts only (free app)"
+    },
+    {
+      "qId": "Q7_AI",
+      "stage": "Step 12: AI Features Inside App",
+      "question": "Will your finished app have AI features (scanning photos/receipts, chat, smart search)?",
+      "chosenLabel": "No AI features inside the app"
+    },
+    {
+      "qId": "Q7_EXTRA",
+      "stage": "Step 13: Specialty Domains",
+      "question": "Is your app in any of these specialized fields?",
+      "chosenLabel": "None of these \u2014 regular web/mobile/API app"
+    },
+    {
+      "qId": "Q8",
+      "stage": "Step 14: Testing & Code Review",
+      "question": "How should the AI test and inspect your code before launch?",
+      "chosenLabel": "Click through UI in a real browser + review"
+    },
+    {
+      "qId": "Q9",
+      "stage": "Step 15: Security & Privacy Rules",
+      "question": "Who will use this app, and should we check security & privacy laws?",
+      "chosenLabel": "Public launch with real user data"
+    },
+    {
+      "qId": "Q10",
+      "stage": "Step 16: Git & Putting It Online",
+      "question": "Where do you want to put your code and host the finished app?",
+      "chosenLabel": "Keep local / GitHub PRs only (no cloud host)"
+    },
+    {
+      "qId": "Q11",
+      "stage": "Step 17: Live Crash Alerts",
+      "question": "Once your app is live, do you want crash dashboards and emergency alerts?",
+      "chosenLabel": "Skip for now (MVP / basic host logs)"
+    },
+    {
+      "qId": "Q12",
+      "stage": "Step 18: Docs & Marketing",
+      "question": "Last step: Do you need README docs, launch copy, or Google search growth (SEO)?",
+      "chosenLabel": "Everything (Docs + Launch Copy + Support + SEO)"
+    }
+  ]
+}

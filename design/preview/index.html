@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NairaBooks — Interactive UI/UX Mockup &amp; Design System Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            nbBg: '#F8FAFC',
+            nbSurface: '#FFFFFF',
+            nbInk: '#0F172A',
+            nbMuted: '#475569',
+            nbEmerald: '#005E34',
+            nbIndigo: '#0F4C81',
+            nbAmber: '#B45309',
+            nbCrimson: '#B91C1C',
+          },
+          fontFamily: {
+            heading: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    :focus-visible {
+      outline: 2px solid #005E34;
+      outline-offset: 2px;
+    }
+    .nb-skip-link {
+      position: absolute;
+      left: -9999px;
+      top: 0.5rem;
+      z-index: 100;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      background: #005E34;
+      color: #FFFFFF;
+      font-weight: 600;
+    }
+    .nb-skip-link:focus {
+      left: 1rem;
+    }
+  </style>
+</head>
+<body class="bg-nbBg text-nbInk font-sans min-h-screen flex flex-col">
+  <a href="#preview-stage" class="nb-skip-link">Skip to live mockup stage</a>
+
+  <!-- Top Navigation & Mockup Controls -->
+  <header class="sticky top-0 z-40 bg-nbSurface/95 backdrop-blur border-b border-slate-300 shadow-sm">
+    <div class="max-w-[1600px] mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-nbEmerald text-white flex items-center justify-center font-heading font-bold text-lg shadow-sm" aria-hidden="true">
+          ₦
+        </div>
+        <div>
+          <h1 class="font-heading font-bold text-base sm:text-lg leading-tight text-nbInk">
+            NairaBooks — Phase 5 UI/UX Live Preview
+          </h1>
+          <p class="text-xs text-nbMuted font-mono">
+            Stitch Project 9422961334487487882 · WCAG 2.2 AA · Tailwind Tokens &amp; Grav Diagrams
+          </p>
+        </div>
+      </div>
+
+      <!-- Screen Switcher Tabs (Complete End-to-End Workflow) -->
+      <nav aria-label="Mockup Views" class="flex flex-wrap items-center gap-1.5" role="tablist">
+        <button
+          type="button"
+          role="tab"
+          aria-selected="true"
+          data-view="screen-1"
+          class="view-tab px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors bg-nbEmerald text-white"
+        >
+          1. Setup
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected="false"
+          data-view="screen-2"
+          class="view-tab px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors bg-slate-100 text-slate-800 hover:bg-slate-200"
+        >
+          2. Overview
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected="false"
+          data-view="screen-3"
+          class="view-tab px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors bg-slate-100 text-slate-800 hover:bg-slate-200"
+        >
+          3. All 10 Books
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected="false"
+          data-view="screen-4"
+          class="view-tab px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors bg-slate-100 text-slate-800 hover:bg-slate-200"
+        >
+          4. Book Entry
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected="false"
+          data-view="screen-5"
+          class="view-tab px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors bg-slate-100 text-slate-800 hover:bg-slate-200"
+        >
+          5. Stock Adj &amp; Journal
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected="false"
+          data-view="screen-6"
+          class="view-tab px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors bg-slate-100 text-slate-800 hover:bg-slate-200"
+        >
+          6. People &amp; Stock
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected="false"
+          data-view="screen-7"
+          class="view-tab px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors bg-slate-100 text-slate-800 hover:bg-slate-200"
+        >
+          7. PDF Bank Match
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected="false"
+          data-view="screen-8"
+          class="view-tab px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors bg-slate-100 text-slate-800 hover:bg-slate-200"
+        >
+          8. Reports
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected="false"
+          data-view="system"
+          class="view-tab px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors bg-slate-100 text-slate-800 hover:bg-slate-200"
+        >
+          9. Tokens &amp; Grav
+        </button>
+      </nav>
+
+      <!-- Viewport & Raw Tab Actions -->
+      <div class="flex flex-wrap items-center gap-2">
+        <div id="viewport-controls" class="inline-flex rounded-lg border border-slate-400 bg-slate-50 p-0.5" role="group" aria-label="Viewport width switcher">
+          <button type="button" data-width="100%" class="vp-btn px-2.5 py-1 rounded-md text-xs font-semibold bg-white text-nbInk shadow-sm">
+            Full
+          </button>
+          <button type="button" data-width="1440px" class="vp-btn px-2.5 py-1 rounded-md text-xs font-semibold text-nbMuted hover:text-nbInk">
+            Desktop
+          </button>
+          <button type="button" data-width="1024px" class="vp-btn px-2.5 py-1 rounded-md text-xs font-semibold text-nbMuted hover:text-nbInk">
+            Tablet
+          </button>
+          <button type="button" data-width="390px" class="vp-btn px-2.5 py-1 rounded-md text-xs font-semibold text-nbMuted hover:text-nbInk">
+            Mobile
+          </button>
+        </div>
+
+        <a
+          id="open-raw-link"
+          href="../stitch/screen-1-setup-business.html"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="px-3 py-1.5 rounded-lg border border-nbIndigo text-nbIndigo hover:bg-blue-50 text-xs font-semibold"
+        >
+          Open Standalone Tab ↗
+        </a>
+      </div>
+    </div>
+
+    <!-- Contextual Notes Bar for Currently Viewed Mockup -->
+    <div class="bg-slate-100 border-t border-slate-200 px-4 sm:px-6 py-2">
+      <div class="max-w-[1600px] mx-auto flex flex-wrap items-center justify-between gap-2 text-xs">
+        <div id="screen-summary" class="text-nbInk font-medium">
+          Step 1 (Setup): Centered business type picker (6 sector tiles + Mix &amp; Match modules preview) with &gt;55% whitespace. Click Continue -&gt; to enter Overview.
+        </div>
+        <div id="audit-note" class="font-mono text-nbEmerald font-semibold">
+          Zero-Sidebar App Flow: &gt;55% Whitespace ✓ · Clickable Continue -&gt; Top Capsule ✓ · Single &lt;h1&gt; &amp; skip link ✓
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Interactive Stage -->
+  <main id="preview-stage" class="flex-1 flex flex-col items-center p-3 sm:p-5 overflow-x-auto">
+    <!-- Iframe Container for Live Interactive Stitch HTML Prototypes -->
+    <div id="iframe-shell" class="w-full flex flex-col items-center">
+      <div
+        id="iframe-frame-wrapper"
+        style="width: 100%; max-width: 100%;"
+        class="transition-all duration-200 bg-white rounded-xl border border-slate-300 shadow-lg overflow-hidden"
+      >
+        <iframe
+          id="mockup-iframe"
+          title="NairaBooks Interactive UI Mockup"
+          src="../stitch/screen-1-setup-business.html"
+          class="w-full border-0 block"
+          style="height: 82vh; min-height: 760px;"
+        ></iframe>
+      </div>
+    </div>
+
+    <!-- Design System, WCAG Contrast Proof & Grav Illustrations View -->
+    <section id="system-panel" class="hidden w-full max-w-[1400px] space-y-6 pb-12" aria-label="Design System, Accessibility Audit, and Grav Illustrations">
+      <!-- Grav Educational Whiteboard Illustrations -->
+      <div class="bg-white rounded-xl border border-slate-300 p-6 shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+          <div>
+            <h2 class="font-heading font-bold text-xl text-nbInk">
+              Grav Educational Article Illustrations (16:9 Whiteboard Explainers)
+            </h2>
+            <p class="text-sm text-nbMuted">
+              Saved under <code class="font-mono text-xs bg-slate-100 px-1.5 py-0.5 rounded">design/illustrations/</code> for non-technical onboarding and docs.
+            </p>
+          </div>
+          <span class="px-3 py-1 rounded-full bg-blue-50 text-nbIndigo border border-blue-200 text-xs font-semibold">
+            Skill #44 · article-illustrations
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <figure class="border border-slate-200 rounded-xl p-4 bg-white">
+            <img
+              src="../illustrations/nairabooks-double-entry-flow.jpg"
+              alt="Whiteboard sketch showing Voucher Input entering a Debits equals Credits scale guarded by Grav, blocking unbalanced vouchers while routing balanced items to WHT, VAT 7.5%, and FRCN Statement of Value Added."
+              class="w-full rounded-lg border border-slate-200"
+            />
+            <figcaption class="mt-3 text-sm text-nbInk">
+              <strong class="font-heading">Figure 1 — Double-Entry &amp; Effective-Dated Tax Flow:</strong>
+              Explains why unbalanced vouchers cannot enter Nigerian statutory schedules or FRCN statements.
+            </figcaption>
+          </figure>
+
+          <figure class="border border-slate-200 rounded-xl p-4 bg-white">
+            <img
+              src="../illustrations/nairabooks-composable-packs.jpg"
+              alt="Whiteboard sketch showing Layer A Nigerian IFRS and Tax Core supporting pluggable modules for Hotel Rooms USALI, Diner POS and Kitchen, Retail and WHT Job Pack, and Custom Capability bricks added by Grav."
+              class="w-full rounded-lg border border-slate-200"
+            />
+            <figcaption class="mt-3 text-sm text-nbInk">
+              <strong class="font-heading">Figure 2 — Composable Industry Engine (Layer A + Layer B):</strong>
+              Illustrates stacking multiple operations (e.g., Hotel + Diner + Retail) cleanly with zero core rewrites.
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <!-- Contrast-Verified Color Swatches & Phase 6 Remediation Table -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white rounded-xl border border-slate-300 p-6 shadow-sm">
+          <h2 class="font-heading font-bold text-lg text-nbInk mb-1">
+            WCAG 2.2 Level AA Token Contrast Proofs
+          </h2>
+          <p class="text-sm text-nbMuted mb-4">
+            Loaded live from <code class="font-mono text-xs bg-slate-100 px-1.5 py-0.5 rounded">design/tokens/nairabooks.tokens.json</code> and enforced in pytest.
+          </p>
+          <div id="token-pairs-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+            Loading token swatches...
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-300 p-6 shadow-sm">
+          <h2 class="font-heading font-bold text-lg text-nbInk mb-1">
+            Zero-Sidebar Top-Capsule Workflow &amp; Accessibility Audit
+          </h2>
+          <p class="text-sm text-nbMuted mb-4">
+            Visual inspection + interactive overhaul across all 8 Stitch screens (<code class="font-mono text-xs">Setup -&gt; Overview -&gt; Books -&gt; Entry -&gt; Adjustments -&gt; People &amp; Stock -&gt; PDF Reconcile -&gt; Reports</code>), backed by <code class="font-mono text-xs bg-slate-100 px-1.5 py-0.5 rounded">design/globals.css</code>:
+          </p>
+          <ul class="space-y-2.5 text-sm text-nbInk">
+            <li class="p-3 rounded-lg bg-emerald-50/60 border border-emerald-200">
+              <span class="font-mono font-bold text-nbEmerald">UX-OVERHAUL · RESOLVED</span> — Replaced sidebar with unified single-line Floating Top Pill Navigation (<code class="font-mono text-xs">Overview | Books | People &amp; Stock | Reconcile | Reports</code>), covering all 10 Books, Master Records, PDF Bank Match, and Reports.
+            </li>
+            <li class="p-3 rounded-lg bg-emerald-50/60 border border-emerald-200">
+              <span class="font-mono font-bold text-nbEmerald">A11Y-01 · RESOLVED</span> — Keyboard skip links verified across all 8 Stitch HTML screens; paired with <code class="font-mono text-xs">.nb-skip-link</code> in globals.
+            </li>
+            <li class="p-3 rounded-lg bg-emerald-50/60 border border-emerald-200">
+              <span class="font-mono font-bold text-nbEmerald">A11Y-02 · RESOLVED</span> — Single semantic <code class="font-mono text-xs">&lt;h1&gt;</code> headline and zero <code class="font-mono text-xs">&lt;aside&gt;</code> sidebars verified across all 8 screens.
+            </li>
+            <li class="p-3 rounded-lg bg-emerald-50/60 border border-emerald-200">
+              <span class="font-mono font-bold text-nbEmerald">A11Y-04 · RESOLVED</span> — Removed <code class="font-mono text-xs">fixed bottom-0</code> overlays, fixed header wrapping with <code class="font-mono text-xs">whitespace-nowrap</code>, and widened icon <code class="font-mono text-xs">pr-9/pr-10</code> input padding on Screens 4 &amp; 5.
+            </li>
+            <li class="p-3 rounded-lg bg-amber-50/60 border border-amber-200">
+              <span class="font-mono font-bold text-nbAmber">A11Y-03 · PHASE 6</span> — <code class="font-mono text-xs">scope="col"</code> / <code class="font-mono text-xs">scope="row"</code> active on Screens 5, 6, 8; bind explicit per-row cell <code class="font-mono text-xs">aria-label</code> attributes inside live Next.js journal &amp; directory grids.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const VIEWS = {
+      'screen-1': {
+        src: '../stitch/screen-1-setup-business.html',
+        summary: 'Step 1 (Setup): Centered business type picker (6 sector tiles + Mix & Match modules preview) with >55% whitespace. Click Continue -> to enter Overview.',
+        audit: 'Zero-Sidebar App Flow: >55% Whitespace ✓ · Clickable Continue -> Top Capsule ✓ · Single <h1> & skip link ✓',
+      },
+      'screen-2': {
+        src: '../stitch/screen-2-overview-top-nav.html',
+        summary: 'Tab 1 (Overview): Zero-sidebar Floating Top Pill Dock (Overview | Books | People & Stock | Reconcile | Reports), 3-step beginner checklist, 3 plain numbers & 1 chart.',
+        audit: 'Sleek Top Capsule Nav ✓ · Zero sidebar ✓ · Click any pill inside the mockup or step guide to explore live ✓',
+      },
+      'screen-3': {
+        src: '../stitch/screen-3-books-hub.html',
+        summary: 'Tab 2 (Books Hub): Complete interactive workflow across ALL 10 Books — Money In (Quote -> Invoice -> Receipt -> Credit Note), Money Out (PO -> Bill -> Payment -> Debit Note) & Stock Adj / Journal.',
+        audit: '10 Books Grouped Calmly ✓ · Directional learning arrows ✓ · Click any book card to open its entry sheet ✓',
+      },
+      'screen-4': {
+        src: '../stitch/screen-4-book-entry-form.html',
+        summary: 'Book Entry Sheet: Paper-receipt form with Book Switcher dropdown across Orders, Invoices, Receipts, POs, Bills, Payments, Credit & Debit Notes + optional Dr/Cr drawer.',
+        audit: 'Clean Receipt Layout ✓ · Live Book Switcher (<select>) ✓ · Generous gap & icon clearance ✓',
+      },
+      'screen-5': {
+        src: '../stitch/screen-5-journal-adjustments.html',
+        summary: 'Stock & Accounting Adjustments: Interactive switcher for Inventory Adjustment Journal, Credit/Debit Notes & Balanced Double-Entry Journal (Debits == Credits).',
+        audit: 'IAS 2 + IFRS Balanced Proof ✓ · scope="col" headers ✓ · Sub-pill switcher & Back to All Books link ✓',
+      },
+      'screen-6': {
+        src: '../stitch/screen-6-directory-create.html',
+        summary: 'Tab 3 (People & Stock): Switch cleanly between Customers, Vendors / Suppliers & Inventory Items while creating new records live on the right panel.',
+        audit: 'Create Customers, Vendors & Inventory in one sleek view ✓ · Live interactive tab/form switching ✓',
+      },
+      'screen-7': {
+        src: '../stitch/screen-7-pdf-bank-reconcile.html',
+        summary: 'Tab 4 (PDF Bank Reconcile): Upload Nigerian bank PDF statements (Zenith, GTBank, Access, UBA) and match extracted rows side-by-side against NairaBooks entries.',
+        audit: 'PDF Dropzone + Split Match Cards ✓ · Click Confirm Match or Browse PDF inside preview ✓',
+      },
+      'screen-8': {
+        src: '../stitch/screen-8-reports-center.html',
+        summary: 'Tab 5 (Financial Reports): Click between Profit & Loss, Balance Sheet, Cash Flow & all 6 Minor Reports / Lists (AR, AP, Inventory Valuation, VAT, WHT, Trial Balance).',
+        audit: 'Complete Reporting Center ✓ · Statement cards & minor lists update live inside sheet ✓ · scope="col"/"row" ✓',
+      },
+      'system': {
+        src: null,
+        summary: 'Design System Hub: Light & Dark WCAG 2.2 AA Contrast Pairs, Two-Mode Audit Notes, and both 16:9 Grav Educational Illustrations.',
+        audit: 'All 18 semantic color pairs mathematically verified >= 4.5:1 (text) / >= 3.0:1 (controls/rings) in tests/test_design_system.py.',
+      },
+    };
+
+    const tabs = document.querySelectorAll('.view-tab');
+    const iframeShell = document.getElementById('iframe-shell');
+    const iframe = document.getElementById('mockup-iframe');
+    const systemPanel = document.getElementById('system-panel');
+    const summaryEl = document.getElementById('screen-summary');
+    const auditEl = document.getElementById('audit-note');
+    const rawLink = document.getElementById('open-raw-link');
+    const vpControls = document.getElementById('viewport-controls');
+    const vpButtons = document.querySelectorAll('.vp-btn');
+    const wrapper = document.getElementById('iframe-frame-wrapper');
+
+    function highlightTab(viewId) {
+      const cfg = VIEWS[viewId] || VIEWS['screen-1'];
+      tabs.forEach((btn) => {
+        const active = btn.dataset.view === viewId;
+        btn.setAttribute('aria-selected', active ? 'true' : 'false');
+        btn.className = active
+          ? 'view-tab px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors bg-nbEmerald text-white'
+          : 'view-tab px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors bg-slate-100 text-slate-800 hover:bg-slate-200';
+      });
+      summaryEl.textContent = cfg.summary;
+      auditEl.textContent = cfg.audit;
+      history.replaceState(null, '', '#' + viewId);
+    }
+
+    function setActiveView(viewId) {
+      const cfg = VIEWS[viewId] || VIEWS['screen-1'];
+      highlightTab(viewId);
+
+      if (cfg.src) {
+        iframeShell.classList.remove('hidden');
+        systemPanel.classList.add('hidden');
+        vpControls.classList.remove('hidden');
+        rawLink.classList.remove('hidden');
+        if (iframe.getAttribute('src') !== cfg.src) {
+          iframe.setAttribute('src', cfg.src);
+        }
+        rawLink.setAttribute('href', cfg.src);
+      } else {
+        iframeShell.classList.add('hidden');
+        systemPanel.classList.remove('hidden');
+        vpControls.classList.add('hidden');
+        rawLink.classList.add('hidden');
+      }
+    }
+
+    // Auto-sync outer gallery tab when navigating interactively inside the prototype
+    iframe.addEventListener('load', () => {
+      try {
+        const loc = iframe.contentWindow && iframe.contentWindow.location;
+        if (!loc || !loc.pathname) return;
+        const fname = loc.pathname.split('/').pop();
+        for (const [vid, cfg] of Object.entries(VIEWS)) {
+          if (cfg.src && cfg.src.endsWith('/' + fname)) {
+            highlightTab(vid);
+            rawLink.setAttribute('href', '../stitch/' + fname + (loc.search || ''));
+            break;
+          }
+        }
+      } catch (_) {}
+    });
+
+    tabs.forEach((btn) => {
+      btn.addEventListener('click', () => setActiveView(btn.dataset.view));
+    });
+
+    vpButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const width = btn.dataset.width;
+        wrapper.style.maxWidth = width;
+        vpButtons.forEach((b) => {
+          b.className = b === btn
+            ? 'vp-btn px-2.5 py-1 rounded-md text-xs font-semibold bg-white text-nbInk shadow-sm'
+            : 'vp-btn px-2.5 py-1 rounded-md text-xs font-semibold text-nbMuted hover:text-nbInk';
+        });
+      });
+    });
+
+    function luminance(hex) {
+      const clean = hex.replace('#', '');
+      const nums = [0, 2, 4].map((i) => {
+        const c = parseInt(clean.slice(i, i + 2), 16) / 255;
+        return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+      });
+      return 0.2126 * nums[0] + 0.7152 * nums[1] + 0.0722 * nums[2];
+    }
+
+    function contrast(a, b) {
+      const la = luminance(a);
+      const lb = luminance(b);
+      return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+    }
+
+    fetch('../tokens/nairabooks.tokens.json')
+      .then((res) => res.json())
+      .then((tokens) => {
+        const grid = document.getElementById('token-pairs-grid');
+        grid.innerHTML = '';
+        tokens.contrastPairs.forEach((pair) => {
+          const palette = tokens.semantic[pair.mode];
+          const fg = palette[pair.fg];
+          const bg = palette[pair.bg];
+          const ratio = contrast(fg, bg).toFixed(2);
+          const card = document.createElement('div');
+          card.className = 'rounded-lg border border-slate-200 p-2.5 flex items-center justify-between gap-2';
+          card.innerHTML = `
+            <div class="min-w-0">
+              <div class="font-semibold text-nbInk truncate">${pair.name}</div>
+              <div class="font-mono text-[11px] text-nbMuted">${pair.mode} · ${fg} on ${bg}</div>
+            </div>
+            <div class="shrink-0 flex items-center gap-1.5">
+              <span class="px-2 py-0.5 rounded font-mono font-bold text-[11px] border border-slate-300" style="background:${bg};color:${fg}">Aa</span>
+              <span class="font-mono font-semibold text-nbEmerald">${ratio}:1</span>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+      })
+      .catch(() => {
+        document.getElementById('token-pairs-grid').textContent =
+          'Open via the local HTTP server to load design/tokens/nairabooks.tokens.json.';
+      });
+
+    const initialHash = window.location.hash.replace('#', '');
+    if (VIEWS[initialHash]) {
+      setActiveView(initialHash);
+    }
+  </script>
+</body>
+</html>

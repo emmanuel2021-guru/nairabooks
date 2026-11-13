@@ -1,0 +1,104 @@
+{
+  "project": "projects/9422961334487487882",
+  "projectId": "9422961334487487882",
+  "title": "NairaBooks - Complete Two-Mode & Top-Capsule Workflow",
+  "designSystem": "assets/8475106491343804798",
+  "screens": [
+    {
+      "slug": "screen-1-setup-business",
+      "screenId": "da6808cc891e463b98f66c59278cc59a",
+      "resourceName": "projects/9422961334487487882/screens/da6808cc891e463b98f66c59278cc59a",
+      "htmlPath": "design/stitch/screen-1-setup-business.html",
+      "screenshotPath": "design/stitch/screen-1-setup-business.png",
+      "htmlBytes": 18539,
+      "screenshotBytes": 251293,
+      "imageMetadata": {
+        "mimeType": "png"
+      }
+    },
+    {
+      "slug": "screen-2-overview-top-nav",
+      "screenId": "110af3e0c9ed4921b0a640dc624ca6ab",
+      "resourceName": "projects/9422961334487487882/screens/110af3e0c9ed4921b0a640dc624ca6ab",
+      "htmlPath": "design/stitch/screen-2-overview-top-nav.html",
+      "screenshotPath": "design/stitch/screen-2-overview-top-nav.png",
+      "htmlBytes": 22441,
+      "screenshotBytes": 283214,
+      "imageMetadata": {
+        "mimeType": "png"
+      }
+    },
+    {
+      "slug": "screen-3-books-hub",
+      "screenId": "eb3aafee39d64e35a12a3e32f2535294",
+      "resourceName": "projects/9422961334487487882/screens/eb3aafee39d64e35a12a3e32f2535294",
+      "htmlPath": "design/stitch/screen-3-books-hub.html",
+      "screenshotPath": "design/stitch/screen-3-books-hub.png",
+      "htmlBytes": 40426,
+      "screenshotBytes": 609051,
+      "imageMetadata": {
+        "mimeType": "png"
+      }
+    },
+    {
+      "slug": "screen-4-book-entry-form",
+      "screenId": "b7b93e46a12a407abbf703b8c185bc6c",
+      "resourceName": "projects/9422961334487487882/screens/b7b93e46a12a407abbf703b8c185bc6c",
+      "htmlPath": "design/stitch/screen-4-book-entry-form.html",
+      "screenshotPath": "design/stitch/screen-4-book-entry-form.png",
+      "htmlBytes": 33186,
+      "screenshotBytes": 461122,
+      "imageMetadata": {
+        "mimeType": "png"
+      }
+    },
+    {
+      "slug": "screen-5-journal-adjustments",
+      "screenId": "49436549d06249dc9419b9db462a61d0",
+      "resourceName": "projects/9422961334487487882/screens/49436549d06249dc9419b9db462a61d0",
+      "htmlPath": "design/stitch/screen-5-journal-adjustments.html",
+      "screenshotPath": "design/stitch/screen-5-journal-adjustments.png",
+      "htmlBytes": 31842,
+      "screenshotBytes": 714582,
+      "imageMetadata": {
+        "mimeType": "png"
+      }
+    },
+    {
+      "slug": "screen-6-directory-create",
+      "screenId": "e725aff1d9b14874a68a0a432fe79480",
+      "resourceName": "projects/9422961334487487882/screens/e725aff1d9b14874a68a0a432fe79480",
+      "htmlPath": "design/stitch/screen-6-directory-create.html",
+      "screenshotPath": "design/stitch/screen-6-directory-create.png",
+      "htmlBytes": 39486,
+      "screenshotBytes": 483389,
+      "imageMetadata": {
+        "mimeType": "png"
+      }
+    },
+    {
+      "slug": "screen-7-pdf-bank-reconcile",
+      "screenId": "ed85bfae27554b7b9698e938439c68c6",
+      "resourceName": "projects/9422961334487487882/screens/ed85bfae27554b7b9698e938439c68c6",
+      "htmlPath": "design/stitch/screen-7-pdf-bank-reconcile.html",
+      "screenshotPath": "design/stitch/screen-7-pdf-bank-reconcile.png",
+      "htmlBytes": 35031,
+      "screenshotBytes": 681162,
+      "imageMetadata": {
+        "mimeType": "png"
+      }
+    },
+    {
+      "slug": "screen-8-reports-center",
+      "screenId": "41102921b37e4ac3868946722d583403",
+      "resourceName": "projects/9422961334487487882/screens/41102921b37e4ac3868946722d583403",
+      "htmlPath": "design/stitch/screen-8-reports-center.html",
+      "screenshotPath": "design/stitch/screen-8-reports-center.png",
+      "htmlBytes": 43234,
+      "screenshotBytes": 600470,
+      "imageMetadata": {
+        "mimeType": "png"
+      }
+    }
+  ]
+}

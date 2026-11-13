@@ -1,0 +1,63 @@
+{
+  "version": "1.0.0",
+  "name": "NairaBooks SAST Security Engine Configuration",
+  "description": "Rules for static application security testing across Python backend and TypeScript web client",
+  "rules": {
+    "python": [
+      {
+        "id": "SEC-PY-001",
+        "name": "Hardcoded Credentials or Private Keys",
+        "severity": "CRITICAL",
+        "pattern": "(?i)(password|secret|api_key|private_key|token)\\s*=\\s*['\"][A-Za-z0-9_\\-+=]{8,}['\"]"
+      },
+      {
+        "id": "SEC-PY-002",
+        "name": "Unsafe Dynamic Code Execution (eval/exec)",
+        "severity": "CRITICAL",
+        "pattern": "\\b(eval|exec)\\s*\\("
+      },
+      {
+        "id": "SEC-PY-003",
+        "name": "Insecure Randomness in Cryptographic Operations",
+        "severity": "HIGH",
+        "pattern": "\\brandom\\.(random|randint|choice)\\s*\\("
+      },
+      {
+        "id": "SEC-PY-004",
+        "name": "Raw SQL String Formatting / Injection Risk",
+        "severity": "HIGH",
+        "pattern": "\\.execute\\s*\\(\\s*f['\"].*\\{.*\\}.*['\"]\\)"
+      }
+    ],
+    "typescript": [
+      {
+        "id": "SEC-TS-001",
+        "name": "Unescaped HTML Injection (dangerouslySetInnerHTML)",
+        "severity": "HIGH",
+        "pattern": "dangerouslySetInnerHTML\\s*="
+      },
+      {
+        "id": "SEC-TS-002",
+        "name": "Dangerous JavaScript URL Scheme",
+        "severity": "CRITICAL",
+        "pattern": "href\\s*=\\s*['\"]javascript:"
+      },
+      {
+        "id": "SEC-TS-003",
+        "name": "Insecure Client Window Opener Without noopener",
+        "severity": "MEDIUM",
+        "pattern": "window\\.open\\([^)]*\\)(?!.*noopener)"
+      }
+    ]
+  },
+  "exclusions": [
+    "node_modules",
+    ".git",
+    ".gemini",
+    ".next",
+    "dist",
+    "__pycache__",
+    "tests",
+    "antigravity-dynamic-vibecode-kit"
+  ]
+}

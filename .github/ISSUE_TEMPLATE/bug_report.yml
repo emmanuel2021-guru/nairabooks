@@ -1,0 +1,53 @@
+name: "🐛 Bug Report / Accounting Invariant Defect"
+description: "Report an issue, calculation anomaly, or unexpected platform behavior"
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting an issue in NairaBooks. Please provide clear steps to reproduce.
+  - type: input
+    id: summary
+    attributes:
+      label: "Plain-English Summary"
+      description: "Brief summary of the issue"
+      placeholder: "e.g., VAT calculation discrepancy on sales invoice rounding"
+    validations:
+      required: true
+  - type: dropdown
+    id: module
+    attributes:
+      label: "Affected Module"
+      options:
+        - "Overview Dashboard"
+        - "Transactions Hub & Recording"
+        - "FRCN Reports & Statements"
+        - "Bank & POS Reconciliation"
+        - "Tax & Statutory Rules"
+        - "Industry Packs (Retail, BOM, Services, etc.)"
+        - "Security & Multi-Tenant Auth"
+        - "Admin & Chart of Accounts"
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: "Steps to Reproduce"
+      description: "Step-by-step description to reproduce the bug"
+      placeholder: "1. Go to '/transactions/sales-invoicing/new'\n2. Enter subtotal ₦100,000.00 with 7.5% VAT\n3. Click Post to Ledger"
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: "Expected Accounting Outcome"
+      description: "What should have happened according to Nigerian IFRS / Tax rules?"
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: "Actual Outcome & Error Message"
+      description: "What actually happened? Include correlation ID if shown."
+    validations:
+      required: true

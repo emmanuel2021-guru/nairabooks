@@ -1,0 +1,16 @@
+{
+  "id": "nigerian-ifrs-core-ledger_20261112",
+  "title": "Nigerian IFRS Double-Entry Ledger & FRCN Statements",
+  "type": "feature",
+  "status": "completed",
+  "created": "2026-11-12T01:48:00+01:00",
+  "updated": "2026-11-12T04:32:00+01:00",
+  "phases": {
+    "total": 2,
+    "completed": 2
+  },
+  "tasks": {
+    "total": 6,
+    "completed": 6
+  }
+}

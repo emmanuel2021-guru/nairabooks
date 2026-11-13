@@ -1,0 +1,22 @@
+name: "⚖️ Statutory CAMA / Tax Compliance Inquiry"
+description: "Report statutory discrepancies or request compliance clarifications"
+labels: ["compliance", "cama-tax"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template for legal and statutory compliance reviews under CAMA 2020, Tax Act 2025, or NDPA 2023.
+  - type: input
+    id: regulation
+    attributes:
+      label: "Governing Statute"
+      placeholder: "e.g., Nigeria Tax Act 2025 Section 56 or CAMA 2020 Section 405"
+    validations:
+      required: true
+  - type: textarea
+    id: discrepancy
+    attributes:
+      label: "Statutory Discrepancy Description"
+      description: "Describe the calculation, classification, or disclosure requiring legal alignment."
+    validations:
+      required: true

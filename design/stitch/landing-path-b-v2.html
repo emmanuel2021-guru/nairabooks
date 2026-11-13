@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NairaBooks — Precision Bookkeeping &amp; Tax Compliance for Nigerian Business</title>
+<!-- Google Fonts & Material Symbols -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;family=Space+Mono:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration matching Theme Tokens -->
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-container-high": "#eae7e7",
+            "background": "#fcf9f8",
+            "on-tertiary-fixed": "#002112",
+            "on-secondary": "#ffffff",
+            "on-primary": "#ffffff",
+            "surface": "#fcf9f8",
+            "outline": "#6e7a71",
+            "on-error": "#ffffff",
+            "surface-bright": "#fcf9f8",
+            "tertiary": "#086b45",
+            "tertiary-container": "#2f855c",
+            "primary": "#006b47",
+            "on-secondary-container": "#656464",
+            "error": "#ba1a1a",
+            "outline-variant": "#bdcac0",
+            "surface-dim": "#dcd9d9",
+            "on-primary-fixed-variant": "#005235",
+            "error-container": "#ffdad6",
+            "on-primary-fixed": "#002113",
+            "surface-container-highest": "#e5e2e1",
+            "on-background": "#1b1b1c",
+            "tertiary-fixed": "#9ff4c4",
+            "on-surface": "#1b1b1c",
+            "surface-container": "#f0eded",
+            "secondary-fixed": "#e5e2e1",
+            "tertiary-fixed-dim": "#83d8a9",
+            "on-primary-container": "#ffffff",
+            "inverse-surface": "#303030",
+            "on-error-container": "#93000a",
+            "on-secondary-fixed-variant": "#474646",
+            "secondary": "#5f5e5e",
+            "surface-variant": "#e5e2e1",
+            "primary-container": "#00875a",
+            "primary-fixed-dim": "#71dba6",
+            "primary-fixed": "#8df7c1",
+            "surface-tint": "#006c47",
+            "surface-container-low": "#f6f3f2",
+            "on-tertiary-fixed-variant": "#005233",
+            "inverse-primary": "#71dba6",
+            "secondary-fixed-dim": "#c8c6c5",
+            "on-tertiary": "#ffffff",
+            "surface-container-lowest": "#ffffff",
+            "inverse-on-surface": "#f3f0ef",
+            "on-surface-variant": "#3e4942",
+            "on-tertiary-container": "#ffffff",
+            "secondary-container": "#e5e2e1",
+            "on-secondary-fixed": "#1c1b1b"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "space-md": "1rem",
+            "margin-tablet": "2.5rem",
+            "space-lg": "1.5rem",
+            "space-xs": "0.25rem",
+            "space-xl": "3rem",
+            "gutter": "1.5rem",
+            "space-sm": "0.5rem",
+            "margin": "1.25rem",
+            "margin-desktop": "5rem",
+            "gutter-desktop": "2rem"
+          },
+          "fontFamily": {
+            "headline-xl": ["Plus Jakarta Sans"],
+            "headline-lg-mobile": ["Plus Jakarta Sans"],
+            "mono-md": ["Space Mono"],
+            "body-md": ["Inter"],
+            "label-caps": ["Space Mono"],
+            "mono-sm": ["Space Mono"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "body-lg": ["Inter"],
+            "body-sm": ["Inter"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "mono-lg": ["Space Mono"],
+            "headline-xl-mobile": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "headline-xl": ["64px", { "lineHeight": "72px", "letterSpacing": "-0.035em", "fontWeight": "700" }],
+            "headline-lg-mobile": ["32px", { "lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "mono-md": ["14px", { "lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+            "body-md": ["15px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "label-caps": ["10px", { "lineHeight": "14px", "letterSpacing": "0.1em", "fontWeight": "700" }],
+            "mono-sm": ["11px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "400" }],
+            "headline-lg": ["44px", { "lineHeight": "52px", "letterSpacing": "-0.03em", "fontWeight": "600" }],
+            "body-lg": ["18px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+            "body-sm": ["13px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "headline-sm": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "headline-md": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "mono-lg": ["22px", { "lineHeight": "28px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "headline-xl-mobile": ["40px", { "lineHeight": "46px", "letterSpacing": "-0.025em", "fontWeight": "700" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    /* Subtle paper texture hairline */
+    .hairline-b { border-bottom: 1px solid #E5E5E0; }
+    .hairline-t { border-top: 1px solid #E5E5E0; }
+    .hairline-r { border-right: 1px solid #E5E5E0; }
+    .hairline-l { border-left: 1px solid #E5E5E0; }
+    .hairline-box { border: 1px solid #E5E5E0; }
+    
+    /* Tactile paper feel shadow */
+    .paper-card {
+      background-color: #FFFFFF;
+      border: 1px solid #E5E5E0;
+      box-shadow: 0px 4px 12px -2px rgba(27, 27, 28, 0.03);
+    }
+    .paper-elevated {
+      box-shadow: 0px 8px 24px -4px rgba(17, 17, 17, 0.05);
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface antialiased font-body-md selection:bg-primary-container selection:text-white">
+<!-- =========================================================================
+       1. TopNavBar (Shared Component anchored)
+       ========================================================================= -->
+<header class="docked full-width top-0 sticky z-50 w-full border-b border-outline-variant bg-surface/90 backdrop-blur-md px-margin-desktop py-4 flex justify-between items-center transition-colors duration-150 ease-out">
+<div class="flex items-center gap-12 max-w-screen-2xl mx-auto w-full justify-between">
+<!-- Brand Logo -->
+<a class="flex items-center gap-1 group" href="#">
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface tracking-tight">nairabooks</span>
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container inline-block mb-1 group-hover:scale-125 transition-transform"></span>
+</a>
+<!-- Center Navigation Links -->
+<nav class="hidden md:flex items-center space-x-8">
+<a class="px-3.5 py-1 text-primary border border-outline-variant rounded-full font-semibold text-body-sm hover:text-primary transition-colors duration-150" href="#hero">Home</a>
+<a class="text-on-surface-variant font-medium text-body-sm hover:text-primary transition-colors duration-150" href="#preview">Features</a>
+<a class="text-on-surface-variant font-medium text-body-sm hover:text-primary transition-colors duration-150" href="#workflows">Banks</a>
+<a class="text-on-surface-variant font-medium text-body-sm hover:text-primary transition-colors duration-150" href="#faq">Help</a>
+</nav>
+<!-- Right Trailing Actions -->
+<div class="flex items-center gap-4">
+<a class="text-on-surface-variant hover:text-primary font-medium text-body-sm transition-colors duration-150 px-3 py-2" href="#signin">Sign In</a>
+<a class="bg-on-surface text-surface-container-lowest hover:bg-primary-container px-5 py-2.5 rounded-full font-headline-sm text-body-sm font-semibold transition-colors duration-150 flex items-center gap-2 group" href="#signup">
+<span>Get Started Free</span>
+<span class="material-symbols-outlined text-sm group-hover:translate-x-0.5 transition-transform" data-icon="arrow_forward">arrow_forward</span>
+</a>
+</div>
+</div>
+</header>
+<!-- =========================================================================
+       2. Editorial Hero Stage
+       ========================================================================= -->
+<section class="relative overflow-hidden bg-[#F8F7F3] pt-12 pb-24 border-b border-outline-variant" id="hero">
+<!-- Oversized Display Watermark -->
+<div class="absolute inset-0 pointer-events-none select-none flex items-center justify-center overflow-hidden opacity-[0.035] leading-none">
+<span class="font-headline-xl text-[26vw] font-extrabold tracking-tighter text-on-surface">nairabooks</span>
+</div>
+<div class="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
+<!-- Top Hero Header Layout (Asymmetric 7/5 Grid) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-8">
+<!-- Left Corner Architectural Stat Widget -->
+<div class="lg:col-span-5 bg-surface-container-lowest/90 backdrop-blur border border-outline-variant p-6 relative">
+<!-- Corner brackets marks -->
+<div class="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-on-surface"></div>
+<div class="absolute top-0 right-0 w-2 h-2 border-t-2 border-r-2 border-on-surface"></div>
+<div class="absolute bottom-0 left-0 w-2 h-2 border-b-2 border-l-2 border-on-surface"></div>
+<div class="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-on-surface"></div>
+<div class="flex items-center justify-between pb-4 mb-4 border-b border-outline-variant">
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-wider">[ 01 — NIGERIAN TAX COMPLIANCE ]</span>
+<div class="flex items-center -space-x-1.5">
+<span class="w-6 h-6 rounded-full bg-[#BA1A1A] text-white text-[9px] font-bold flex items-center justify-center ring-2 ring-white">ZB</span>
+<span class="w-6 h-6 rounded-full bg-[#F37021] text-white text-[9px] font-bold flex items-center justify-center ring-2 ring-white">GT</span>
+<span class="w-6 h-6 rounded-full bg-[#0066FF] text-white text-[9px] font-bold flex items-center justify-center ring-2 ring-white">MP</span>
+</div>
+</div>
+<div class="flex items-baseline gap-3">
+<span class="font-headline-xl text-headline-xl font-bold text-on-surface leading-none">0%</span>
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-mono-sm font-semibold bg-[#EBF5F0] text-primary-container">
+              Verified Legal Code
+            </span>
+</div>
+<p class="mt-2 font-headline-sm text-body-md font-semibold text-on-surface">Company tax under ₦100M (2025 Act)</p>
+<p class="mt-1 font-body-sm text-body-sm text-secondary">Automated small-business status filing directly mapped to Federal Inland Revenue Service parameters.</p>
+</div>
+<!-- Right Hero Headline Column -->
+<div class="lg:col-span-7 lg:pl-6 pt-2">
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-surface-container-low border border-outline-variant rounded-full mb-4">
+<span class="w-2 h-2 rounded-full bg-primary-container animate-pulse"></span>
+<span class="font-mono-sm text-mono-sm uppercase text-on-surface-variant font-medium">Real-Time Ledger Engine</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg font-bold text-on-surface tracking-tight max-w-xl">
+            NairaBooks gives you total control of your money.
+          </h1>
+<p class="mt-3 font-body-lg text-body-lg text-secondary max-w-lg leading-relaxed">
+            Daily POS sales, Zenith and GTBank alerts, and 7.5% VAT sorted automatically with institutional clarity.
+          </p>
+</div>
+</div>
+<!-- Central Hero Frame with Editorial Image -->
+<div class="relative w-full max-w-3xl mx-auto mt-6">
+<div class="relative overflow-hidden rounded-lg border border-outline-variant bg-[#EFECE6] aspect-[4/5] sm:aspect-[3/4] md:aspect-[16/11] flex items-center justify-center paper-elevated">
+<!-- Central Portrait Asset -->
+<img alt="Portrait of a poised Nigerian businesswoman in a linen suit holding the sleek Adire emerald green card" class="w-full h-full object-cover object-top" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUTwwT3wd8dntweKxgSKcmGgLxnENxbrJO0qWtt1tfZVdVkNbwGauM_fgrXIhGgfrJ8384o11wtilMakH9eAGIGkHqv5NblwDc8h8AnjH7tAsxGS7R52I78qIcouV9cefaAQxxrERrJykrNjWhZ_jTLoIUeUbs4DRvTsvzMP5IKR_sOvnPQ3V8PxoVbDDKMBjhmkiEgUEZZ5_ycVt8FSEAko2G5tbzvS709hYuSgobQCWgLvZnb44rsYjWdwhbUqWYNAasTfFzMzw"/>
+<!-- Gradient Overlay at bottom for tactile blend -->
+<div class="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none"></div>
+<!-- Overlapping Portrait CTA Orb Button -->
+<a class="absolute bottom-6 right-6 md:bottom-8 md:right-8 bg-surface-container-lowest text-on-surface pl-5 pr-3 py-3 rounded-full flex items-center gap-3 shadow-xl hover:bg-surface-container-low transition-all duration-200 group border border-outline-variant" href="#signup">
+<span class="font-headline-sm text-body-sm font-bold">Get started free</span>
+<span class="w-8 h-8 rounded-full bg-on-surface text-surface-container-lowest flex items-center justify-center group-hover:bg-primary-container transition-colors">
+<span class="material-symbols-outlined text-base" data-icon="add">add</span>
+</span>
+</a>
+</div>
+<!-- Floating Anchored Bottom Card (Split 2-Halves) -->
+<div class="mt-8 md:-mt-12 relative z-20 mx-auto max-w-4xl bg-surface-container-lowest border border-outline-variant shadow-lg rounded-sm grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-outline-variant">
+<!-- Left Half: Supported Channels -->
+<div class="p-6 md:p-8 flex flex-col justify-between">
+<div>
+<div class="font-label-caps text-label-caps text-outline mb-2 uppercase tracking-wider">[ MULTI-RAIL INGESTION ]</div>
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">NairaBooks works for every way you get paid</h3>
+<p class="font-body-sm text-body-sm text-secondary mt-1">Automatic matching without uploading spreadsheets or calculating ledger differences.</p>
+</div>
+<div class="flex flex-wrap gap-2 mt-6">
+<span class="px-2.5 py-1 bg-surface-container-low border border-outline-variant rounded font-mono-sm text-mono-sm text-on-surface font-medium">POS Terminals</span>
+<span class="px-2.5 py-1 bg-surface-container-low border border-outline-variant rounded font-mono-sm text-mono-sm text-on-surface font-medium">Bank Transfers</span>
+<span class="px-2.5 py-1 bg-surface-container-low border border-outline-variant rounded font-mono-sm text-mono-sm text-on-surface font-medium">Online Invoices</span>
+</div>
+</div>
+<!-- Right Half: Mini Sparkline & Realtime Pulse -->
+<div class="p-6 md:p-8 flex flex-col justify-between bg-[#FAFAF8]">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+<span class="font-mono-sm text-mono-sm text-secondary uppercase font-semibold">Today in Lagos</span>
+</div>
+<span class="font-mono-sm text-mono-sm font-bold text-primary-container px-2 py-0.5 bg-[#EBF5F0] rounded">
+                +₦420,000
+              </span>
+</div>
+<!-- Upward Cashflow Visual Representation -->
+<div class="my-4">
+<div class="h-14 flex items-end gap-1.5 pt-2">
+<div class="w-1/12 bg-surface-variant h-[30%] rounded-t-sm"></div>
+<div class="w-1/12 bg-surface-variant h-[45%] rounded-t-sm"></div>
+<div class="w-1/12 bg-surface-variant h-[40%] rounded-t-sm"></div>
+<div class="w-1/12 bg-surface-variant h-[60%] rounded-t-sm"></div>
+<div class="w-1/12 bg-surface-variant h-[55%] rounded-t-sm"></div>
+<div class="w-1/12 bg-primary-fixed-dim h-[70%] rounded-t-sm"></div>
+<div class="w-1/12 bg-primary-fixed-dim h-[65%] rounded-t-sm"></div>
+<div class="w-1/12 bg-primary h-[80%] rounded-t-sm"></div>
+<div class="w-1/12 bg-primary h-[75%] rounded-t-sm"></div>
+<div class="w-1/12 bg-primary-container h-[90%] rounded-t-sm"></div>
+<div class="w-1/12 bg-primary-container h-[85%] rounded-t-sm"></div>
+<div class="w-1/12 bg-primary-container h-[100%] rounded-t-sm"></div>
+</div>
+</div>
+<div class="flex justify-between items-center text-secondary border-t border-outline-variant pt-3">
+<span class="font-body-sm text-body-sm">Automated Settlement</span>
+<span class="font-mono-sm text-mono-sm text-on-surface font-semibold">100% reconciled</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- =========================================================================
+       3. Interactive Product Preview Showcase
+       ========================================================================= -->
+<section class="py-20 bg-surface" id="preview">
+<div class="max-w-6xl mx-auto px-6 lg:px-8">
+<div class="text-center max-w-2xl mx-auto mb-12">
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-wider">[ 02 — DUAL-MODE RECONCILIATION ]</span>
+<h2 class="font-headline-lg text-headline-lg font-bold text-on-surface mt-2">Precision without bookkeeping jargon</h2>
+<p class="font-body-md text-body-md text-secondary mt-2">Toggle between plain everyday language and double-entry accounting records in real-time.</p>
+</div>
+<!-- Browser Framed Live Ledger Window -->
+<div class="paper-card rounded-md overflow-hidden border border-outline-variant paper-elevated">
+<!-- Window Chrome Bar -->
+<div class="bg-surface-container-high px-4 py-3 flex items-center justify-between border-b border-outline-variant">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-[#FF5F56] inline-block"></span>
+<span class="w-3 h-3 rounded-full bg-[#FFBD2E] inline-block"></span>
+<span class="w-3 h-3 rounded-full bg-[#27C93F] inline-block"></span>
+<span class="ml-4 font-mono-sm text-mono-sm text-secondary">app.nairabooks.ng — Live Reconciliation</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-surface-container-lowest font-mono-sm text-[11px] text-primary-container border border-outline-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container animate-pulse"></span> Live Stream
+            </span>
+</div>
+</div>
+<!-- Subheader Controls Bar -->
+<div class="p-6 bg-surface-container-low border-b border-outline-variant flex flex-col md:flex-row md:items-center justify-between gap-4">
+<!-- Scenario Tabs -->
+<div class="flex items-center gap-2">
+<button class="scenario-tab active px-4 py-1.5 rounded bg-surface-container-lowest border border-on-surface text-on-surface font-headline-sm text-body-sm font-semibold transition-all" data-scenario="shop">
+              Shop Sale
+            </button>
+<button class="scenario-tab px-4 py-1.5 rounded bg-transparent border border-outline-variant text-secondary font-headline-sm text-body-sm font-medium hover:bg-surface-container-lowest transition-all" data-scenario="abuja">
+              Abuja Invoice
+            </button>
+<button class="scenario-tab px-4 py-1.5 rounded bg-transparent border border-outline-variant text-secondary font-headline-sm text-body-sm font-medium hover:bg-surface-container-lowest transition-all" data-scenario="hotel">
+              Hotel &amp; Diner
+            </button>
+</div>
+<!-- Mode Toggle: Plain English vs Accountant View -->
+<div class="inline-flex p-1 bg-surface-container rounded border border-outline-variant">
+<button class="px-3.5 py-1 text-body-sm font-semibold rounded bg-surface-container-lowest text-on-surface shadow-xs transition-all" id="viewTogglePlain">
+              Plain English
+            </button>
+<button class="px-3.5 py-1 text-body-sm font-medium rounded text-secondary hover:text-on-surface transition-all" id="viewToggleAccountant">
+              Accountant View
+            </button>
+</div>
+</div>
+<!-- Ledger Canvas Body -->
+<div class="p-6 md:p-10 bg-surface-container-lowest">
+<!-- Balance Row -->
+<div class="flex flex-col md:flex-row md:items-end justify-between pb-8 mb-8 border-b border-outline-variant gap-4">
+<div>
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-wider" id="balanceLabel">NET REALIZED EARNINGS</span>
+<div class="flex items-baseline gap-4 mt-1">
+<span class="font-mono-lg text-4xl md:text-5xl font-bold text-on-surface tracking-tight" id="mainBalanceDisplay">₦413,700.00</span>
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-mono-sm font-semibold bg-[#EBF5F0] text-primary-container">
+<span class="material-symbols-outlined text-sm" data-icon="check_circle">check_circle</span>
+                  Balanced
+                </span>
+</div>
+</div>
+<!-- Sample Receipt Trigger -->
+<button class="inline-flex items-center gap-2 px-4 py-2 border border-outline-variant hover:border-on-surface rounded text-body-sm font-semibold text-on-surface bg-surface-container-lowest hover:bg-surface-container-low transition-colors" id="openReceiptBtn">
+<span class="material-symbols-outlined text-lg" data-icon="receipt_long">receipt_long</span>
+<span>See Sample Receipt</span>
+</button>
+</div>
+<!-- 4-Row Live Transaction Breakdown List -->
+<div class="space-y-0 border border-outline-variant rounded divide-y divide-outline-variant font-mono-md text-mono-md overflow-hidden">
+<!-- Row 1 -->
+<div class="p-4 flex flex-col sm:flex-row sm:items-center justify-between hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-3">
+<span class="w-8 h-8 rounded bg-surface-container flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined text-lg" data-icon="account_balance">account_balance</span>
+</span>
+<div>
+<div class="font-body-md text-body-md font-semibold text-on-surface" id="row1Title">Money landing in Zenith Bank</div>
+<div class="font-mono-sm text-mono-sm text-secondary" id="row1Sub">Terminal Batch #88194 • POS gross payout</div>
+</div>
+</div>
+<div class="mt-2 sm:mt-0 text-right">
+<div class="text-primary-container font-bold" id="row1Val">+₦450,000.00</div>
+<div class="font-mono-sm text-mono-sm text-outline" id="row1Code">DR 1010 CASH AT BANK</div>
+</div>
+</div>
+<!-- Row 2 -->
+<div class="p-4 flex flex-col sm:flex-row sm:items-center justify-between hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-3">
+<span class="w-8 h-8 rounded bg-surface-container flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined text-lg" data-icon="point_of_sale">point_of_sale</span>
+</span>
+<div>
+<div class="font-body-md text-body-md font-semibold text-on-surface" id="row2Title">POS fee taken by Moniepoint</div>
+<div class="font-mono-sm text-mono-sm text-secondary" id="row2Sub">Capped provider rate at 0.71%</div>
+</div>
+</div>
+<div class="mt-2 sm:mt-0 text-right">
+<div class="text-[#BA1A1A] font-bold" id="row2Val">-₦3,225.00</div>
+<div class="font-mono-sm text-mono-sm text-outline" id="row2Code">CR 5020 MERCHANT CHARGES</div>
+</div>
+</div>
+<!-- Row 3 -->
+<div class="p-4 flex flex-col sm:flex-row sm:items-center justify-between bg-surface-container-low/60 hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-3">
+<span class="w-8 h-8 rounded bg-surface-container flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined text-lg" data-icon="storefront">storefront</span>
+</span>
+<div>
+<div class="font-body-md text-body-md font-semibold text-on-surface" id="row3Title">Your real shop earnings</div>
+<div class="font-mono-sm text-mono-sm text-secondary" id="row3Sub">Recognized core retail turnover</div>
+</div>
+</div>
+<div class="mt-2 sm:mt-0 text-right">
+<div class="text-on-surface font-bold" id="row3Val">₦413,700.00</div>
+<div class="font-mono-sm text-mono-sm text-outline" id="row3Code">CR 4001 REVENUE MERCHANDISE</div>
+</div>
+</div>
+<!-- Row 4 -->
+<div class="p-4 flex flex-col sm:flex-row sm:items-center justify-between hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-3">
+<span class="w-8 h-8 rounded bg-[#EBF5F0] flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined text-lg" data-icon="savings">savings</span>
+</span>
+<div>
+<div class="font-body-md text-body-md font-semibold text-on-surface" id="row4Title">7.5% VAT set aside safely</div>
+<div class="font-mono-sm text-mono-sm text-primary-container font-medium" id="row4Sub">Auto-ringfenced in FIRS compliant holding pot</div>
+</div>
+</div>
+<div class="mt-2 sm:mt-0 text-right">
+<div class="text-primary-container font-bold" id="row4Val">₦33,075.00</div>
+<div class="font-mono-sm text-mono-sm text-outline" id="row4Code">CR 2050 VAT PAYABLE ESCROW</div>
+</div>
+</div>
+</div>
+<!-- Bottom Audit Note -->
+<div class="mt-6 flex flex-col sm:flex-row sm:items-center justify-between text-secondary font-mono-sm text-mono-sm gap-2">
+<span>Verified against CBN clearing standard ISO20022</span>
+<span>Ref: NB-LAG-2025-0982-Z</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Sample Receipt Modal Backdrop (Lightweight Interactive) -->
+<div class="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs hidden flex items-center justify-center p-4" id="receiptModal">
+<div class="bg-surface-container-lowest border border-outline-variant p-6 max-w-sm w-full rounded shadow-2xl relative">
+<button class="absolute top-4 right-4 text-secondary hover:text-on-surface" id="closeReceiptBtn">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+<div class="text-center pb-4 border-b border-dashed border-outline-variant">
+<span class="font-label-caps text-label-caps text-outline uppercase">[ DIGITAL FISCAL RECEIPT ]</span>
+<h4 class="font-headline-sm text-headline-sm font-bold text-on-surface mt-1">Adire Textile Ltd.</h4>
+<p class="font-mono-sm text-mono-sm text-secondary">Victoria Island, Lagos • TIN: 24890123-0001</p>
+</div>
+<div class="py-4 space-y-2 font-mono-sm text-mono-sm">
+<div class="flex justify-between">
+<span class="text-secondary">Date &amp; Time</span>
+<span>Today, 14:32 WAT</span>
+</div>
+<div class="flex justify-between">
+<span class="text-secondary">Payment Method</span>
+<span>POS Terminal #92</span>
+</div>
+<div class="flex justify-between">
+<span class="text-secondary">Gross Amount</span>
+<span class="font-bold">₦450,000.00</span>
+</div>
+<div class="flex justify-between text-secondary">
+<span>Less Merchant Fee</span>
+<span>-₦3,225.00</span>
+</div>
+<div class="flex justify-between text-primary-container">
+<span>7.5% FIRS VAT Pot</span>
+<span>₦33,075.00</span>
+</div>
+<div class="flex justify-between pt-2 border-t border-dashed border-outline-variant font-bold text-on-surface text-mono-md">
+<span>Net Settled</span>
+<span>₦413,700.00</span>
+</div>
+</div>
+<div class="pt-2 text-center">
+<p class="font-mono-sm text-[10px] text-outline">Verified and logged directly to NairaBooks cloud archive.</p>
+</div>
+</div>
+</div>
+<!-- =========================================================================
+       4. Two-Card Workflow Section (Side-by-Side)
+       ========================================================================= -->
+<section class="py-20 bg-surface-container-low border-t border-b border-outline-variant" id="workflows">
+<div class="max-w-7xl mx-auto px-6 lg:px-12">
+<div class="max-w-xl mb-12">
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-wider">[ 03 — DYNAMIC FINANCIAL METRICS ]</span>
+<h2 class="font-headline-lg text-headline-lg font-bold text-on-surface mt-2">Zero surprises on tax or transaction fees</h2>
+<p class="font-body-md text-body-md text-secondary mt-2">Every payment source split mathematically before the funds even leave your escrow account.</p>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+<!-- CARD 1: Interactive ₦100,000 Sale-Split Visualizer -->
+<div class="paper-card p-8 rounded-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-4">
+<span class="font-label-caps text-label-caps text-outline uppercase">[ WORKFLOW • INFLOW SIMULATOR ]</span>
+<span class="font-mono-sm text-mono-sm font-bold text-on-surface">Base: ₦100,000</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Where does every Naira go?</h3>
+<p class="font-body-sm text-body-sm text-secondary mt-1">Select payment method to visualize immediate automated deductions.</p>
+<!-- Mode Selector Toggles -->
+<div class="grid grid-cols-3 gap-2 mt-6">
+<button class="split-btn active py-2 px-3 border border-on-surface bg-on-surface text-surface-container-lowest font-mono-sm text-mono-sm font-semibold rounded transition-all text-center" data-type="pos">
+                POS Sale
+              </button>
+<button class="split-btn py-2 px-3 border border-outline-variant bg-surface-container-lowest text-on-surface font-mono-sm text-mono-sm font-medium rounded hover:bg-surface-container transition-all text-center" data-type="online">
+                Online Link
+              </button>
+<button class="split-btn py-2 px-3 border border-outline-variant bg-surface-container-lowest text-on-surface font-mono-sm text-mono-sm font-medium rounded hover:bg-surface-container transition-all text-center" data-type="transfer">
+                Bank Transfer
+              </button>
+</div>
+<!-- Segmented Horizontal Progress Bar -->
+<div class="mt-8">
+<div class="h-5 w-full flex rounded overflow-hidden p-0.5 bg-surface-container border border-outline-variant">
+<div class="h-full bg-primary-container transition-all duration-300" id="barKeep" style="width: 90.7%" title="You Keep"></div>
+<div class="h-full bg-primary-fixed transition-all duration-300" id="barVat" style="width: 7.5%" title="VAT"></div>
+<div class="h-full bg-error transition-all duration-300" id="barFee" style="width: 1.8%" title="Processing Fee"></div>
+</div>
+</div>
+<!-- Breakdown Stat Tiles -->
+<div class="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-outline-variant">
+<div>
+<span class="font-mono-sm text-mono-sm text-secondary block">You keep</span>
+<span class="font-mono-md text-mono-md font-bold text-on-surface block mt-1" id="txtKeepVal">₦90,700</span>
+<span class="font-mono-sm text-[11px] text-primary-container font-semibold" id="txtKeepPct">90.7%</span>
+</div>
+<div>
+<span class="font-mono-sm text-mono-sm text-secondary block">7.5% VAT pot</span>
+<span class="font-mono-md text-mono-md font-bold text-on-surface block mt-1" id="txtVatVal">₦7,500</span>
+<span class="font-mono-sm text-[11px] text-primary-fixed-dim font-semibold" id="txtVatPct">7.5%</span>
+</div>
+<div>
+<span class="font-mono-sm text-mono-sm text-secondary block">Fee paid</span>
+<span class="font-mono-md text-mono-md font-bold text-on-surface block mt-1" id="txtFeeVal">₦1,800</span>
+<span class="font-mono-sm text-[11px] text-error font-semibold" id="txtFeePct">1.8%</span>
+</div>
+</div>
+</div>
+<div class="mt-8 p-3 bg-surface-container-low rounded border border-outline-variant flex items-center gap-3">
+<span class="material-symbols-outlined text-primary-container" data-icon="verified_user">verified_user</span>
+<p class="font-body-sm text-body-sm text-secondary">
+              NairaBooks automatically separates the VAT and fees to prevent accidental corporate overspending.
+            </p>
+</div>
+</div>
+<!-- CARD 2: Clickable Fiscal Quarters Chart -->
+<div class="paper-card p-8 rounded-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-4">
+<span class="font-label-caps text-label-caps text-outline uppercase">[ FISCAL AUDIT • 2024 / 2025 ]</span>
+<span class="px-2 py-0.5 bg-[#EBF5F0] rounded font-mono-sm text-mono-sm text-primary-container font-bold">
+                Net Margin: 34.2%
+              </span>
+</div>
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Grouped quarterly ledger performance</h3>
+<p class="font-body-sm text-body-sm text-secondary mt-1">Review verified gross inflows, operating expenses, and retained profit.</p>
+<!-- Quarter Selector Buttons -->
+<div class="flex items-center gap-2 mt-6">
+<button class="quarter-btn active flex-1 py-1.5 border border-on-surface bg-surface-container-lowest font-mono-sm text-mono-sm font-bold text-on-surface rounded transition-all" data-q="q1">Q1</button>
+<button class="quarter-btn flex-1 py-1.5 border border-outline-variant bg-surface-container-low font-mono-sm text-mono-sm font-medium text-secondary rounded hover:text-on-surface transition-all" data-q="q2">Q2</button>
+<button class="quarter-btn flex-1 py-1.5 border border-outline-variant bg-surface-container-low font-mono-sm text-mono-sm font-medium text-secondary rounded hover:text-on-surface transition-all" data-q="q3">Q3</button>
+<button class="quarter-btn flex-1 py-1.5 border border-outline-variant bg-surface-container-low font-mono-sm text-mono-sm font-medium text-secondary rounded hover:text-on-surface transition-all" data-q="q4">Q4 (Est.)</button>
+</div>
+<!-- Grouped Bar Chart Visualizer -->
+<div class="mt-8 pt-4 pb-2 border-b border-outline-variant">
+<div class="h-44 flex items-end justify-around gap-6 px-4">
+<!-- Group 1: Sales In -->
+<div class="flex flex-col items-center flex-1 h-full justify-end">
+<span class="font-mono-sm text-mono-sm font-bold text-primary-container mb-2" id="chartSalesVal">₦14.2M</span>
+<div class="w-full max-w-[42px] bg-primary-container rounded-t transition-all duration-300" id="barSales" style="height: 85%;"></div>
+<span class="font-mono-sm text-mono-sm text-secondary mt-2">Sales In</span>
+</div>
+<!-- Group 2: Bills Paid -->
+<div class="flex flex-col items-center flex-1 h-full justify-end">
+<span class="font-mono-sm text-mono-sm font-bold text-secondary mb-2" id="chartBillsVal">₦9.3M</span>
+<div class="w-full max-w-[42px] bg-secondary rounded-t transition-all duration-300" id="barBills" style="height: 55%;"></div>
+<span class="font-mono-sm text-mono-sm text-secondary mt-2">Bills Paid</span>
+</div>
+<!-- Group 3: Profit Left -->
+<div class="flex flex-col items-center flex-1 h-full justify-end">
+<span class="font-mono-sm text-mono-sm font-bold text-on-surface mb-2" id="chartProfitVal">₦4.9M</span>
+<div class="w-full max-w-[42px] bg-on-surface rounded-t transition-all duration-300" id="barProfit" style="height: 38%;"></div>
+<span class="font-mono-sm text-mono-sm text-secondary mt-2">Profit Left</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Accompanying metric note -->
+<div class="mt-6 flex items-center justify-between font-mono-sm text-mono-sm">
+<span class="text-secondary">Statutory CIT liability:</span>
+<span class="font-bold text-primary-container">₦0.00 (Exempt under s.23 CITA)</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- =========================================================================
+       5. Business Sectors, Comparison & FAQ
+       ========================================================================= -->
+<section class="py-20 bg-surface">
+<div class="max-w-7xl mx-auto px-6 lg:px-12 space-y-24">
+<!-- Part A: Sector Strip & Split Card -->
+<div>
+<div class="text-center max-w-2xl mx-auto mb-10">
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-wider">[ 04 — SECTOR-SPECIFIC WORKFLOWS ]</span>
+<h2 class="font-headline-lg text-headline-lg font-bold text-on-surface mt-2">Built for how Nigerian enterprises operate</h2>
+</div>
+<!-- 6-Category Sector Strip -->
+<div class="flex items-center justify-start md:justify-center overflow-x-auto gap-2 pb-4 scrollbar-none border-b border-outline-variant">
+<button class="sector-tab active px-5 py-2 rounded-full border border-on-surface bg-on-surface text-surface-container-lowest font-headline-sm text-body-sm font-semibold transition-all whitespace-nowrap" data-sector="retail">Retail Shops</button>
+<button class="sector-tab px-5 py-2 rounded-full border border-outline-variant bg-surface-container-lowest text-secondary font-headline-sm text-body-sm font-medium hover:text-on-surface transition-all whitespace-nowrap" data-sector="wholesale">Wholesale</button>
+<button class="sector-tab px-5 py-2 rounded-full border border-outline-variant bg-surface-container-lowest text-secondary font-headline-sm text-body-sm font-medium hover:text-on-surface transition-all whitespace-nowrap" data-sector="makers">Makers</button>
+<button class="sector-tab px-5 py-2 rounded-full border border-outline-variant bg-surface-container-lowest text-secondary font-headline-sm text-body-sm font-medium hover:text-on-surface transition-all whitespace-nowrap" data-sector="contractors">Contractors</button>
+<button class="sector-tab px-5 py-2 rounded-full border border-outline-variant bg-surface-container-lowest text-secondary font-headline-sm text-body-sm font-medium hover:text-on-surface transition-all whitespace-nowrap" data-sector="agencies">Agencies</button>
+<button class="sector-tab px-5 py-2 rounded-full border border-outline-variant bg-surface-container-lowest text-secondary font-headline-sm text-body-sm font-medium hover:text-on-surface transition-all whitespace-nowrap" data-sector="ngos">NGOs</button>
+</div>
+<!-- Sector Dynamic Split Card -->
+<div class="mt-8 paper-card rounded-md border border-outline-variant grid grid-cols-1 md:grid-cols-12 divide-y md:divide-y-0 md:divide-x divide-outline-variant">
+<div class="md:col-span-7 p-8 md:p-12">
+<span class="font-label-caps text-label-caps text-primary-container font-bold uppercase" id="sectorTag">[ RETAIL &amp; STOREFRONTS ]</span>
+<h3 class="font-headline-md text-headline-md font-bold text-on-surface mt-2" id="sectorTitle">
+              Sync multiple POS terminals across physical branches
+            </h3>
+<p class="font-body-md text-body-md text-secondary mt-3 leading-relaxed" id="sectorDesc">
+              Whether you run three outlets in Ikeja or one supermarket in Wuse 2, NairaBooks continuously reads your Moniepoint and OPay terminal settlement batches, auto-reconciling them with your commercial bank receipts.
+            </p>
+<div class="grid grid-cols-2 gap-6 mt-8 pt-8 border-t border-outline-variant">
+<div>
+<span class="font-mono-sm text-mono-sm text-secondary uppercase">Average Reconciliation Time</span>
+<p class="font-mono-lg text-mono-lg font-bold text-on-surface mt-1" id="sectorMetric1">45 seconds / day</p>
+</div>
+<div>
+<span class="font-mono-sm text-mono-sm text-secondary uppercase">Discrepancy Elimination</span>
+<p class="font-mono-lg text-mono-lg font-bold text-primary-container mt-1" id="sectorMetric2">99.8% accurate</p>
+</div>
+</div>
+</div>
+<div class="md:col-span-5 p-8 md:p-12 bg-[#FAFAF8] flex flex-col justify-between">
+<div>
+<span class="font-label-caps text-label-caps text-outline uppercase">[ WORKFLOW ARCHITECTURE ]</span>
+<ul class="mt-4 space-y-4 font-body-sm text-body-sm text-on-surface" id="sectorFeatures">
+<li class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-primary-container text-lg mt-0.5" data-icon="check_circle">check_circle</span>
+<span>End-of-day Z-report match against actual bank credits</span>
+</li>
+<li class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-primary-container text-lg mt-0.5" data-icon="check_circle">check_circle</span>
+<span>Separate cashier shifts without sharing bank login credentials</span>
+</li>
+<li class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-primary-container text-lg mt-0.5" data-icon="check_circle">check_circle</span>
+<span>Direct inventory valuation matching with purchase invoices</span>
+</li>
+</ul>
+</div>
+<div class="mt-8 pt-4 border-t border-outline-variant">
+<a class="text-body-sm font-semibold text-primary-container hover:underline inline-flex items-center gap-1" href="#signup">
+<span>Deploy this workflow for your business</span>
+<span class="material-symbols-outlined text-base" data-icon="arrow_forward">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+<!-- Part B: Comparison Matrix Table -->
+<div>
+<div class="text-center max-w-2xl mx-auto mb-10">
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-wider">[ 05 — PLATFORM BENCHMARK ]</span>
+<h2 class="font-headline-lg text-headline-lg font-bold text-on-surface mt-2">Purpose-engineered for Nigeria</h2>
+<p class="font-body-md text-body-md text-secondary mt-1">Why modern Nigerian business owners are replacing legacy tools.</p>
+</div>
+<div class="paper-card rounded border border-outline-variant overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-outline-variant bg-surface-container-high">
+<th class="p-4 font-label-caps text-label-caps text-outline uppercase tracking-wider">Capabilities</th>
+<th class="p-4 font-headline-sm text-body-sm font-semibold text-secondary">Excel / Notes</th>
+<th class="p-4 font-headline-sm text-body-sm font-semibold text-secondary">Foreign Apps (QuickBooks / Xero)</th>
+<th class="p-4 font-headline-sm text-body-sm font-bold text-primary-container bg-surface-container-lowest border-l border-r border-outline-variant">NairaBooks</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant font-body-sm text-body-sm">
+<tr>
+<td class="p-4 font-semibold text-on-surface">Auto Nigerian Bank Sync</td>
+<td class="p-4 text-secondary">Manual CSV import</td>
+<td class="p-4 text-secondary">Breaks regularly / Not supported</td>
+<td class="p-4 bg-surface-container-lowest border-l border-r border-outline-variant font-bold text-primary-container flex items-center gap-2">
+<span class="material-symbols-outlined text-base" data-icon="check_circle">check_circle</span>
+                  Direct CBN-compliant Open Banking
+                </td>
+</tr>
+<tr>
+<td class="p-4 font-semibold text-on-surface">FIRS 2025 Act Compliance</td>
+<td class="p-4 text-secondary">Requires manual formula updates</td>
+<td class="p-4 text-secondary">Foreign tax structures only</td>
+<td class="p-4 bg-surface-container-lowest border-l border-r border-outline-variant font-bold text-primary-container flex items-center gap-2">
+<span class="material-symbols-outlined text-base" data-icon="check_circle">check_circle</span>
+                  Zero CIT exemption built-in
+                </td>
+</tr>
+<tr>
+<td class="p-4 font-semibold text-on-surface">Moniepoint/OPay POS Feed</td>
+<td class="p-4 text-secondary">Manual tallying</td>
+<td class="p-4 text-secondary">No API connection</td>
+<td class="p-4 bg-surface-container-lowest border-l border-r border-outline-variant font-bold text-primary-container flex items-center gap-2">
+<span class="material-symbols-outlined text-base" data-icon="check_circle">check_circle</span>
+                  Live terminal settlement ingest
+                </td>
+</tr>
+<tr>
+<td class="p-4 font-semibold text-on-surface">Daily WhatsApp P&amp;L Alert</td>
+<td class="p-4 text-secondary">None</td>
+<td class="p-4 text-secondary">Email only</td>
+<td class="p-4 bg-surface-container-lowest border-l border-r border-outline-variant font-bold text-primary-container flex items-center gap-2">
+<span class="material-symbols-outlined text-base" data-icon="check_circle">check_circle</span>
+                  Automated 8:00 PM summary
+                </td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Part C: Accordion FAQ Card -->
+<div>
+<div class="text-center max-w-2xl mx-auto mb-10">
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-wider">[ 06 — REGULATORY &amp; OPERATIONAL CLARITY ]</span>
+<h2 class="font-headline-lg text-headline-lg font-bold text-on-surface mt-2">Frequently Asked Questions</h2>
+</div>
+<div class="paper-card rounded border border-outline-variant divide-y divide-outline-variant max-w-3xl mx-auto">
+<!-- Item 1 -->
+<div class="faq-item">
+<button class="faq-btn w-full p-6 text-left flex items-center justify-between gap-4 hover:bg-surface-container-low transition-colors">
+<span class="font-headline-sm text-body-md font-bold text-on-surface">How does the 0% Company Income Tax exemption under the 2025 Act work?</span>
+<span class="material-symbols-outlined text-secondary transition-transform duration-200 faq-icon" data-icon="expand_more">expand_more</span>
+</button>
+<div class="faq-content px-6 pb-6 text-secondary font-body-md text-body-sm leading-relaxed hidden">
+              Under recent Nigerian tax reforms, small companies with gross annual turnover below ₦100,000,000 are subject to a 0% Company Income Tax rate. NairaBooks continually tracks your rolling 12-month turnover, tags relevant non-taxable lines, and generates the exact schedule required by the FIRS so you claim your full statutory exemption with zero penalties.
+            </div>
+</div>
+<!-- Item 2 -->
+<div class="faq-item">
+<button class="faq-btn w-full p-6 text-left flex items-center justify-between gap-4 hover:bg-surface-container-low transition-colors">
+<span class="font-headline-sm text-body-md font-bold text-on-surface">Can NairaBooks link to my Nigerian corporate bank accounts?</span>
+<span class="material-symbols-outlined text-secondary transition-transform duration-200 faq-icon" data-icon="expand_more">expand_more</span>
+</button>
+<div class="faq-content px-6 pb-6 text-secondary font-body-md text-body-sm leading-relaxed hidden">
+              Yes. NairaBooks integrates securely with all major Nigerian commercial banks (Zenith, GTBank, Access, UBA, FirstBank, Stanbic) and fintech business platforms (Moniepoint, OPay, Kuda Business) via read-only, encrypted API feeds compliant with Nigeria Data Protection Regulation (NDPR).
+            </div>
+</div>
+<!-- Item 3 -->
+<div class="faq-item">
+<button class="faq-btn w-full p-6 text-left flex items-center justify-between gap-4 hover:bg-surface-container-low transition-colors">
+<span class="font-headline-sm text-body-md font-bold text-on-surface">Does it calculate the 7.5% VAT automatically from POS sales?</span>
+<span class="material-symbols-outlined text-secondary transition-transform duration-200 faq-icon" data-icon="expand_more">expand_more</span>
+</button>
+<div class="faq-content px-6 pb-6 text-secondary font-body-md text-body-sm leading-relaxed hidden">
+              Instantly. When POS transactions settle, NairaBooks isolates the core revenue from the statutory 7.5% Value Added Tax and merchant gateway charges, logging the tax in an automated FIRS escrow register so your monthly VAT returns take one click.
+            </div>
+</div>
+<!-- Item 4 -->
+<div class="faq-item">
+<button class="faq-btn w-full p-6 text-left flex items-center justify-between gap-4 hover:bg-surface-container-low transition-colors">
+<span class="font-headline-sm text-body-md font-bold text-on-surface">Do I still need an external accountant?</span>
+<span class="material-symbols-outlined text-secondary transition-transform duration-200 faq-icon" data-icon="expand_more">expand_more</span>
+</button>
+<div class="faq-content px-6 pb-6 text-secondary font-body-md text-body-sm leading-relaxed hidden">
+              NairaBooks handles 95% of daily journal entries, categorization, and tax schedules autonomously. You can invite your external ICAN/ANAN chartered accountant with one-click read-only or sign-off access to review year-end audited financials in minutes instead of paying them weeks of manual fees.
+            </div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- =========================================================================
+       Footer (Shared Component anchored)
+       ========================================================================= -->
+<footer class="docked full-width w-full border-t border-outline-variant bg-surface-container-low px-margin-desktop py-space-xl flex flex-col gap-space-lg">
+<div class="max-w-screen-2xl mx-auto w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+<!-- Logo + Legal Identity -->
+<div>
+<div class="font-headline-sm text-headline-sm font-bold text-on-surface tracking-tight flex items-center gap-1">
+<span>nairabooks</span>
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container inline-block"></span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary mt-1 max-w-lg">
+          © 2025 NairaBooks Technologies Ltd. Licensed by relevant Nigerian regulatory authorities. All rights reserved.
+        </p>
+</div>
+<!-- Links from Shared Component JSON -->
+<div class="flex flex-wrap gap-x-6 gap-y-2 font-mono-sm text-mono-sm">
+<a class="text-on-surface-variant font-normal hover:text-primary transition-colors duration-150" href="#privacy">Privacy Policy</a>
+<a class="text-on-surface-variant font-normal hover:text-primary transition-colors duration-150" href="#terms">Terms of Service</a>
+<a class="text-on-surface-variant font-normal hover:text-primary transition-colors duration-150" href="#security">Security &amp; NDPR</a>
+<a class="text-on-surface-variant font-normal hover:text-primary transition-colors duration-150" href="#ndic">NDIC Coverage</a>
+<a class="text-on-surface-variant font-normal hover:text-primary transition-colors duration-150" href="#cbn">CBN Compliance</a>
+<a class="text-on-surface-variant font-normal hover:text-primary transition-colors duration-150" href="#api">API Documentation</a>
+<a class="text-on-surface-variant font-normal hover:text-primary transition-colors duration-150" href="#contact">Contact Operations</a>
+</div>
+</div>
+<!-- Final Institutional Microprint Hairline -->
+<div class="max-w-screen-2xl mx-auto w-full pt-4 border-t border-outline-variant flex flex-col sm:flex-row justify-between items-center text-[11px] font-mono-sm text-outline gap-2">
+<span>Operating strictly within Guidelines on Open Banking in Nigeria (2023) and Nigerian Finance Act frameworks.</span>
+<span>Lagos • Abuja • Port Harcourt</span>
+</div>
+</footer>
+<!-- =========================================================================
+       Inline Vanilla Interactive Scripting (Micro-Interactions)
+       ========================================================================= -->
+<script>
+    // --- 1. Scenario Data Engine (Product Showcase) ---
+    const scenarios = {
+      shop: {
+        balance: '₦413,700.00',
+        r1Title: 'Money landing in Zenith Bank',
+        r1Sub: 'Terminal Batch #88194 • POS gross payout',
+        r1Val: '+₦450,000.00',
+        r2Title: 'POS fee taken by Moniepoint',
+        r2Sub: 'Capped provider rate at 0.71%',
+        r2Val: '-₦3,225.00',
+        r3Title: 'Your real shop earnings',
+        r3Sub: 'Recognized core retail turnover',
+        r3Val: '₦413,700.00',
+        r4Title: '7.5% VAT set aside safely',
+        r4Val: '₦33,075.00'
+      },
+      abuja: {
+        balance: '₦1,850,000.00',
+        r1Title: 'Direct corporate wire from GTBank',
+        r1Sub: 'Consulting Milestones #3 • Federal Ministry of Works',
+        r1Val: '+₦2,000,000.00',
+        r2Title: 'Stamp Duty & WHT Withholding',
+        r2Sub: '5% statutory WHT deducted at source',
+        r2Val: '-₦100,000.00',
+        r3Title: 'Your real shop earnings',
+        r3Sub: 'Consultancy Retainer Fee Revenue',
+        r3Val: '₦1,850,000.00',
+        r4Title: '7.5% VAT set aside safely',
+        r4Val: '₦50,000.00'
+      },
+      hotel: {
+        balance: '₦895,400.00',
+        r1Title: 'Weekend guest settlements in Access Bank',
+        r1Sub: 'POS #12, #14 & Online reservation gateway',
+        r1Val: '+₦980,000.00',
+        r2Title: 'Merchant POS & gateway charges',
+        r2Sub: 'Weighted card interchange fees',
+        r2Val: '-₦12,100.00',
+        r3Title: 'Your real shop earnings',
+        r3Sub: 'Hospitality & culinary dining revenue',
+        r3Val: '₦895,400.00',
+        r4Title: '7.5% VAT set aside safely',
+        r4Val: '₦72,500.00'
+      }
+    };
+
+    const scenarioTabs = document.querySelectorAll('.scenario-tab');
+    scenarioTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        scenarioTabs.forEach(t => {
+          t.classList.remove('bg-surface-container-lowest', 'border-on-surface', 'text-on-surface', 'font-semibold');
+          t.classList.add('bg-transparent', 'border-outline-variant', 'text-secondary', 'font-medium');
+        });
+        tab.classList.remove('bg-transparent', 'border-outline-variant', 'text-secondary', 'font-medium');
+        tab.classList.add('bg-surface-container-lowest', 'border-on-surface', 'text-on-surface', 'font-semibold');
+
+        const key = tab.dataset.scenario;
+        const data = scenarios[key];
+        document.getElementById('mainBalanceDisplay').innerText = data.balance;
+        document.getElementById('row1Title').innerText = data.r1Title;
+        document.getElementById('row1Sub').innerText = data.r1Sub;
+        document.getElementById('row1Val').innerText = data.r1Val;
+        document.getElementById('row2Title').innerText = data.r2Title;
+        document.getElementById('row2Sub').innerText = data.r2Sub;
+        document.getElementById('row2Val').innerText = data.r2Val;
+        document.getElementById('row3Title').innerText = data.r3Title;
+        document.getElementById('row3Sub').innerText = data.r3Sub;
+        document.getElementById('row3Val').innerText = data.r3Val;
+        document.getElementById('row4Title').innerText = data.r4Title;
+        document.getElementById('row4Val').innerText = data.r4Val;
+      });
+    });
+
+    // --- 2. Plain English vs Accountant View Toggle ---
+    const btnPlain = document.getElementById('viewTogglePlain');
+    const btnAccountant = document.getElementById('viewToggleAccountant');
+
+    btnPlain.addEventListener('click', () => {
+      btnPlain.classList.add('bg-surface-container-lowest', 'text-on-surface', 'font-semibold');
+      btnPlain.classList.remove('text-secondary', 'font-medium');
+      btnAccountant.classList.remove('bg-surface-container-lowest', 'text-on-surface', 'font-semibold');
+      btnAccountant.classList.add('text-secondary', 'font-medium');
+
+      document.getElementById('row1Code').innerText = "DR 1010 CASH AT BANK";
+      document.getElementById('row2Code').innerText = "CR 5020 MERCHANT CHARGES";
+      document.getElementById('row3Code').innerText = "CR 4001 REVENUE MERCHANDISE";
+      document.getElementById('row4Code').innerText = "CR 2050 VAT PAYABLE ESCROW";
+      document.getElementById('balanceLabel').innerText = "NET REALIZED EARNINGS";
+    });
+
+    btnAccountant.addEventListener('click', () => {
+      btnAccountant.classList.add('bg-surface-container-lowest', 'text-on-surface', 'font-semibold');
+      btnAccountant.classList.remove('text-secondary', 'font-medium');
+      btnPlain.classList.remove('bg-surface-container-lowest', 'text-on-surface', 'font-semibold');
+      btnPlain.classList.add('text-secondary', 'font-medium');
+
+      document.getElementById('row1Code').innerText = "ASSET: CURRENT CASH (DEBIT)";
+      document.getElementById('row2Code').innerText = "EXPENSE: OPEX COST (CREDIT)";
+      document.getElementById('row3Code').innerText = "EQUITY/REV: INCOME LEDGER";
+      document.getElementById('row4Code').innerText = "LIABILITY: FIRS STATUTORY ESCROW";
+      document.getElementById('balanceLabel').innerText = "TRIAL BALANCE SURPLUS";
+    });
+
+    // --- 3. Receipt Popover Modal Logic ---
+    const receiptModal = document.getElementById('receiptModal');
+    const openReceiptBtn = document.getElementById('openReceiptBtn');
+    const closeReceiptBtn = document.getElementById('closeReceiptBtn');
+
+    openReceiptBtn.addEventListener('click', () => receiptModal.classList.remove('hidden'));
+    closeReceiptBtn.addEventListener('click', () => receiptModal.classList.add('hidden'));
+    receiptModal.addEventListener('click', (e) => {
+      if (e.target === receiptModal) receiptModal.classList.add('hidden');
+    });
+
+    // --- 4. Interactive ₦100k Split Visualizer ---
+    const splitData = {
+      pos: { keep: '₦90,700', keepPct: '90.7%', vat: '₦7,500', vatPct: '7.5%', fee: '₦1,800', feePct: '1.8%', wKeep: '90.7%', wVat: '7.5%', wFee: '1.8%' },
+      online: { keep: '₦91,000', keepPct: '91.0%', vat: '₦7,500', vatPct: '7.5%', fee: '₦1,500', feePct: '1.5%', wKeep: '91.0%', wVat: '7.5%', wFee: '1.5%' },
+      transfer: { keep: '₦92,450', keepPct: '92.45%', vat: '₦7,500', vatPct: '7.5%', fee: '₦50', feePct: '0.05%', wKeep: '92.45%', wVat: '7.5%', wFee: '0.5%' }
+    };
+
+    const splitButtons = document.querySelectorAll('.split-btn');
+    splitButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        splitButtons.forEach(b => {
+          b.classList.remove('border-on-surface', 'bg-on-surface', 'text-surface-container-lowest', 'font-semibold');
+          b.classList.add('border-outline-variant', 'bg-surface-container-lowest', 'text-on-surface', 'font-medium');
+        });
+        btn.classList.remove('border-outline-variant', 'bg-surface-container-lowest', 'font-medium');
+        btn.classList.add('border-on-surface', 'bg-on-surface', 'text-surface-container-lowest', 'font-semibold');
+
+        const type = btn.dataset.type;
+        const conf = splitData[type];
+        document.getElementById('txtKeepVal').innerText = conf.keep;
+        document.getElementById('txtKeepPct').innerText = conf.keepPct;
+        document.getElementById('txtVatVal').innerText = conf.vat;
+        document.getElementById('txtVatPct').innerText = conf.vatPct;
+        document.getElementById('txtFeeVal').innerText = conf.fee;
+        document.getElementById('txtFeePct').innerText = conf.feePct;
+
+        document.getElementById('barKeep').style.width = conf.wKeep;
+        document.getElementById('barVat').style.width = conf.wVat;
+        document.getElementById('barFee').style.width = conf.wFee;
+      });
+    });
+
+    // --- 5. Clickable Quarters Bar Visualizer ---
+    const quarterData = {
+      q1: { sales: '₦14.2M', bills: '₦9.3M', profit: '₦4.9M', hSales: '85%', hBills: '55%', hProfit: '38%' },
+      q2: { sales: '₦18.6M', bills: '₦11.1M', profit: '₦7.5M', hSales: '95%', hBills: '60%', hProfit: '50%' },
+      q3: { sales: '₦12.8M', bills: '₦8.4M', profit: '₦4.4M', hSales: '75%', hBills: '50%', hProfit: '32%' },
+      q4: { sales: '₦22.4M', bills: '₦13.2M', profit: '₦9.2M', hSales: '100%', hBills: '65%', hProfit: '58%' }
+    };
+
+    const quarterButtons = document.querySelectorAll('.quarter-btn');
+    quarterButtons.forEach(qBtn => {
+      qBtn.addEventListener('click', () => {
+        quarterButtons.forEach(b => {
+          b.classList.remove('border-on-surface', 'bg-surface-container-lowest', 'text-on-surface', 'font-bold');
+          b.classList.add('border-outline-variant', 'bg-surface-container-low', 'text-secondary', 'font-medium');
+        });
+        qBtn.classList.remove('border-outline-variant', 'bg-surface-container-low', 'text-secondary', 'font-medium');
+        qBtn.classList.add('border-on-surface', 'bg-surface-container-lowest', 'text-on-surface', 'font-bold');
+
+        const q = qBtn.dataset.q;
+        const d = quarterData[q];
+        document.getElementById('chartSalesVal').innerText = d.sales;
+        document.getElementById('chartBillsVal').innerText = d.bills;
+        document.getElementById('chartProfitVal').innerText = d.profit;
+        document.getElementById('barSales').style.height = d.hSales;
+        document.getElementById('barBills').style.height = d.hBills;
+        document.getElementById('barProfit').style.height = d.hProfit;
+      });
+    });
+
+    // --- 6. Sector Tab Switcher ---
+    const sectors = {
+      retail: {
+        tag: '[ RETAIL & STOREFRONTS ]',
+        title: 'Sync multiple POS terminals across physical branches',
+        desc: 'Whether you run three outlets in Ikeja or one supermarket in Wuse 2, NairaBooks continuously reads your Moniepoint and OPay terminal settlement batches, auto-reconciling them with your commercial bank receipts.',
+        m1: '45 seconds / day',
+        m2: '99.8% accurate',
+        features: [
+          'End-of-day Z-report match against actual bank credits',
+          'Separate cashier shifts without sharing bank login credentials',
+          'Direct inventory valuation matching with purchase invoices'
+        ]
+      },
+      wholesale: {
+        tag: '[ WHOLESALE & DISTRIBUTION ]',
+        title: 'High-volume transfer reconciliation with automatic customer tagging',
+        desc: 'Automate tracking of credit supplies and massive direct bank transfers. Match partial buyer wires from Alaba or Onitsha directly to distinct order invoices without messy manual bank receipts.',
+        m1: '12,000 lines / min',
+        m2: '0% unapplied cash',
+        features: [
+          'Automated credit term reminders sent through WhatsApp',
+          'Batch PDF statements generated with company watermarks',
+          'Direct tracking of shipping expenses against consignments'
+        ]
+      },
+      makers: {
+        tag: '[ MANUFACTURING & MAKERS ]',
+        title: 'Cost of goods sold (COGS) tied to raw material naira fluctuations',
+        desc: 'Track local textile sourcing, generator diesel expenses, and packaging inventory. NairaBooks separates recurring direct production outlays from administrative overhead automatically.',
+        m1: 'Realtime COGS',
+        m2: 'Accurate unit cost',
+        features: [
+          'Diesel and power generator amortisation schedules',
+          'Raw material import duty and port clearance ledgering',
+          'BOM (Bill of Materials) tracking for fashion & food producers'
+        ]
+      },
+      contractors: {
+        tag: '[ CONTRACTORS & ENGINEERING ]',
+        title: 'Project-by-project cashflow and 5% Withholding Tax (WHT) ledgering',
+        desc: 'Keep construction sites and government contracts solvent. Automatically track retainage, advance payments, and calculate net receivables after 5% WHT deductions.',
+        m1: 'Per-project P&L',
+        m2: 'Zero tax leakage',
+        features: [
+          'Automatic generation of WHT credit note requests',
+          'Subcontractor payment vouchers with instant proof-of-work ties',
+          'Separate escrow trackers for mobilization fees'
+        ]
+      },
+      agencies: {
+        tag: '[ CREATIVE & TECH AGENCIES ]',
+        title: 'Dual-currency FX billing with auto NGN parallel and official rates',
+        desc: 'Invoice remote clients in USD/GBP while seamlessly logging statutory Naira books according to central regulatory conversion standards without dual spreadsheets.',
+        m1: 'Instant FX audit',
+        m2: 'Automated 7.5% VAT',
+        features: [
+          'USD/GBP offshore payout ledgering into Dom accounts',
+          'Freelancer retainer tracking with milestone milestones',
+          'Clean SaaS subscription expense tracking in Naira equivalents'
+        ]
+      },
+      ngos: {
+        tag: '[ NON-PROFITS & NGOS ]',
+        title: 'Strict donor fund ring-fencing with audit-ready grant reports',
+        desc: 'Separate restricted grant funding from general administrative donations. Meet USAID, EU, and local regulatory reporting criteria effortlessly.',
+        m1: '100% compliant',
+        m2: 'Multi-grant audit',
+        features: [
+          'Restricted fund tracking ensuring zero co-mingling',
+          'Automatic creation of donor expenditure verification tables',
+          'Zero-tax documentation ready for statutory filing'
+        ]
+      }
+    };
+
+    const sectorTabs = document.querySelectorAll('.sector-tab');
+    sectorTabs.forEach(sTab => {
+      sTab.addEventListener('click', () => {
+        sectorTabs.forEach(t => {
+          t.classList.remove('border-on-surface', 'bg-on-surface', 'text-surface-container-lowest', 'font-semibold');
+          t.classList.add('border-outline-variant', 'bg-surface-container-lowest', 'text-secondary', 'font-medium');
+        });
+        sTab.classList.remove('border-outline-variant', 'bg-surface-container-lowest', 'text-secondary', 'font-medium');
+        sTab.classList.add('border-on-surface', 'bg-on-surface', 'text-surface-container-lowest', 'font-semibold');
+
+        const sec = sTab.dataset.sector;
+        const cur = sectors[sec];
+        document.getElementById('sectorTag').innerText = cur.tag;
+        document.getElementById('sectorTitle').innerText = cur.title;
+        document.getElementById('sectorDesc').innerText = cur.desc;
+        document.getElementById('sectorMetric1').innerText = cur.m1;
+        document.getElementById('sectorMetric2').innerText = cur.m2;
+
+        const featList = document.getElementById('sectorFeatures');
+        featList.innerHTML = cur.features.map(f => `
+          <li class="flex items-start gap-2.5">
+            <span class="material-symbols-outlined text-primary-container text-lg mt-0.5" data-icon="check_circle">check_circle</span>
+            <span>${f}</span>
+          </li>
+        `).join('');
+      });
+    });
+
+    // --- 7. FAQ Accordion Interaction ---
+    const faqBtns = document.querySelectorAll('.faq-btn');
+    faqBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const content = btn.nextElementSibling;
+        const icon = btn.querySelector('.faq-icon');
+        const isHidden = content.classList.contains('hidden');
+
+        // Close all
+        document.querySelectorAll('.faq-content').forEach(c => c.classList.add('hidden'));
+        document.querySelectorAll('.faq-icon').forEach(i => i.style.transform = 'rotate(0deg)');
+
+        if (isHidden) {
+          content.classList.remove('hidden');
+          icon.style.transform = 'rotate(180deg)';
+        }
+      });
+    });
+  </script>
+</body></html>

@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>307-Skill Question &amp; If-Statement Flowchart</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    body { font-family: inherit; }
+    .card-hover { transition: border-color 0.15s ease, opacity 0.2s ease, box-shadow 0.15s ease; }
+    .node-active { border-color: var(--primary) !important; box-shadow: 0 0 0 2px var(--primary); }
+    .node-visited { border-color: var(--primary) !important; }
+    .node-dimmed { opacity: 0.35; }
+  </style>
+</head>
+<body class="bg-[var(--background)] text-[var(--foreground)] antialiased min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="border-b border-[var(--border)] bg-[var(--card)] px-5 py-4">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <h1 class="text-lg font-semibold text-[var(--foreground)]">307-Skill Decision Wizard</h1>
+        <p class="text-xs text-[var(--muted-foreground)] mt-0.5">
+          Answer simple yes/no and plain-English questions about what you&apos;re building to get the exact skills you need.
+        </p>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <button id="btn-show-all" class="text-xs px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--secondary)] text-[var(--secondary-foreground)] cursor-pointer hover:opacity-90">
+          Show All 307 Skills
+        </button>
+        <button id="btn-reset" class="text-xs px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--secondary)] text-[var(--secondary-foreground)] cursor-pointer hover:opacity-90">
+          Start Over
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Active Question Bar -->
+  <section class="border-b border-[var(--border)] bg-[var(--content)] px-5 py-4">
+    <div class="max-w-6xl mx-auto">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+        <div class="flex flex-wrap items-center gap-2">
+          <button id="btn-back" type="button" class="text-xs px-2.5 py-1 rounded-lg border border-[var(--border)] bg-[var(--card)] text-[var(--foreground)] cursor-pointer hover:border-[var(--primary)] disabled:opacity-40 disabled:cursor-not-allowed">
+            &larr; Back
+          </button>
+          <span id="q-step-badge" class="text-xs font-mono px-2.5 py-1 rounded bg-[var(--secondary)] text-[var(--secondary-foreground)]">Question 1</span>
+        </div>
+        <div class="flex flex-wrap items-center gap-1.5 text-xs">
+          <span class="text-[var(--muted-foreground)]">Quick examples:</span>
+          <button type="button" data-preset="billSplit" class="preset-btn px-2.5 py-1 rounded-lg border border-[var(--border)] bg-[var(--card)] text-[var(--foreground)] cursor-pointer hover:border-[var(--primary)]">
+            Bill-Splitter Web App
+          </button>
+          <button type="button" data-preset="saas" class="preset-btn px-2.5 py-1 rounded-lg border border-[var(--border)] bg-[var(--card)] text-[var(--foreground)] cursor-pointer hover:border-[var(--primary)]">
+            Paid SaaS App
+          </button>
+          <button type="button" data-preset="script" class="preset-btn px-2.5 py-1 rounded-lg border border-[var(--border)] bg-[var(--card)] text-[var(--foreground)] cursor-pointer hover:border-[var(--primary)]">
+            Quick Python Script
+          </button>
+        </div>
+      </div>
+      <div id="breadcrumb" class="flex flex-wrap items-center gap-1.5 text-xs text-[var(--muted-foreground)] mb-2.5"></div>
+      <div class="rounded-xl border border-[var(--border)] bg-[var(--card)] p-4">
+        <div>
+          <div id="q-stage" class="text-xs font-medium text-[var(--muted-foreground)]"></div>
+          <h2 id="q-title" class="text-base font-semibold text-[var(--foreground)] mt-0.5"></h2>
+          <p id="q-hint" class="text-xs text-[var(--muted-foreground)] mt-1"></p>
+        </div>
+        <div id="q-options" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 mt-4"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Flowchart + Loadout Drawer -->
+  <div class="flex flex-col lg:flex-row flex-1 min-h-0">
+    <!-- Decision Flowchart Columns -->
+    <main class="flex-1 overflow-auto p-5">
+      <div class="flex items-center justify-between gap-3 mb-3">
+        <div class="text-xs font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">Decision Flowchart (Click any diamond to jump there)</div>
+        <input id="search-box" type="search" placeholder="Filter skills (e.g. tdd, conductor, stripe, k8s)..."
+          class="text-xs px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--card)] text-[var(--foreground)] placeholder-[var(--placeholder)] w-64 focus:outline-none focus:border-[var(--primary)]" />
+      </div>
+      <div id="flow-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+    </main>
+
+    <!-- Compiled Loadout Sidebar -->
+    <aside class="w-full lg:w-96 shrink-0 border-t lg:border-t-0 lg:border-l border-[var(--border)] bg-[var(--card)] p-4 flex flex-col gap-3">
+      <div class="flex items-center justify-between gap-2">
+        <div>
+          <h3 class="text-sm font-semibold text-[var(--foreground)]">Matched Workflow Loadout</h3>
+          <p id="loadout-stats" class="text-xs text-[var(--muted-foreground)]">0 skills selected so far</p>
+        </div>
+        <label class="flex items-center gap-1.5 text-xs text-[var(--muted-foreground)] cursor-pointer select-none">
+          <input id="dedup-toggle" type="checkbox" checked class="rounded" />
+          Hide duplicates
+        </label>
+      </div>
+
+      <div id="loadout-steps" class="flex-1 overflow-y-auto space-y-2.5 max-h-96 lg:max-h-[calc(100vh-300px)] pr-1"></div>
+
+      <div class="pt-3 border-t border-[var(--border)] flex flex-col gap-2">
+        <button id="btn-download-json" class="w-full text-xs font-semibold px-3 py-2 rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)] cursor-pointer hover:opacity-90">
+          Download wizard-selection.json (For Vibecode Kit)
+        </button>
+        <button id="btn-copy-prompt" class="w-full text-xs font-medium px-3 py-2 rounded-lg border border-[var(--primary)] bg-[var(--secondary)] text-[var(--secondary-foreground)] cursor-pointer hover:opacity-90">
+          Copy Chat Prompt (No Terminal Needed)
+        </button>
+        <div class="flex flex-wrap gap-2">
+          <button id="btn-copy-list" class="flex-1 text-xs font-medium px-2.5 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--secondary)] text-[var(--secondary-foreground)] cursor-pointer hover:opacity-90">
+            Copy Skill Names
+          </button>
+          <button id="btn-copy-skills-json" class="flex-1 text-xs font-medium px-2.5 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--secondary)] text-[var(--secondary-foreground)] cursor-pointer hover:opacity-90">
+            Copy skills.json
+          </button>
+          <button id="btn-copy-agents" class="flex-1 text-xs font-medium px-2.5 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--secondary)] text-[var(--secondary-foreground)] cursor-pointer hover:opacity-90">
+            Copy AGENTS.md
+          </button>
+        </div>
+      </div>
+      <div id="copy-status" class="text-xs text-[var(--muted-foreground)] min-h-4"></div>
+    </aside>
+  </div>
+
+  <script>
+    // Complete 307-skill dictionary partitioned cleanly into action blocks
+    const BLOCKS = {
+      N0_A: { label: "Catalog & DX Init", skills: ["antigravity-skills-manager", "dx-optimizer"] },
+      N0_B: { label: "Agent Tuning", skills: ["agent-orchestration-improve-agent", "agent-orchestration-multi-agent-optimize"] },
+      N1_A: { label: "Market & Competitor Validation", skills: ["search-specialist", "competitive-landscape", "market-sizing-analysis", "startup-analyst", "business-analyst", "startup-metrics-framework"] },
+      N1_B: { label: "Business Case & Financials", skills: ["startup-business-analyst-market-opportunity", "startup-business-analyst-business-case", "startup-business-analyst-financial-projections", "startup-financial-modeling", "team-composition-analysis", "data-storytelling"] },
+      N2_A: { label: "Conductor Project Init", skills: ["conductor-setup", "context-driven-development"] },
+      N2_B: { label: "Thread Context Save / Restore", skills: ["context-manager", "context-management-context-save", "context-management-context-restore", "code-refactoring-context-restore", "conductor-status"] },
+      N2_C: { label: "Spec Gate & Track Creation", skills: ["conductor-validator", "conductor-new-track", "track-management", "conductor-manage"] },
+      N2_E_TS: { label: "TS/JS Project Scaffold", skills: ["javascript-typescript-typescript-scaffold"] },
+      N2_E_PY: { label: "Python Project Scaffold", skills: ["python-development-python-scaffold", "uv-package-manager"] },
+      N2_E_RS: { label: "Rust Project Scaffold", skills: ["systems-programming-rust-project"] },
+      N3_A: { label: "Core Backend Architecture", skills: ["architect-review", "architecture-patterns", "backend-architect", "microservices-patterns", "architecture-decision-records"] },
+      N3_B: { label: "Monorepo & Build Caching", skills: ["monorepo-architect", "monorepo-management", "turborepo-caching", "nx-workspace-patterns", "bazel-build-optimization"] },
+      N3_C: { label: "C4 & Mermaid Diagrams", skills: ["mermaid-expert", "c4-context", "c4-container", "c4-component", "c4-code", "c4-architecture-c4-architecture"] },
+      N3_D1: { label: "REST / OpenAPI Contracts", skills: ["api-design-principles", "openapi-spec-generation", "api-documenter"] },
+      N3_D2: { label: "GraphQL Contracts", skills: ["api-design-principles", "graphql-architect", "api-documenter"] },
+      N3_E: { label: "Threat Modeling (Security by Design)", skills: ["threat-modeling-expert", "stride-analysis-patterns", "attack-tree-construction", "security-requirement-extraction", "threat-mitigation-mapping"] },
+      N4_A: { label: "Relational SQL & Postgres", skills: ["database-architect", "postgresql", "sql-pro", "sql-optimization-patterns", "database-optimizer", "database-admin"] },
+      N4_C: { label: "Event Sourcing & CQRS", skills: ["event-sourcing-architect", "event-store-design", "cqrs-implementation", "projection-patterns", "saga-orchestration"] },
+      N4_B: { label: "Zero-Downtime Migrations & CDC", skills: ["database-migrations-sql-migrations", "database-migration", "database-migrations-migration-observability"] },
+      N5_A: { label: "UI/UX & Tailwind Design System", skills: ["ui-ux-designer", "tailwind-design-system", "kpi-dashboard-design", "article-illustrations"] },
+      N5_B: { label: "WCAG & Screen Reader Audits", skills: ["wcag-audit-patterns", "accessibility-compliance-accessibility-audit", "screen-reader-testing"] },
+      N6_A: { label: "Conductor Outer Loop", skills: ["conductor-implement", "workflow-patterns", "full-stack-orchestration-full-stack-feature", "backend-development-feature-development"] },
+      N6_B: { label: "Strict TDD Inner Loop", skills: ["tdd-orchestrator", "tdd-workflows-tdd-cycle", "tdd-workflows-tdd-red", "tdd-workflows-tdd-green", "tdd-workflows-tdd-refactor"] },
+      N6_C: { label: "Web / Next.js / TypeScript", skills: ["typescript-pro", "typescript-advanced-types", "javascript-pro", "modern-javascript-patterns", "nextjs-app-router-patterns", "frontend-developer", "frontend-mobile-development-component-scaffold", "react-state-management", "react-modernization", "nodejs-backend-patterns"] },
+      N6_D: { label: "Mobile & Cross-Platform", skills: ["multi-platform-apps-multi-platform", "mobile-developer", "react-native-architecture", "flutter-expert", "ios-developer"] },
+      N6_E: { label: "Python Backend (FastAPI / Django)", skills: ["python-pro", "async-python-patterns", "fastapi-pro", "fastapi-templates", "django-pro", "python-performance-optimization", "python-packaging"] },
+      N6_F: { label: "Go / Rust / Java / .NET / Systems", skills: ["golang-pro", "go-concurrency-patterns", "rust-pro", "rust-async-patterns", "memory-safety-patterns", "c-pro", "cpp-pro", "java-pro", "dotnet-architect", "dotnet-backend-patterns", "csharp-pro", "ruby-pro", "php-pro", "elixir-pro", "scala-pro", "haskell-pro", "julia-pro"] },
+      N6_G1: { label: "Resilient Error Handling", skills: ["error-handling-patterns"] },
+      N6_G2: { label: "Legacy Modernization & Upgrades", skills: ["angular-migration", "framework-migration-code-migrate", "framework-migration-deps-upgrade", "framework-migration-legacy-modernize", "legacy-modernizer", "dependency-upgrade"] },
+      N7_A1: { label: "Auth & RBAC", skills: ["auth-implementation-patterns"] },
+      N7_A2: { label: "Payments, Subscriptions & PCI", skills: ["payment-integration", "stripe-integration", "paypal-integration", "billing-automation", "pci-compliance"] },
+      N7_B: { label: "AI, Prompts, RAG & Evals", skills: ["ai-engineer", "prompt-engineer", "prompt-engineering-patterns", "llm-application-dev-prompt-optimize", "llm-application-dev-ai-assistant", "langchain-architecture", "llm-application-dev-langchain-agent", "rag-implementation", "embedding-strategies", "vector-database-engineer", "vector-index-tuning", "similarity-search-patterns", "hybrid-search-implementation", "llm-evaluation"] },
+      N7_C: { label: "Data Pipelines, ML, Temporal & Quant", skills: ["data-engineer", "data-engineering-data-pipeline", "data-engineering-data-driven-feature", "data-quality-frameworks", "airflow-dag-patterns", "dbt-transformation-patterns", "spark-optimization", "data-scientist", "ml-engineer", "mlops-engineer", "ml-pipeline-workflow", "machine-learning-ops-ml-pipeline", "workflow-orchestration-patterns", "temporal-python-pro", "quant-analyst", "backtesting-frameworks", "risk-manager", "risk-metrics-calculation"] },
+      N7_D1: { label: "Web3 & Smart Contracts", skills: ["blockchain-developer", "solidity-security", "defi-protocol-templates", "nft-standards", "web3-testing"] },
+      N7_D2: { label: "Game Development", skills: ["godot-gdscript-patterns", "unity-developer", "unity-ecs-patterns", "minecraft-bukkit-pro"] },
+      N7_D3: { label: "Embedded, Firmware & Reverse Eng.", skills: ["arm-cortex-expert", "firmware-analyst", "binary-analysis-patterns", "anti-reversing-techniques", "protocol-reverse-engineering", "reverse-engineer", "malware-analyst", "memory-forensics"] },
+      N8_A1: { label: "JS/TS Testing & API Mocks", skills: ["javascript-testing-patterns", "unit-testing-test-generate", "test-automator", "api-testing-observability-api-mock"] },
+      N8_A2: { label: "Python & Temporal Testing", skills: ["python-testing-patterns", "temporal-python-testing", "unit-testing-test-generate", "test-automator", "api-testing-observability-api-mock"] },
+      N8_B: { label: "E2E & Visual QA", skills: ["e2e-testing-patterns", "ui-visual-validator"] },
+      N8_C: { label: "Debug & Track Rollback", skills: ["debugger", "debugging-strategies", "error-detective", "debugging-toolkit-smart-debug", "error-diagnostics-smart-debug", "error-debugging-error-analysis", "error-diagnostics-error-analysis", "distributed-debugging-debug-trace", "conductor-revert"] },
+      N8_D: { label: "Code Review, Refactor & Perf", skills: ["code-reviewer", "code-review-excellence", "code-review-ai-ai-review", "comprehensive-review-full-review", "error-debugging-multi-agent-review", "performance-testing-review-ai-review", "performance-testing-review-multi-agent-review", "code-refactoring-refactor-clean", "codebase-cleanup-refactor-clean", "code-refactoring-tech-debt", "codebase-cleanup-tech-debt", "application-performance-performance-optimization", "performance-engineer"] },
+      N9_A: { label: "App Security, SAST & Supply Chain", skills: ["security-auditor", "backend-security-coder", "frontend-security-coder", "frontend-mobile-security-xss-scan", "mobile-security-coder", "security-scanning-security-hardening", "security-scanning-security-sast", "sast-configuration", "secrets-management", "dependency-management-deps-audit", "codebase-cleanup-deps-audit", "security-scanning-security-dependencies"] },
+      N9_C1: { label: "Legal & GDPR Privacy", skills: ["legal-advisor", "gdpr-data-handling", "security-compliance-compliance-check"] },
+      N9_C2: { label: "HR & Employment Contracts", skills: ["hr-pro", "employment-contract-templates"] },
+      N10_A: { label: "Git, PRs & Team Sync", skills: ["git-pr-workflows-git-workflow", "git-advanced-workflows", "git-pr-workflows-pr-enhance", "comprehensive-review-pr-enhance", "changelog-automation", "team-collaboration-issue", "team-collaboration-standup-notes"] },
+      N10_B1: { label: "CI/CD Pipelines & Deployment", skills: ["github-actions-templates", "gitlab-ci-patterns", "cicd-automation-workflow-automate", "deployment-engineer", "deployment-pipeline-design", "deployment-validation-config-validate"] },
+      N10_B2: { label: "Bash & Shell Automation", skills: ["bash-pro", "bash-defensive-patterns", "bats-testing-patterns", "posix-shell-pro", "shellcheck-configuration"] },
+      N10_C: { label: "Cloud, Terraform & Kubernetes", skills: ["cloud-architect", "multi-cloud-architecture", "hybrid-cloud-architect", "hybrid-cloud-networking", "network-engineer", "cost-optimization", "database-cloud-optimization-cost-optimize", "terraform-specialist", "terraform-module-library", "kubernetes-architect", "k8s-manifest-generator", "k8s-security-policies", "helm-chart-scaffolding", "gitops-workflow", "istio-traffic-management", "linkerd-patterns", "service-mesh-expert", "mtls-configuration"] },
+      N11_A: { label: "Monitoring, Tracing & SLOs", skills: ["observability-engineer", "observability-monitoring-monitor-setup", "observability-monitoring-slo-implement", "slo-implementation", "error-debugging-error-trace", "error-diagnostics-error-trace", "distributed-tracing", "prometheus-configuration", "grafana-dashboards", "service-mesh-observability"] },
+      N11_B: { label: "SRE Incidents & Postmortems", skills: ["devops-troubleshooter", "incident-responder", "incident-response-incident-response", "incident-response-smart-fix", "incident-runbook-templates", "on-call-handoff-patterns", "postmortem-writing"] },
+      N12_A: { label: "Docs, Tutorials & Onboarding", skills: ["docs-architect", "code-documentation-doc-generate", "documentation-generation-doc-generate", "code-documentation-code-explain", "tutorial-engineer", "reference-builder", "git-pr-workflows-onboard"] },
+      N12_B: { label: "Launch Marketing & Support", skills: ["content-marketer", "sales-automator", "customer-support"] },
+      N12_C: { label: "SEO Content & Technical Flywheel", skills: ["seo-content-planner", "seo-structure-architect", "seo-keyword-strategist", "seo-meta-optimizer", "seo-content-writer", "seo-snippet-hunter", "seo-content-auditor", "seo-authority-builder", "seo-cannibalization-detector", "seo-content-refresher"] },
+    };
+
+    // Overlapping duplicates to filter out automatically when "Hide duplicates" is checked
+    const REDUNDANT_DUPLICATES = new Set([
+      "code-refactoring-context-restore",
+      "codebase-cleanup-refactor-clean",
+      "codebase-cleanup-tech-debt",
+      "codebase-cleanup-deps-audit",
+      "security-scanning-security-dependencies",
+      "documentation-generation-doc-generate",
+      "comprehensive-review-pr-enhance",
+      "error-diagnostics-error-analysis",
+      "error-diagnostics-error-trace",
+      "error-diagnostics-smart-debug",
+      "performance-testing-review-ai-review",
+      "performance-testing-review-multi-agent-review",
+      "database-cloud-optimization-cost-optimize",
+      "observability-monitoring-slo-implement",
+    ]);
+
+    // Decision Tree Questions (Plain-English If / Else Nodes)
+    const QUESTIONS = [
+      {
+        id: "Q0",
+        stage: "Step 1: Tool Setup",
+        question: "Are you setting up your AI coding tools or agent prompts first?",
+        hint: "If Antigravity already works and you just want to build your app, click 'No'.",
+        options: [
+          { label: "No — skip straight to my project", desc: "My tools and skills are already ready to go", blocks: [], next: "Q1" },
+          { label: "Yes — organize skills & dev setup", desc: "Install/pick skills and tidy up dev speed", blocks: ["N0_A"], next: "Q1" },
+          { label: "Yes — also tune AI agent prompts", desc: "Organize skills AND optimize multi-agent teamwork", blocks: ["N0_A", "N0_B"], next: "Q1" },
+        ],
+      },
+      {
+        id: "Q1",
+        stage: "Step 2: Idea Check",
+        question: "Do you already know what your app should do, or do you want research first?",
+        hint: "Most side projects & hackathons click 'Yes, I know what I want'. Pick research for a new startup idea.",
+        options: [
+          { label: "Yes, I know what I want to build", desc: "Skip market research and start planning right away", blocks: [], next: "Q2" },
+          { label: "Check competitors & market demand first", desc: "Research rival apps, user pain points, and sizing", blocks: ["N1_A"], next: "Q2" },
+          { label: "Make an investor pitch & financial plan", desc: "Full market research PLUS revenue/cost forecasts", blocks: ["N1_A", "N1_B"], next: "Q2" },
+        ],
+      },
+      {
+        id: "Q2",
+        stage: "Step 3: Project Plan & Memory",
+        question: "Are you starting fresh today, or continuing work from earlier sessions?",
+        hint: "Sets up Conductor to track your project plan step-by-step so the AI stays on track.",
+        options: [
+          { label: "Brand new project today", desc: "Create a fresh product spec and step-by-step task list", blocks: ["N2_A", "N2_C"], next: "Q2_SCAF" },
+          { label: "Continuing a multi-session build", desc: "Also save/restore memory across long chat threads", blocks: ["N2_A", "N2_B", "N2_C"], next: "Q2_SCAF" },
+        ],
+      },
+      {
+        id: "Q2_SCAF",
+        stage: "Step 4: Starter Files",
+        question: "Do you need an empty starter code folder created for you?",
+        hint: "Pick a language template if your project folder is empty, or choose 'No' if files already exist.",
+        options: [
+          { label: "No — my project folder already exists", desc: "Skip generating starter boilerplate files", blocks: [], next: "Q3" },
+          { label: "Yes — TypeScript / JavaScript starter", desc: "Create package.json, tsconfig & starter folders", blocks: ["N2_E_TS"], next: "Q3" },
+          { label: "Yes — Python starter (uv)", desc: "Create pyproject.toml, uv env & starter folders", blocks: ["N2_E_PY"], next: "Q3" },
+          { label: "Yes — Rust starter", desc: "Create Cargo.toml and a Rust crate structure", blocks: ["N2_E_RS"], next: "Q3" },
+        ],
+      },
+      {
+        id: "Q3",
+        stage: "Step 5: App Size & Structure",
+        question: "How big is the project you're building?",
+        hint: "Small scripts skip architecture planning. Real web/mobile apps usually pick 'Standard app'.",
+        options: [
+          { label: "Small script or quick utility", desc: "Just a few files — skip architecture & API contracts", blocks: [], next: "Q4" },
+          { label: "Standard web or mobile app", desc: "Clean backend/app structure and design decisions", blocks: ["N3_A"], next: "Q3_API" },
+          { label: "Large multi-app workspace (Monorepo)", desc: "Multiple apps sharing code plus architecture diagrams", blocks: ["N3_A", "N3_B", "N3_C"], next: "Q3_API" },
+        ],
+      },
+      {
+        id: "Q3_API",
+        stage: "Step 6: Server APIs & Input Safety",
+        question: "Will users submit forms, log in, or upload files/photos to your backend?",
+        hint: "Whenever users send inputs or upload photos/receipts, include safety checks so attackers can't abuse endpoints.",
+        options: [
+          { label: "Yes — standard API + safety checks (Most common)", desc: "JSON REST endpoints plus upload/input threat check", blocks: ["N3_D1", "N3_E"], next: "Q4" },
+          { label: "Yes — GraphQL API + safety checks", desc: "GraphQL schema design plus input safety check", blocks: ["N3_D2", "N3_E"], next: "Q4" },
+          { label: "Private internal API only (trusted team)", desc: "Internal endpoints without public security review", blocks: ["N3_D1"], next: "Q4" },
+          { label: "No backend API needed", desc: "Everything runs inside the browser or CLI only", blocks: [], next: "Q4" },
+        ],
+      },
+      {
+        id: "Q4",
+        stage: "Step 7: Saving Data",
+        question: "Does your app need to save data in a database (users, bills, orders, posts)?",
+        hint: "Pick 'Database + safe live updates' for most real apps so future changes won't break existing user data.",
+        options: [
+          { label: "No — nothing saved to a database", desc: "Browser-only state or stateless calculator/tool", blocks: [], next: "Q5" },
+          { label: "Yes — basic database (quick start)", desc: "Postgres/SQL tables and fast queries", blocks: ["N4_A"], next: "Q5" },
+          { label: "Yes — database + safe live updates (Recommended)", desc: "SQL tables PLUS zero-downtime migration scripts", blocks: ["N4_A", "N4_B"], next: "Q5" },
+          { label: "Yes — full financial audit trail / ledger", desc: "Save every edit forever as an event history (CQRS)", blocks: ["N4_A", "N4_C", "N4_B"], next: "Q5" },
+        ],
+      },
+      {
+        id: "Q5",
+        stage: "Step 8: Screens & Design",
+        question: "Will users tap buttons on a screen, or is it backend / command-line only?",
+        hint: "Accessibility checks verify color contrast, keyboard use, and screen-reader labels.",
+        options: [
+          { label: "Yes — screens + accessibility check (Recommended)", desc: "Plan layout/Tailwind colors PLUS WCAG checks", blocks: ["N5_A", "N5_B"], next: "Q6" },
+          { label: "Yes — screens & visual styling only", desc: "Plan user flows, dashboard layout & Tailwind UI", blocks: ["N5_A"], next: "Q6" },
+          { label: "No screens — backend API or CLI only", desc: "Skip all UI design and frontend accessibility", blocks: [], next: "Q6" },
+        ],
+      },
+      {
+        id: "Q6",
+        stage: "Step 9: Coding Style & Tests",
+        question: "How strictly should the AI write tests while coding features?",
+        hint: "Writing tests first (TDD) prevents math, split, or payment bugs. Building fast skips strict test-first loops.",
+        options: [
+          { label: "Write tests first, then code (TDD — Safest)", desc: "Runs Red -> Green -> Refactor on each task step", blocks: ["N6_A", "N6_B"], next: "Q6_STACK" },
+          { label: "Build features first, test afterward (Faster)", desc: "Moves step-by-step faster for quick prototypes", blocks: ["N6_A"], next: "Q6_STACK" },
+        ],
+      },
+      {
+        id: "Q6_STACK",
+        stage: "Step 10: Language / Platform",
+        question: "What coding language or platform are you building with?",
+        hint: "If you're unsure for a browser app or website, choose 'Website / Web App (Next.js / TS)'.",
+        options: [
+          { label: "Website / Web App (Next.js / React / TS)", desc: "Browser app + Node/TypeScript backend + Tailwind", blocks: ["N6_C", "N6_G1"], next: "Q7_AUTH" },
+          { label: "Phone App + Web (React Native / Flutter / iOS)", desc: "Mobile app on phones plus web backend", blocks: ["N6_C", "N6_D", "N6_G1"], next: "Q7_AUTH" },
+          { label: "Python App / Backend (FastAPI / Django)", desc: "Python web APIs, scripts, automation, or AI backend", blocks: ["N6_E", "N6_G1"], next: "Q7_AUTH" },
+          { label: "Go / Rust / Java / .NET / C++ Backend", desc: "Compiled or high-speed backend languages", blocks: ["N6_F", "N6_G1"], next: "Q7_AUTH" },
+          { label: "Updating an old codebase (Legacy Migration)", desc: "Modernizing Angular, old React, or outdated packages", blocks: ["N6_C", "N6_G1", "N6_G2"], next: "Q7_AUTH" },
+        ],
+      },
+      {
+        id: "Q7_AUTH",
+        stage: "Step 11: Accounts & Payments",
+        question: "Do users need to log in or pay money inside your app?",
+        hint: "Public share-link tools (like quick bill splitters) often skip login & checkout for faster sharing.",
+        options: [
+          { label: "Neither — anyone can open and use it", desc: "Instant access or shareable links, no signup needed", blocks: [], next: "Q7_AI" },
+          { label: "Login / user accounts only (free app)", desc: "Sign up, OAuth login, sessions & role permissions", blocks: ["N7_A1"], next: "Q7_AI" },
+          { label: "Login + take payments (Stripe / PayPal)", desc: "Accounts PLUS checkout, billing & card compliance", blocks: ["N7_A1", "N7_A2"], next: "Q7_AI" },
+        ],
+      },
+      {
+        id: "Q7_AI",
+        stage: "Step 12: AI Features Inside App",
+        question: "Will your finished app have AI features (scanning photos/receipts, chat, smart search)?",
+        hint: "Pick 'Yes' only if your end-users use AI features inside the app itself.",
+        options: [
+          { label: "No AI features inside the app", desc: "Standard app buttons and formulas only", blocks: [], next: "Q7_EXTRA" },
+          { label: "Yes — AI chat, receipt/photo scan, or doc search", desc: "Adds prompt tuning, vector search (RAG) & evals", blocks: ["N7_B"], next: "Q7_EXTRA" },
+        ],
+      },
+      {
+        id: "Q7_EXTRA",
+        stage: "Step 13: Specialty Domains",
+        question: "Is your app in any of these specialized fields?",
+        hint: "Most everyday web/mobile apps click 'None of these — regular app'.",
+        options: [
+          { label: "None of these — regular web/mobile/API app", desc: "Skip specialty toolkits and go straight to QA", blocks: [], next: "Q8" },
+          { label: "Data pipelines, ML training, or finance trading", desc: "Airflow/dbt ETL, ML models, Spark, or backtesting", blocks: ["N7_C"], next: "Q8" },
+          { label: "Crypto / Web3 / Blockchain / NFTs", desc: "Smart contracts, DeFi templates & Solidity audits", blocks: ["N7_D1"], next: "Q8" },
+          { label: "Video Games (Unity / Godot / Minecraft)", desc: "Game loops, GDScript, C# Unity ECS & servers", blocks: ["N7_D2"], next: "Q8" },
+          { label: "Embedded chips, firmware, or reverse engineering", desc: "ARM devices, binary/malware & protocol analysis", blocks: ["N7_D3"], next: "Q8" },
+        ],
+      },
+      {
+        id: "Q8",
+        stage: "Step 14: Testing & Code Review",
+        question: "How should the AI test and inspect your code before launch?",
+        hint: "Includes automatic bug debugging (and safe rollback) if tests fail, plus final code cleanup when green.",
+        options: [
+          { label: "Click through UI in a real browser + review", desc: "Best for web/UI apps: unit tests, E2E & visual QA", blocks: ["N8_A1", "N8_B", "N8_C", "N8_D"], next: "Q9" },
+          { label: "Test Python backend/APIs + debug + review", desc: "Best for Python apps: pytest, API mocks & speed review", blocks: ["N8_A2", "N8_C", "N8_D"], next: "Q9" },
+          { label: "Test backend API / CLI logic only (no browser)", desc: "Best for APIs/Go/Rust/CLI: unit tests & code review", blocks: ["N8_A1", "N8_C", "N8_D"], next: "Q9" },
+        ],
+      },
+      {
+        id: "Q9",
+        stage: "Step 15: Security & Privacy Rules",
+        question: "Who will use this app, and should we check security & privacy laws?",
+        hint: "If strangers on the internet sign up or enter personal details, include a public security scan + privacy check.",
+        options: [
+          { label: "Just for me / quick local demo", desc: "Skip security audits and legal/privacy paperwork", blocks: [], next: "Q10" },
+          { label: "Security & dependency scan only", desc: "Check code & npm/pip packages for bugs, skip legal docs", blocks: ["N9_A"], next: "Q10" },
+          { label: "Public launch with real user data", desc: "Security scan PLUS GDPR privacy & compliance checks", blocks: ["N9_A", "N9_C1"], next: "Q10" },
+          { label: "Public company + hiring / team contracts", desc: "Security, GDPR privacy AND HR employment contracts", blocks: ["N9_A", "N9_C1", "N9_C2"], next: "Q10" },
+        ],
+      },
+      {
+        id: "Q10",
+        stage: "Step 16: Git & Putting It Online",
+        question: "Where do you want to put your code and host the finished app?",
+        hint: "Modern hosts like Vercel, Railway, or Netlify deploy directly from GitHub with zero server setup.",
+        options: [
+          { label: "Keep local / GitHub PRs only (no cloud host)", desc: "Clean Git workflow, PRs & changelog without hosting", blocks: ["N10_A"], next: "Q11" },
+          { label: "Easy cloud host (Vercel / Railway / Netlify)", desc: "GitHub workflows PLUS automatic CI/CD push-to-live", blocks: ["N10_A", "N10_B1"], next: "Q11" },
+          { label: "Easy cloud + custom server Bash scripts", desc: "Auto-deploy PLUS tested shell scripts for servers", blocks: ["N10_A", "N10_B1", "N10_B2"], next: "Q11" },
+          { label: "Enterprise cloud (AWS / Terraform / Kubernetes)", desc: "Full infrastructure-as-code, Helm & cluster scaling", blocks: ["N10_A", "N10_B1", "N10_B2", "N10_C"], next: "Q11" },
+        ],
+      },
+      {
+        id: "Q11",
+        stage: "Step 17: Live Crash Alerts",
+        question: "Once your app is live, do you want crash dashboards and emergency alerts?",
+        hint: "Hackathons and early MVPs can skip this; apps with real paying traffic add dashboards.",
+        options: [
+          { label: "Skip for now (MVP / basic host logs)", desc: "Built-in host logs are plenty to start", blocks: [], next: "Q12" },
+          { label: "Yes — uptime charts & error tracing", desc: "Add Prometheus/Grafana dashboards & distributed traces", blocks: ["N11_A"], next: "Q12" },
+          { label: "Yes — full 24/7 on-call crash playbooks", desc: "Live charts PLUS incident runbooks & postmortems", blocks: ["N11_A", "N11_B"], next: "Q12" },
+        ],
+      },
+      {
+        id: "Q12",
+        stage: "Step 18: Docs & Marketing",
+        question: "Last step: Do you need README docs, launch copy, or Google search growth (SEO)?",
+        hint: "Choose what helps people understand or discover your finished app.",
+        options: [
+          { label: "All set — skip extra docs & marketing", desc: "Finish now with just your engineering workflow", blocks: [], next: "DONE" },
+          { label: "Write README, API docs & user guides only", desc: "Clear onboarding guides and tutorials for your repo", blocks: ["N12_A"], next: "DONE" },
+          { label: "Landing page copy, customer support & SEO", desc: "Help users find your app on Google and convert", blocks: ["N12_B", "N12_C"], next: "DONE" },
+          { label: "Everything (Docs + Launch Copy + Support + SEO)", desc: "Complete documentation, launch marketing & SEO kit", blocks: ["N12_A", "N12_B", "N12_C"], next: "DONE" },
+        ],
+      },
+    ];
+
+    const PRESETS = {
+      billSplit: { Q0: 0, Q1: 0, Q2: 0, Q2_SCAF: 1, Q3: 1, Q3_API: 0, Q4: 2, Q5: 0, Q6: 0, Q6_STACK: 0, Q7_AUTH: 0, Q7_AI: 1, Q7_EXTRA: 0, Q8: 0, Q9: 1, Q10: 1, Q11: 0, Q12: 1 },
+      saas: { Q0: 0, Q1: 1, Q2: 0, Q2_SCAF: 1, Q3: 1, Q3_API: 0, Q4: 2, Q5: 0, Q6: 0, Q6_STACK: 0, Q7_AUTH: 2, Q7_AI: 0, Q7_EXTRA: 0, Q8: 0, Q9: 2, Q10: 1, Q11: 1, Q12: 2 },
+      script: { Q0: 0, Q1: 0, Q2: 0, Q2_SCAF: 2, Q3: 0, Q4: 0, Q5: 2, Q6: 1, Q6_STACK: 2, Q7_AUTH: 0, Q7_AI: 0, Q7_EXTRA: 0, Q8: 1, Q9: 0, Q10: 0, Q11: 0, Q12: 0 },
+    };
+
+    const qMap = Object.fromEntries(QUESTIONS.map(q => [q.id, q]));
+    let currentQId = "Q0";
+    let answers = {}; // qId -> optionIndex
+    let showAllMode = false;
+
+    const btnBack = document.getElementById("btn-back");
+    const qStepBadge = document.getElementById("q-step-badge");
+    const qStage = document.getElementById("q-stage");
+    const qTitle = document.getElementById("q-title");
+    const qHint = document.getElementById("q-hint");
+    const qOptions = document.getElementById("q-options");
+    const breadcrumb = document.getElementById("breadcrumb");
+    const flowGrid = document.getElementById("flow-grid");
+    const loadoutSteps = document.getElementById("loadout-steps");
+    const loadoutStats = document.getElementById("loadout-stats");
+    const dedupToggle = document.getElementById("dedup-toggle");
+    const searchBox = document.getElementById("search-box");
+    const copyStatus = document.getElementById("copy-status");
+
+    function countUniqueSkillsInOption(opt) {
+      const dedup = dedupToggle.checked;
+      const seen = new Set();
+      opt.blocks.forEach(bid => {
+        BLOCKS[bid].skills.forEach(sk => {
+          if (!dedup || !REDUNDANT_DUPLICATES.has(sk)) seen.add(sk);
+        });
+      });
+      return seen.size;
+    }
+
+    function getTraversalState() {
+      const selected = [];
+      const visitedQ = new Set();
+      const trail = [];
+      let ptr = "Q0";
+      while (ptr && ptr !== "DONE" && !visitedQ.has(ptr)) {
+        const ansIdx = answers[ptr];
+        const q = qMap[ptr];
+        if (!q || ansIdx === undefined) break;
+        visitedQ.add(ptr);
+        const opt = q.options[ansIdx];
+        trail.push({ qId: ptr, label: opt.label });
+        opt.blocks.forEach(b => selected.push({ qId: ptr, blockId: b }));
+        ptr = opt.next;
+      }
+      return { selected, visitedQ, trail };
+    }
+
+    function getPreviousQuestionId(trail) {
+      if (!trail.length) return null;
+      if (currentQId === "DONE") return trail[trail.length - 1].qId;
+      const idx = trail.findIndex(t => t.qId === currentQId);
+      if (idx > 0) return trail[idx - 1].qId;
+      if (idx === 0) return null;
+      return trail[trail.length - 1].qId;
+    }
+
+    function renderQuestionBox() {
+      const idx = QUESTIONS.findIndex(q => q.id === currentQId);
+      const { trail } = getTraversalState();
+      const prevQId = getPreviousQuestionId(trail);
+      btnBack.disabled = !prevQId;
+
+      if (currentQId === "DONE") {
+        qStepBadge.textContent = "Finished";
+        qStage.textContent = "All Done";
+        qTitle.textContent = "Your custom workflow is ready in the right panel!";
+        qHint.textContent = "Click any breadcrumb pill above or any card below to change an answer, or copy your skills on the right.";
+        qOptions.innerHTML = `<button type="button" onclick="restartTree()" class="text-xs font-medium px-3.5 py-2.5 rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)] cursor-pointer hover:opacity-90">Start Over</button>`;
+      } else {
+        const q = qMap[currentQId];
+        qStepBadge.textContent = `Question ${idx + 1} of ${QUESTIONS.length}`;
+        qStage.textContent = q.stage;
+        qTitle.textContent = q.question;
+        qHint.textContent = q.hint;
+        qOptions.innerHTML = "";
+        q.options.forEach((opt, oIdx) => {
+          const isChosen = answers[q.id] === oIdx;
+          const skillCount = countUniqueSkillsInOption(opt);
+          const countText = skillCount === 0 ? "Skips this step (0 skills)" : `+${skillCount} skill${skillCount === 1 ? "" : "s"}`;
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = `text-left rounded-xl border p-3 cursor-pointer transition-colors flex flex-col justify-between gap-2 ${
+            isChosen
+              ? "border-[var(--primary)] bg-[var(--primary)] text-[var(--primary-foreground)]"
+              : "border-[var(--border)] bg-[var(--background)] text-[var(--foreground)] hover:border-[var(--primary)]"
+          }`;
+          btn.innerHTML = `
+            <div>
+              <div class="text-xs font-semibold">${isChosen ? "&#10003; " : ""}${opt.label}</div>
+              <div class="text-xs mt-1 ${isChosen ? "opacity-90" : "text-[var(--muted-foreground)]"}">${opt.desc}</div>
+            </div>
+            <div class="text-xs font-mono ${isChosen ? "opacity-90" : "text-[var(--muted-foreground)]"}">${countText}</div>
+          `;
+          btn.addEventListener("click", () => {
+            showAllMode = false;
+            answers[q.id] = oIdx;
+            currentQId = opt.next;
+            renderAll();
+          });
+          qOptions.appendChild(btn);
+        });
+      }
+
+      // Breadcrumb trail along active path only
+      breadcrumb.innerHTML = trail.map(({ qId, label }) =>
+        `<button type="button" onclick="jumpTo('${qId}')" class="px-2 py-0.5 rounded bg-[var(--secondary)] text-[var(--secondary-foreground)] hover:opacity-80 cursor-pointer">${qMap[qId].stage}: ${label}</button>`
+      ).join(" &rarr; ") || "Pick your first answer below (or click a quick example above).";
+    }
+
+    function renderFlowGrid() {
+      const query = searchBox.value.trim().toLowerCase();
+      const { visitedQ } = getTraversalState();
+
+      flowGrid.innerHTML = "";
+      QUESTIONS.forEach((q, qIdx) => {
+        const chosenIdx = answers[q.id];
+        const isCurrent = currentQId === q.id && !showAllMode;
+        const isAnswered = visitedQ.has(q.id) && chosenIdx !== undefined;
+        const matchesSearch = !query ||
+          q.question.toLowerCase().includes(query) ||
+          q.stage.toLowerCase().includes(query) ||
+          q.options.some(o =>
+            o.label.toLowerCase().includes(query) ||
+            o.desc.toLowerCase().includes(query) ||
+            o.blocks.some(bid => BLOCKS[bid].skills.some(sk => sk.toLowerCase().includes(query)))
+          );
+
+        const card = document.createElement("div");
+        card.className = `card-hover rounded-xl border border-[var(--border)] bg-[var(--card)] p-3.5 flex flex-col gap-2.5 ${
+          isCurrent ? "node-active" : isAnswered ? "node-visited" : ""
+        } ${!matchesSearch ? "node-dimmed" : ""}`;
+
+        const header = document.createElement("button");
+        header.type = "button";
+        header.className = "text-left cursor-pointer";
+        header.innerHTML = `
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-mono font-semibold px-2 py-0.5 rounded bg-[var(--secondary)] text-[var(--secondary-foreground)]">#${qIdx + 1} &bull; ${q.id}</span>
+            <span class="text-xs text-[var(--muted-foreground)]">${q.stage}</span>
+          </div>
+          <div class="text-xs font-semibold text-[var(--foreground)] mt-1.5">${q.question}</div>
+        `;
+        header.addEventListener("click", () => jumpTo(q.id));
+        card.appendChild(header);
+
+        // Branches inside this decision card
+        const branchesEl = document.createElement("div");
+        branchesEl.className = "space-y-2 border-t border-[var(--border)] pt-2";
+
+        q.options.forEach((opt, oIdx) => {
+          const isBranchSelected = showAllMode || (isAnswered && chosenIdx === oIdx);
+          const row = document.createElement("div");
+          row.className = `rounded-lg border p-2 ${
+            isBranchSelected
+              ? "border-[var(--primary)] bg-[var(--background)]"
+              : "border-[var(--border)] bg-[var(--background)] opacity-60"
+          }`;
+
+          const branchBtn = document.createElement("button");
+          branchBtn.type = "button";
+          branchBtn.className = "w-full text-left cursor-pointer";
+          branchBtn.innerHTML = `
+            <div class="flex items-center justify-between gap-2 text-xs font-medium text-[var(--foreground)]">
+              <span>${opt.label}</span>
+              <span class="font-mono text-[var(--muted-foreground)] shrink-0">&rarr; ${opt.next}</span>
+            </div>
+            <div class="text-xs text-[var(--muted-foreground)] mt-0.5">${opt.desc}</div>
+          `;
+          branchBtn.addEventListener("click", () => {
+            showAllMode = false;
+            answers[q.id] = oIdx;
+            currentQId = opt.next;
+            renderAll();
+          });
+          row.appendChild(branchBtn);
+
+          if (opt.blocks.length > 0) {
+            const pills = document.createElement("div");
+            pills.className = "flex flex-wrap gap-1 mt-1.5";
+            const seenInOpt = new Set();
+            opt.blocks.forEach(bid => {
+              BLOCKS[bid].skills.forEach(sk => {
+                if (seenInOpt.has(sk)) return;
+                seenInOpt.add(sk);
+                const hit = query && sk.toLowerCase().includes(query);
+                const span = document.createElement("span");
+                span.className = `text-xs px-1.5 py-0.5 rounded border ${
+                  hit
+                    ? "border-[var(--primary)] bg-[var(--primary)] text-[var(--primary-foreground)]"
+                    : "border-[var(--border)] bg-[var(--card)] text-[var(--muted-foreground)]"
+                }`;
+                span.textContent = sk;
+                pills.appendChild(span);
+              });
+            });
+            row.appendChild(pills);
+          }
+
+          branchesEl.appendChild(row);
+        });
+
+        card.appendChild(branchesEl);
+        flowGrid.appendChild(card);
+      });
+    }
+
+    function getCompiledLoadout() {
+      const dedup = dedupToggle.checked;
+      const seen = new Set();
+      const groups = [];
+      const { selected } = getTraversalState();
+
+      if (showAllMode) {
+        Object.entries(BLOCKS).forEach(([bid, blk]) => {
+          const kept = blk.skills.filter(sk => (!dedup || !REDUNDANT_DUPLICATES.has(sk)) && !seen.has(sk));
+          kept.forEach(s => seen.add(s));
+          if (kept.length) groups.push({ blockId: bid, label: blk.label, skills: kept });
+        });
+      } else {
+        selected.forEach(({ blockId }) => {
+          const blk = BLOCKS[blockId];
+          const kept = blk.skills.filter(sk => (!dedup || !REDUNDANT_DUPLICATES.has(sk)) && !seen.has(sk));
+          kept.forEach(s => seen.add(s));
+          if (kept.length) groups.push({ blockId, label: blk.label, skills: kept });
+        });
+      }
+      return { groups, total: seen.size };
+    }
+
+    function buildWizardPayload() {
+      const { groups } = getCompiledLoadout();
+      const { trail } = getTraversalState();
+      const selectedSkills = groups.flatMap(g => g.skills);
+      return {
+        version: "1.0",
+        generatedAt: new Date().toISOString(),
+        dedupApplied: dedupToggle.checked,
+        mode: showAllMode ? "all_skills" : "wizard_path",
+        totalSkills: selectedSkills.length,
+        selectedSkills,
+        blocks: groups.map(g => ({ blockId: g.blockId, label: g.label, skills: g.skills })),
+        answers: showAllMode ? [] : trail.map(t => ({
+          qId: t.qId,
+          stage: qMap[t.qId].stage,
+          question: qMap[t.qId].question,
+          chosenLabel: t.label,
+        })),
+      };
+    }
+
+    function renderLoadout() {
+      const { groups, total } = getCompiledLoadout();
+      loadoutStats.textContent = `${total} unique skill${total === 1 ? "" : "s"} in active path`;
+      if (groups.length === 0) {
+        loadoutSteps.innerHTML = `<div class="text-xs text-[var(--muted-foreground)]">Answer questions at the top (or click a Quick Example) to populate your skill loadout.</div>`;
+        return;
+      }
+      loadoutSteps.innerHTML = groups.map(g => `
+        <div class="rounded-lg border border-[var(--border)] bg-[var(--background)] p-2.5">
+          <div class="text-xs font-semibold text-[var(--foreground)] mb-1.5">${g.label} (${g.skills.length})</div>
+          <div class="flex flex-wrap gap-1">
+            ${g.skills.map(s => `<code class="text-xs px-1.5 py-0.5 rounded bg-[var(--secondary)] text-[var(--secondary-foreground)]">${s}</code>`).join("")}
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderAll() {
+      renderQuestionBox();
+      renderFlowGrid();
+      renderLoadout();
+    }
+
+    async function copyTextSafely(text, okMsg) {
+      try {
+        await navigator.clipboard.writeText(text);
+        copyStatus.textContent = okMsg;
+      } catch {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        const ok = document.execCommand("copy");
+        document.body.removeChild(ta);
+        copyStatus.textContent = ok ? okMsg : "Could not access clipboard in this preview.";
+      }
+    }
+
+    window.jumpTo = (qId) => {
+      showAllMode = false;
+      currentQId = qId;
+      renderAll();
+    };
+
+    window.restartTree = () => {
+      showAllMode = false;
+      answers = {};
+      currentQId = "Q0";
+      copyStatus.textContent = "";
+      renderAll();
+    };
+
+    btnBack.addEventListener("click", () => {
+      const { trail } = getTraversalState();
+      const prev = getPreviousQuestionId(trail);
+      if (prev) jumpTo(prev);
+    });
+
+    document.querySelectorAll(".preset-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const key = btn.getAttribute("data-preset");
+        if (!PRESETS[key]) return;
+        showAllMode = false;
+        answers = { ...PRESETS[key] };
+        currentQId = "DONE";
+        renderAll();
+      });
+    });
+
+    document.getElementById("btn-reset").addEventListener("click", window.restartTree);
+    document.getElementById("btn-show-all").addEventListener("click", () => {
+      showAllMode = !showAllMode;
+      renderAll();
+    });
+    dedupToggle.addEventListener("change", renderAll);
+    searchBox.addEventListener("input", renderFlowGrid);
+
+    function requireSelectedSkills() {
+      const payload = buildWizardPayload();
+      if (!payload.totalSkills) {
+        copyStatus.textContent = "Answer questions first (or pick a Quick Example) so at least 1 skill is selected.";
+        return null;
+      }
+      return payload;
+    }
+
+    document.getElementById("btn-download-json").addEventListener("click", () => {
+      const payload = requireSelectedSkills();
+      if (!payload) return;
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "wizard-selection.json";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      copyStatus.textContent = `Downloaded wizard-selection.json (${payload.totalSkills} skills). Drop it into your project or pass it to init-project.`;
+    });
+
+    document.getElementById("btn-copy-prompt").addEventListener("click", async () => {
+      const payload = requireSelectedSkills();
+      if (!payload) return;
+      const promptText = [
+        "Use `dynamic-workflow-architect` to generate my project's custom workflow, `.agents/skills.json`, `AGENTS.md`, `docs/WORKFLOW_PLAN.md`, `docs/SKILL_COVERAGE.md`, and stage docs using 100% of the selected wizard skills below (with context management and stage documentation enabled at every stage):",
+        "",
+        "```json",
+        JSON.stringify(payload, null, 2),
+        "```",
+      ].join("\n");
+      await copyTextSafely(promptText, `Copied chat setup prompt (${payload.totalSkills} skills). Paste this directly into Antigravity!`);
+    });
+
+    document.getElementById("btn-copy-skills-json").addEventListener("click", async () => {
+      const payload = requireSelectedSkills();
+      if (!payload) return;
+      const skillsJson = {
+        entries: [
+          {
+            path: ".agents/kit/skills",
+            include_only: payload.selectedSkills,
+          },
+        ],
+      };
+      await copyTextSafely(JSON.stringify(skillsJson, null, 2), `Copied .agents/skills.json config (${payload.totalSkills} skills). Set 'path' to your kit skills folder if located elsewhere.`);
+    });
+
+    document.getElementById("btn-copy-list").addEventListener("click", async () => {
+      const payload = requireSelectedSkills();
+      if (!payload) return;
+      await copyTextSafely(payload.selectedSkills.join("\n"), `Copied ${payload.totalSkills} skill names to clipboard.`);
+    });
+
+    document.getElementById("btn-copy-agents").addEventListener("click", async () => {
+      const payload = requireSelectedSkills();
+      if (!payload) return;
+      const lines = [
+        "# Project Skill Workflow (`AGENTS.md`)",
+        "",
+        `Active wizard loadout (${payload.totalSkills} skills). Ensure every skill below is tracked in \`docs/SKILL_COVERAGE.md\`:`,
+        "",
+        ...payload.blocks.map((g, i) => `${i + 1}. **${g.label}**: ${g.skills.map(s => "`" + s + "`").join(", ")}`),
+      ];
+      await copyTextSafely(lines.join("\n"), "Copied AGENTS.md workflow router to clipboard.");
+    });
+
+    renderAll();
+  </script>
+</body>
+</html>

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NairaBooks — Business Setup (Step 1 of 3)</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;family=Public+Sans:wght@500;600&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CDN with plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "primary": "#004424",
+            "on-tertiary-container": "#ffb389",
+            "error": "#ba1a1a",
+            "surface-container-highest": "#d5e3fd",
+            "primary-fixed-dim": "#89d7a2",
+            "secondary": "#2d6197",
+            "on-tertiary": "#ffffff",
+            "on-surface-variant": "#3f4941",
+            "tertiary": "#632900",
+            "primary-fixed": "#a4f4bd",
+            "on-primary-fixed": "#00210f",
+            "on-secondary": "#ffffff",
+            "inverse-on-surface": "#ebf1ff",
+            "on-error": "#ffffff",
+            "tertiary-fixed-dim": "#ffb68e",
+            "outline": "#6f7a70",
+            "surface-container-high": "#dde9ff",
+            "surface": "#f8f9ff",
+            "surface-container": "#e6eeff",
+            "surface-container-low": "#eff4ff",
+            "on-error-container": "#93000a",
+            "surface-variant": "#d5e3fd",
+            "secondary-container": "#92c1fe",
+            "on-secondary-container": "#144f84",
+            "surface-dim": "#ccdbf4",
+            "on-tertiary-fixed-variant": "#763300",
+            "on-primary-container": "#86d5a0",
+            "background": "#f8f9ff",
+            "on-tertiary-fixed": "#331200",
+            "error-container": "#ffdad6",
+            "tertiary-container": "#873b00",
+            "secondary-fixed": "#d2e4ff",
+            "on-surface": "#0d1c2f",
+            "outline-variant": "#bfc9be",
+            "on-primary-fixed-variant": "#00522d",
+            "tertiary-fixed": "#ffdbca",
+            "on-background": "#0d1c2f",
+            "inverse-surface": "#233144",
+            "on-secondary-fixed-variant": "#07497d",
+            "on-primary": "#ffffff",
+            "primary-container": "#005e34",
+            "on-secondary-fixed": "#001c37",
+            "secondary-fixed-dim": "#a0c9ff",
+            "surface-container-lowest": "#ffffff",
+            "surface-tint": "#196c40",
+            "inverse-primary": "#89d7a2",
+            "surface-bright": "#f8f9ff"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "fontFamily": {
+            "headline": ["Plus Jakarta Sans", "sans-serif"],
+            "display": ["Plus Jakarta Sans", "sans-serif"],
+            "body": ["Inter", "sans-serif"],
+            "label": ["Public Sans", "sans-serif"]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .material-symbols-fill {
+      font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+</head>
+<body class="bg-surface font-body text-on-surface antialiased min-h-screen flex flex-col selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- Accessibility Skip Link -->
+<a class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[60] focus:px-4 focus:py-2 focus:bg-primary-container focus:text-white focus:rounded-lg focus:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary" href="#main-content">
+    Skip to main content
+  </a>
+<!-- TopNavBar Shared Component Mapping -->
+<header class="fixed top-0 left-0 w-full z-50 bg-surface-container-lowest border-b border-outline-variant/30 shadow-sm">
+<div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+<!-- Left: Brand Logo & Wordmark -->
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-primary-container flex items-center justify-center text-white shadow-xs">
+<span class="material-symbols-outlined text-[20px]" data-icon="account_balance">account_balance</span>
+</div>
+<span class="font-headline font-black text-xl tracking-tight text-primary">NairaBooks</span>
+</div>
+<!-- Center: Stepper Indicator -->
+<div class="text-secondary font-semibold font-label text-sm uppercase tracking-wider">
+        Step 1 of 3
+      </div>
+<!-- Right: Trailing Secondary Action -->
+<div class="flex items-center">
+<a class="inline-flex items-center gap-1.5 text-on-surface-variant hover:text-primary transition-colors duration-150 font-medium font-label text-sm focus:ring-2 focus:ring-primary focus:outline-none rounded px-2 py-1" href="#help">
+<span class="material-symbols-outlined text-[18px]" data-icon="help_outline">help_outline</span>
+<span>Need help?</span>
+</a>
+</div>
+</div>
+</header>
+<!-- Main Canvas: Minimalist, Airy & Spatially Focused -->
+<main class="flex-1 flex flex-col justify-center pt-28 pb-20 px-6" id="main-content">
+<div class="w-full max-w-3xl mx-auto">
+<!-- Heading Section -->
+<div class="text-center space-y-3">
+<h1 class="font-headline font-extrabold text-3xl sm:text-4xl text-on-surface tracking-tight leading-tight">
+          What kind of business do you run?
+        </h1>
+<p class="text-on-surface-variant text-base sm:text-lg max-w-xl mx-auto leading-relaxed font-normal">
+          We will set up clean categories and reports tailored to how you work. You can change this anytime.
+        </p>
+</div>
+<!-- 3x2 Business Type Selector Grid -->
+<div aria-label="Select business category" class="mt-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5" role="radiogroup">
+<!-- Card 1: Retail & Online Shop -->
+<div aria-checked="false" class="group relative p-7 rounded-2xl bg-surface-container-lowest border border-outline-variant/50 shadow-sm hover:border-outline hover:shadow transition-all duration-150 flex flex-col justify-between text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" role="radio" tabindex="0">
+<div class="w-12 h-12 rounded-xl bg-surface flex items-center justify-center text-on-surface-variant group-hover:text-primary-container transition-colors mb-5">
+<span class="material-symbols-outlined text-[26px]" data-icon="store">store</span>
+</div>
+<div>
+<h2 class="font-headline font-bold text-base text-on-surface group-hover:text-primary-container transition-colors">
+              Retail &amp; Online Shop
+            </h2>
+<p class="text-on-surface-variant text-sm mt-1 leading-normal">
+              Sell products in store or online
+            </p>
+</div>
+</div>
+<!-- Card 2: Wholesale & Supply -->
+<div aria-checked="false" class="group relative p-7 rounded-2xl bg-surface-container-lowest border border-outline-variant/50 shadow-sm hover:border-outline hover:shadow transition-all duration-150 flex flex-col justify-between text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" role="radio" tabindex="0">
+<div class="w-12 h-12 rounded-xl bg-surface flex items-center justify-center text-on-surface-variant group-hover:text-primary-container transition-colors mb-5">
+<span class="material-symbols-outlined text-[26px]" data-icon="local_shipping">local_shipping</span>
+</div>
+<div>
+<h2 class="font-headline font-bold text-base text-on-surface group-hover:text-primary-container transition-colors">
+              Wholesale &amp; Supply
+            </h2>
+<p class="text-on-surface-variant text-sm mt-1 leading-normal">
+              Buy in bulk and distribute
+            </p>
+</div>
+</div>
+<!-- Card 3: Maker & Light Factory -->
+<div aria-checked="false" class="group relative p-7 rounded-2xl bg-surface-container-lowest border border-outline-variant/50 shadow-sm hover:border-outline hover:shadow transition-all duration-150 flex flex-col justify-between text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" role="radio" tabindex="0">
+<div class="w-12 h-12 rounded-xl bg-surface flex items-center justify-center text-on-surface-variant group-hover:text-primary-container transition-colors mb-5">
+<span class="material-symbols-outlined text-[26px]" data-icon="precision_manufacturing">precision_manufacturing</span>
+</div>
+<div>
+<h2 class="font-headline font-bold text-base text-on-surface group-hover:text-primary-container transition-colors">
+              Maker &amp; Light Factory
+            </h2>
+<p class="text-on-surface-variant text-sm mt-1 leading-normal">
+              Turn raw materials into goods
+            </p>
+</div>
+</div>
+<!-- Card 4: Builder & Contractor (ACTIVE STATE) -->
+<div aria-checked="true" class="group relative p-7 rounded-2xl bg-surface-container-lowest border-2 border-primary-container shadow-sm ring-1 ring-primary-container/20 flex flex-col justify-between text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" role="radio" tabindex="0">
+<div class="flex items-center justify-between mb-5">
+<div class="w-12 h-12 rounded-xl bg-primary-fixed/40 flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined material-symbols-fill text-[26px]" data-icon="construction">construction</span>
+</div>
+<!-- Active indicator dot -->
+<div aria-hidden="true" class="w-2.5 h-2.5 rounded-full bg-primary-container"></div>
+</div>
+<div>
+<h2 class="font-headline font-bold text-base text-primary-container">
+              Builder &amp; Contractor
+            </h2>
+<p class="text-on-surface-variant text-sm mt-1 leading-normal">
+              Projects, sites, and subcontractors
+            </p>
+</div>
+</div>
+<!-- Card 5: Services & Agency -->
+<div aria-checked="false" class="group relative p-7 rounded-2xl bg-surface-container-lowest border border-outline-variant/50 shadow-sm hover:border-outline hover:shadow transition-all duration-150 flex flex-col justify-between text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" role="radio" tabindex="0">
+<div class="w-12 h-12 rounded-xl bg-surface flex items-center justify-center text-on-surface-variant group-hover:text-primary-container transition-colors mb-5">
+<span class="material-symbols-outlined text-[26px]" data-icon="business_center">business_center</span>
+</div>
+<div>
+<h2 class="font-headline font-bold text-base text-on-surface group-hover:text-primary-container transition-colors">
+              Services &amp; Agency
+            </h2>
+<p class="text-on-surface-variant text-sm mt-1 leading-normal">
+              Clients, retainers, and hours
+            </p>
+</div>
+</div>
+<!-- Card 6: Non-Profit / NGO -->
+<div aria-checked="false" class="group relative p-7 rounded-2xl bg-surface-container-lowest border border-outline-variant/50 shadow-sm hover:border-outline hover:shadow transition-all duration-150 flex flex-col justify-between text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" role="radio" tabindex="0">
+<div class="w-12 h-12 rounded-xl bg-surface flex items-center justify-center text-on-surface-variant group-hover:text-primary-container transition-colors mb-5">
+<span class="material-symbols-outlined text-[26px]" data-icon="volunteer_activism">volunteer_activism</span>
+</div>
+<div>
+<h2 class="font-headline font-bold text-base text-on-surface group-hover:text-primary-container transition-colors">
+              Non-Profit / NGO
+            </h2>
+<p class="text-on-surface-variant text-sm mt-1 leading-normal">
+              Donations, grants, and programs
+            </p>
+</div>
+</div>
+</div>
+<!-- Module Mix Link -->
+<div class="mt-8 text-center">
+<a class="inline-flex items-center gap-1.5 text-sm font-medium text-secondary hover:text-primary transition-colors group focus:outline-none focus:ring-2 focus:ring-primary rounded px-2 py-1" href="#mix-modules">
+<span>Running more than one type? Mix and match modules (e.g. Hotel + Diner)</span>
+<span class="inline-block transform group-hover:translate-x-0.5 transition-transform">→</span>
+</a>
+</div>
+<!-- Primary Action CTA -->
+<div class="mt-12 flex flex-col items-center justify-center">
+<button class="inline-flex items-center justify-center gap-2 bg-primary-container hover:bg-[#004827] active:scale-95 text-white font-headline font-semibold text-base px-10 py-3.5 rounded-xl shadow-sm transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary" type="button">
+<span>Continue</span>
+<span aria-hidden="true">→</span>
+</button>
+</div>
+</div>
+</main>
+<script>
+    // Lightweight interactive selection micro-interaction
+    document.addEventListener('DOMContentLoaded', () => {
+      const cards = document.querySelectorAll('[role="radio"]');
+      
+      cards.forEach(card => {
+        card.addEventListener('click', () => {
+          selectCard(card);
+        });
+        
+        card.addEventListener('keydown', (e) => {
+          if (e.key === ' ' || e.key === 'Enter') {
+            e.preventDefault();
+            selectCard(card);
+          }
+        });
+      });
+
+      function selectCard(activeCard) {
+        cards.forEach(c => {
+          c.setAttribute('aria-checked', 'false');
+          c.className = 'group relative p-7 rounded-2xl bg-surface-container-lowest border border-outline-variant/50 shadow-sm hover:border-outline hover:shadow transition-all duration-150 flex flex-col justify-between text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2';
+          
+          const iconContainer = c.querySelector('.w-12');
+          if (iconContainer) {
+            iconContainer.className = 'w-12 h-12 rounded-xl bg-surface flex items-center justify-center text-on-surface-variant group-hover:text-primary-container transition-colors mb-5';
+          }
+          
+          const title = c.querySelector('h2');
+          if (title) {
+            title.className = 'font-headline font-bold text-base text-on-surface group-hover:text-primary-container transition-colors';
+          }
+
+          const indicator = c.querySelector('.rounded-full.bg-primary-container');
+          if (indicator) {
+            indicator.remove();
+          }
+        });
+
+        // Apply active emerald styling to chosen card
+        activeCard.setAttribute('aria-checked', 'true');
+        activeCard.className = 'group relative p-7 rounded-2xl bg-surface-container-lowest border-2 border-primary-container shadow-sm ring-1 ring-primary-container/20 flex flex-col justify-between text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2';
+
+        const iconContainer = activeCard.querySelector('.w-12');
+        if (iconContainer) {
+          iconContainer.className = 'w-12 h-12 rounded-xl bg-primary-fixed/40 flex items-center justify-center text-primary-container';
+        }
+
+        const title = activeCard.querySelector('h2');
+        if (title) {
+          title.className = 'font-headline font-bold text-base text-primary-container';
+        }
+
+        // Add subtle active dot
+        const topRow = activeCard.querySelector('.flex.items-center');
+        if (!topRow) {
+          const firstDiv = activeCard.firstElementChild;
+          const wrapper = document.createElement('div');
+          wrapper.className = 'flex items-center justify-between mb-5';
+          firstDiv.parentNode.insertBefore(wrapper, firstDiv);
+          wrapper.appendChild(firstDiv);
+          firstDiv.classList.remove('mb-5');
+
+          const dot = document.createElement('div');
+          dot.className = 'w-2.5 h-2.5 rounded-full bg-primary-container';
+          dot.setAttribute('aria-hidden', 'true');
+          wrapper.appendChild(dot);
+        } else if (!activeCard.querySelector('.rounded-full.bg-primary-container')) {
+          const dot = document.createElement('div');
+          dot.className = 'w-2.5 h-2.5 rounded-full bg-primary-container';
+          dot.setAttribute('aria-hidden', 'true');
+          topRow.appendChild(dot);
+        }
+      }
+    });
+  </script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const mixLink = document.querySelector('a[href="#mix-modules"]');
+    if (mixLink) {
+      const box = document.createElement('div');
+      box.className = 'hidden mt-4 mx-auto max-w-xl rounded-xl border border-emerald-200 bg-emerald-50/60 p-4 text-left text-xs text-slate-700';
+      box.innerHTML = '<div class="font-semibold text-emerald-900 mb-2">Universal Custom / Composable Pack Builder (Preview)</div><div class="flex flex-wrap gap-2"><span class="px-2.5 py-1 rounded-full bg-white border border-emerald-200 font-medium">✓ Core IFRS Books</span><span class="px-2.5 py-1 rounded-full bg-white border border-emerald-200 font-medium">✓ Hotel Rooms (USALI)</span><span class="px-2.5 py-1 rounded-full bg-white border border-emerald-200 font-medium">✓ Diner POS &amp; Kitchen</span><span class="px-2.5 py-1 rounded-full bg-white border border-slate-200">+ Retail Stock</span></div>';
+      mixLink.parentNode.appendChild(box);
+      mixLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        box.classList.toggle('hidden');
+      });
+    }
+    document.querySelectorAll('button').forEach((btn) => {
+      if (btn.textContent.includes('Continue')) {
+        btn.addEventListener('click', () => {
+          window.location.href = 'screen-2-overview-top-nav.html';
+        });
+      }
+    });
+  });
+</script>
+
+</body></html>

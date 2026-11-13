@@ -1,0 +1,25 @@
+# Python / uv
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+dist/
+build/
+*.egg-info/
+
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+
+# Node / Next.js (future frontend)
+node_modules/
+.next/
+out/
+
+# OS / Editor
+.DS_Store
+Thumbs.db

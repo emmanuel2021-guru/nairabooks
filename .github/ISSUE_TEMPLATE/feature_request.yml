@@ -1,0 +1,30 @@
+name: "✨ Feature Proposal / Industry Pack Extension"
+description: "Suggest an idea, new business pack template, or operational workflow"
+labels: ["enhancement", "feature-request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Suggest enhancements for NairaBooks or new declarative industry packs.
+  - type: input
+    id: title
+    attributes:
+      label: "Feature Title"
+      placeholder: "e.g., Export statutory e-invoices directly to NRS tax portal"
+    validations:
+      required: true
+  - type: textarea
+    id: business_value
+    attributes:
+      label: "Business Value & Target Industry"
+      description: "Which Nigerian business archetypes benefit from this?"
+      placeholder: "Beneficiaries: Wholesale distributors operating across multiple states."
+    validations:
+      required: true
+  - type: textarea
+    id: solution_outline
+    attributes:
+      label: "Proposed Solution & Accounting Impact"
+      description: "How should the feature work? What GL accounts or tax rules are involved?"
+    validations:
+      required: true

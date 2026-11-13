@@ -1,0 +1,181 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/2025.10/",
+  "meta": {
+    "name": "NairaBooks Ledger Daylight AA",
+    "version": "1.0.0",
+    "stitchProject": "projects/9422961334487487882",
+    "stitchDesignSystem": "assets/8475106491343804798",
+    "wcagTarget": "WCAG 2.2 Level AA",
+    "normalTextContrastMin": 4.5,
+    "uiComponentContrastMin": 3.0
+  },
+  "brand": {
+    "emerald": {
+      "50": "#ECFDF5",
+      "100": "#D1FAE5",
+      "500": "#10B981",
+      "700": "#005E34",
+      "800": "#004424",
+      "900": "#064E3B"
+    },
+    "indigo": {
+      "50": "#EFF6FF",
+      "100": "#DBEAFE",
+      "700": "#1D4ED8",
+      "800": "#0F4C81",
+      "900": "#1E3A8A"
+    },
+    "amber": {
+      "50": "#FFFBEB",
+      "100": "#FEF3C7",
+      "700": "#B45309",
+      "800": "#92400E",
+      "900": "#78350F"
+    },
+    "crimson": {
+      "50": "#FEF2F2",
+      "100": "#FEE2E2",
+      "700": "#B91C1C",
+      "800": "#991B1B"
+    },
+    "slate": {
+      "50": "#F8FAFC",
+      "100": "#F1F5F9",
+      "200": "#E2E8F0",
+      "300": "#CBD5E1",
+      "400": "#94A3B8",
+      "500": "#64748B",
+      "600": "#475569",
+      "700": "#334155",
+      "800": "#1E293B",
+      "900": "#0F172A",
+      "950": "#020617"
+    },
+    "white": "#FFFFFF"
+  },
+  "semantic": {
+    "light": {
+      "background": "#F8FAFC",
+      "surface": "#FFFFFF",
+      "surfaceMuted": "#F1F5F9",
+      "foreground": "#0F172A",
+      "foregroundMuted": "#475569",
+      "primary": "#005E34",
+      "primaryHover": "#004424",
+      "primaryForeground": "#FFFFFF",
+      "primarySoftBg": "#ECFDF5",
+      "primarySoftForeground": "#065F46",
+      "secondary": "#0F4C81",
+      "secondaryForeground": "#FFFFFF",
+      "secondarySoftBg": "#EFF6FF",
+      "secondarySoftForeground": "#1E3A8A",
+      "warning": "#B45309",
+      "warningForeground": "#FFFFFF",
+      "warningSoftBg": "#FEF3C7",
+      "warningSoftForeground": "#78350F",
+      "destructive": "#B91C1C",
+      "destructiveForeground": "#FFFFFF",
+      "destructiveSoftBg": "#FEF2F2",
+      "destructiveSoftForeground": "#991B1B",
+      "borderSubtle": "#CBD5E1",
+      "borderInteractive": "#64748B",
+      "focusRing": "#005E34"
+    },
+    "dark": {
+      "background": "#0B1120",
+      "surface": "#111827",
+      "surfaceMuted": "#1E293B",
+      "foreground": "#F8FAFC",
+      "foregroundMuted": "#CBD5E1",
+      "primary": "#34D399",
+      "primaryHover": "#6EE7B7",
+      "primaryForeground": "#022C22",
+      "primarySoftBg": "#064E3B",
+      "primarySoftForeground": "#ECFDF5",
+      "secondary": "#93C5FD",
+      "secondaryForeground": "#082F49",
+      "secondarySoftBg": "#1E3A8A",
+      "secondarySoftForeground": "#EFF6FF",
+      "warning": "#FBBF24",
+      "warningForeground": "#451A03",
+      "warningSoftBg": "#78350F",
+      "warningSoftForeground": "#FEF3C7",
+      "destructive": "#FCA5A5",
+      "destructiveForeground": "#450A0A",
+      "destructiveSoftBg": "#7F1D1D",
+      "destructiveSoftForeground": "#FEF2F2",
+      "borderSubtle": "#334155",
+      "borderInteractive": "#94A3B8",
+      "focusRing": "#34D399"
+    }
+  },
+  "contrastPairs": [
+    { "mode": "light", "name": "Primary CTA button text", "fg": "primaryForeground", "bg": "primary", "minRatio": 4.5 },
+    { "mode": "light", "name": "Secondary compliance CTA", "fg": "secondaryForeground", "bg": "secondary", "minRatio": 4.5 },
+    { "mode": "light", "name": "Warning solid badge", "fg": "warningForeground", "bg": "warning", "minRatio": 4.5 },
+    { "mode": "light", "name": "Destructive alert CTA", "fg": "destructiveForeground", "bg": "destructive", "minRatio": 4.5 },
+    { "mode": "light", "name": "Primary soft status pill", "fg": "primarySoftForeground", "bg": "primarySoftBg", "minRatio": 4.5 },
+    { "mode": "light", "name": "Secondary soft compliance pill", "fg": "secondarySoftForeground", "bg": "secondarySoftBg", "minRatio": 4.5 },
+    { "mode": "light", "name": "Warning soft alert box", "fg": "warningSoftForeground", "bg": "warningSoftBg", "minRatio": 4.5 },
+    { "mode": "light", "name": "Destructive soft error box", "fg": "destructiveSoftForeground", "bg": "destructiveSoftBg", "minRatio": 4.5 },
+    { "mode": "light", "name": "Primary ink on card surface", "fg": "foreground", "bg": "surface", "minRatio": 4.5 },
+    { "mode": "light", "name": "Muted ink on card surface", "fg": "foregroundMuted", "bg": "surface", "minRatio": 4.5 },
+    { "mode": "light", "name": "Primary ink on app canvas", "fg": "foreground", "bg": "background", "minRatio": 4.5 },
+    { "mode": "light", "name": "Interactive control border on card", "fg": "borderInteractive", "bg": "surface", "minRatio": 3.0 },
+    { "mode": "light", "name": "Keyboard focus ring on card", "fg": "focusRing", "bg": "surface", "minRatio": 3.0 },
+    { "mode": "dark", "name": "Dark primary CTA button text", "fg": "primaryForeground", "bg": "primary", "minRatio": 4.5 },
+    { "mode": "dark", "name": "Dark primary ink on card", "fg": "foreground", "bg": "surface", "minRatio": 4.5 },
+    { "mode": "dark", "name": "Dark muted ink on card", "fg": "foregroundMuted", "bg": "surface", "minRatio": 4.5 },
+    { "mode": "dark", "name": "Dark control border on card", "fg": "borderInteractive", "bg": "surface", "minRatio": 3.0 },
+    { "mode": "dark", "name": "Dark keyboard focus ring on card", "fg": "focusRing", "bg": "surface", "minRatio": 3.0 }
+  ],
+  "typography": {
+    "fontFamilies": {
+      "heading": ["Plus Jakarta Sans", "Inter", "system-ui", "sans-serif"],
+      "body": ["Inter", "system-ui", "sans-serif"],
+      "mono": ["JetBrains Mono", "ui-monospace", "SFMono-Regular", "monospace"]
+    },
+    "scale": {
+      "display-lg": { "fontSize": "2.25rem", "lineHeight": "2.75rem", "fontWeight": "700", "letterSpacing": "-0.02em" },
+      "headline-md": { "fontSize": "1.5rem", "lineHeight": "2rem", "fontWeight": "600", "letterSpacing": "-0.01em" },
+      "headline-sm": { "fontSize": "1.125rem", "lineHeight": "1.5rem", "fontWeight": "600", "letterSpacing": "0em" },
+      "body-md": { "fontSize": "0.9375rem", "lineHeight": "1.5rem", "fontWeight": "400", "letterSpacing": "0em" },
+      "body-sm": { "fontSize": "0.8125rem", "lineHeight": "1.25rem", "fontWeight": "400", "letterSpacing": "0em" },
+      "data-tabular": { "fontSize": "0.875rem", "lineHeight": "1.25rem", "fontWeight": "500", "fontVariantNumeric": "tabular-nums" },
+      "label-caps": { "fontSize": "0.75rem", "lineHeight": "1rem", "fontWeight": "600", "letterSpacing": "0.06em" }
+    }
+  },
+  "spacing": {
+    "base": "4px",
+    "xs": "4px",
+    "sm": "8px",
+    "md": "16px",
+    "lg": "24px",
+    "xl": "40px",
+    "gutter": "24px",
+    "margin": "32px"
+  },
+  "radii": {
+    "sm": "4px",
+    "md": "8px",
+    "lg": "12px",
+    "full": "9999px"
+  },
+  "componentContracts": {
+    "kpiCard": {
+      "requiresTextAndIconStatus": true,
+      "numericFont": "mono",
+      "tabularNums": true
+    },
+    "ledgerTable": {
+      "requiresScopeColHeaders": true,
+      "horizontalScrollWrapper": "overflow-x-auto",
+      "moneyAlignment": "right",
+      "balanceLiveRegion": "aria-live=polite"
+    },
+    "stickyFooter": {
+      "preventContentOverlap": true,
+      "mainBottomPaddingMinPx": 112
+    }
+  }
+}

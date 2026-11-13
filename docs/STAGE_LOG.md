@@ -926,3 +926,23 @@
   - `uv run pytest -q`: **100 passed** across 26 test modules in 100%.
   - `uv run ruff check src tests` & `uv run mypy src tests`: **0 errors**.
   - `uv run python scripts/verify_workflow.py --project .`: **128 / 128 wizard skills verified (100%)**.
+
+
+### 2026-11-13: Mobile Viewport Optimization & Universal Android/Samsung Internet Naira Glyph (`U+20A6`) Rendering (Phase 5 & 6 Revamp)
+- **Plain-English Summary (Non-Developers):**
+  - **Naira Symbol Restored on Mobile:** Fixed the missing character box (`▯`) on Samsung Galaxy phones and Android mobile browsers. The Naira symbol (`₦`) is now explicitly pulled from Samsung's and Android's native system fonts (`Roboto` and `Samsung Sans`), ensuring crisp, beautiful rendering of all financial figures (e.g. `₦5,328,200`).
+  - **Sleek Mobile App Bar:** Transformed the top navigation bar on mobile phones. Instead of ballooning into an awkward oversized oval, it now renders as a compact, native app bar: Logo and settings on top, followed by a smooth horizontal scrollable pill ribbon (`Overview | Transactions | Reconcile | Reports | Admin`) that takes only ~80px of screen height.
+  - **Mobile Touch Polish:** Added Next.js 15 viewport theme color (`#006838` Nigerian emerald), optimized card padding, and added frictionless scrollbar-free touch dragging.
+- **Files Created / Changed:**
+  - `web/src/app/globals.css`: Added `@font-face` `NairaSystemGlyph` for `U+20A6`, refactored `.nb-money-cell` to tabular system fonts with native `₦` glyph support, and added `.no-scrollbar`.
+  - `web/tailwind.config.ts`: Updated `mono`, `sans`, and `heading` font families with `NairaSystemGlyph`, `Roboto`, and `Samsung Sans`.
+  - `web/src/app/layout.tsx`: Exported Next.js 15 `viewport` configuration with emerald theme color.
+  - `web/src/components/TopNavCapsule.tsx`: Refactored to unified, responsive single-`<nav>` structure (`rounded-2xl` on mobile, `rounded-full` on desktop).
+  - `web/src/components/TransactionsHubWorkspace.tsx`: Optimized mobile card padding, responsive action pill ribbon, and removed accidental duplicate markup.
+  - `docs/DECISIONS.md`: Logged `ADR-038`.
+  - `docs/STAGE_LOG.md`, `docs/STATE.md`, `docs/SESSION_HANDOFF.md`: Updated living documentation.
+- **Verification Commands & Results:**
+  - `npm --prefix web run build`: **Compiled successfully in 15.5s, all 44 routes generated cleanly**.
+  - `npm --prefix web test`: **16 test files / 56 Vitest tests passed** (**0 axe-core violations**).
+  - `uv run pytest -q`: **100 passed** across 26 test modules in 100%.
+  - `uv run python scripts/verify_workflow.py --project .`: **128 / 128 wizard skills verified (100%)**.

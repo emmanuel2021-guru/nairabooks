@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { Geist_Mono, Inter } from "next/font/google";
 import { RouteLoaderOverlay } from "@/components/RouteLoaderOverlay";
@@ -17,6 +17,13 @@ const geistMono = Geist_Mono({
   variable: "--font-ios-mono",
   display: "swap",
 });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#006838",
+};
 
 export const metadata: Metadata = {
   title: "NairaBooks — Nigerian IFRS & Tax Act 2025 Workspace",

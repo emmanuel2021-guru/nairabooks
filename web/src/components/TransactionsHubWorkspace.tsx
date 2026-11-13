@@ -244,27 +244,27 @@ export function TransactionsHubWorkspace({
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className="mx-auto max-w-6xl space-y-5 px-4 pb-sticky-clearance pt-4 sm:px-6">
+      <div className="mx-auto max-w-6xl space-y-4 sm:space-y-5 px-3 sm:px-6 pb-sticky-clearance pt-2 sm:pt-4">
         {/* Minimalist Cupertino Header with Status Badges */}
         <motion.section
           initial={prefersReduced ? false : { opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ type: "spring", stiffness: 280, damping: 24 }}
-          className="flex flex-col gap-4 rounded-[22px] border border-[#E5E5EA] bg-white p-5 shadow-[0_6px_22px_rgba(28,28,30,0.04)] sm:flex-row sm:items-center sm:justify-between"
+          className="flex flex-col gap-3 rounded-2xl sm:rounded-[22px] border border-[#E5E5EA] bg-white p-4 sm:p-5 shadow-[0_6px_22px_rgba(28,28,30,0.04)] sm:flex-row sm:items-center sm:justify-between"
         >
-          <div className="flex items-start gap-3.5">
+          <div className="flex items-start gap-3">
             <div
-              className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-[15px] bg-[#E6F5ED] text-[#006838] shadow-inner"
+              className="inline-flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-[14px] bg-[#E6F5ED] text-[#006838] shadow-inner"
               aria-hidden="true"
             >
-              <Sparkles className="h-6 w-6" />
+              <Sparkles className="h-5 w-5 sm:h-6 sm:w-6" />
             </div>
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-2xl font-bold tracking-[-0.03em] text-[#1C1C1E]">
+                <h1 className="text-xl sm:text-2xl font-bold tracking-[-0.03em] text-[#1C1C1E]">
                   Transactions
                 </h1>
-                <Badge variant="emerald" className="text-[11px]">
+                <Badge variant="emerald" className="text-[10px] sm:text-[11px]">
                   {TRANSACTION_TYPES.length} Entry Types
                 </Badge>
                 {mode === "pro" && (
@@ -273,7 +273,7 @@ export function TransactionsHubWorkspace({
                   </Badge>
                 )}
               </div>
-              <p className="mt-1 text-sm text-[#5E5E64]">
+              <p className="mt-1 text-xs sm:text-sm text-[#5E5E64]">
                 Choose an action below to create a new record, inspect the transaction register, or edit existing entries.
               </p>
             </div>
@@ -283,12 +283,12 @@ export function TransactionsHubWorkspace({
         {/* 🎛️ THE 3 ACTION BUTTONS (Sleek Segmented Pill Island, Alive, Zero-Clutter) */}
         <section
           aria-label="Choose transaction view"
-          className="flex flex-col items-center justify-center gap-3 pt-1"
+          className="flex flex-col items-center justify-center gap-2.5 pt-0.5"
         >
           <div
             role="group"
             aria-label="Transaction workspace actions"
-            className="inline-flex flex-wrap items-center justify-center gap-2 rounded-full border border-[#D1D1D6] bg-white p-1.5 shadow-[0_4px_16px_rgba(0,0,0,0.06)]"
+            className="flex max-w-full items-center justify-start sm:justify-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar rounded-2xl sm:rounded-full border border-[#D1D1D6] bg-white p-1.5 shadow-[0_4px_16px_rgba(0,0,0,0.06)]"
           >
             {/* 1. Create New */}
             <button
@@ -296,7 +296,7 @@ export function TransactionsHubWorkspace({
               data-testid="hero-choice-create"
               aria-pressed={activeChoice === "create"}
               onClick={() => setActiveChoice("create")}
-              className={`nb-crisp-pill-lift relative inline-flex min-h-[44px] items-center gap-2.5 rounded-full px-5 text-xs font-semibold ${
+              className={`nb-crisp-pill-lift relative inline-flex min-h-[42px] sm:min-h-[44px] shrink-0 items-center gap-2 rounded-full px-4 sm:px-5 text-xs font-semibold whitespace-nowrap ${
                 activeChoice === "create" ? "text-white" : "text-[#5E5E64] hover:bg-[#F2F2F7] hover:text-[#1C1C1E]"
               }`}
             >
@@ -310,11 +310,11 @@ export function TransactionsHubWorkspace({
               )}
               <span className="relative z-10 flex items-center gap-2">
                 <span
-                  className={`inline-flex h-6 w-6 items-center justify-center rounded-full transition-colors ${
+                  className={`inline-flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full transition-colors ${
                     activeChoice === "create" ? "bg-white/20 text-white" : "bg-emerald-50 text-[#006838]"
                   }`}
                 >
-                  <Plus className="h-3.5 w-3.5" aria-hidden="true" />
+                  <Plus className="h-3 w-3 sm:h-3.5 sm:w-3.5" aria-hidden="true" />
                 </span>
                 <span className="font-bold tracking-[-0.01em]">Create New</span>
                 <span
@@ -333,7 +333,7 @@ export function TransactionsHubWorkspace({
               data-testid="hero-choice-list"
               aria-pressed={activeChoice === "list"}
               onClick={() => setActiveChoice("list")}
-              className={`nb-crisp-pill-lift relative inline-flex min-h-[44px] items-center gap-2.5 rounded-full px-5 text-xs font-semibold ${
+              className={`nb-crisp-pill-lift relative inline-flex min-h-[42px] sm:min-h-[44px] shrink-0 items-center gap-2 rounded-full px-4 sm:px-5 text-xs font-semibold whitespace-nowrap ${
                 activeChoice === "list" ? "text-white" : "text-[#5E5E64] hover:bg-[#F2F2F7] hover:text-[#1C1C1E]"
               }`}
             >
@@ -370,7 +370,7 @@ export function TransactionsHubWorkspace({
               data-testid="hero-choice-edit"
               aria-pressed={activeChoice === "edit"}
               onClick={() => setActiveChoice("edit")}
-              className={`nb-crisp-pill-lift relative inline-flex min-h-[44px] items-center gap-2.5 rounded-full px-5 text-xs font-semibold ${
+              className={`nb-crisp-pill-lift relative inline-flex min-h-[42px] sm:min-h-[44px] shrink-0 items-center gap-2 rounded-full px-4 sm:px-5 text-xs font-semibold whitespace-nowrap ${
                 activeChoice === "edit" ? "text-white" : "text-[#5E5E64] hover:bg-[#F2F2F7] hover:text-[#1C1C1E]"
               }`}
             >
@@ -586,12 +586,12 @@ export function TransactionsHubWorkspace({
             {/* Directional 3-Metric Summary Strip */}
             <section
               aria-label="Transactions summary metrics"
-              className="grid grid-cols-1 gap-3 sm:grid-cols-3"
+              className="grid grid-cols-1 gap-2.5 sm:grid-cols-3"
             >
-              <div className="nb-crisp-card-lift flex items-center justify-between rounded-[18px] border border-[#E5E5EA] bg-white px-4 py-3.5 shadow-[0_2px_10px_rgba(28,28,30,0.03)] hover:border-[#006838]/50 hover:shadow-[0_10px_22px_rgba(0,104,56,0.08)]">
+              <div className="nb-crisp-card-lift flex items-center justify-between rounded-2xl border border-[#E5E5EA] bg-white px-4 py-3 sm:py-3.5 shadow-sm hover:border-[#006838]/50">
                 <div>
                   <p className="text-[11px] font-semibold text-[#5E5E64]">Money In Recorded</p>
-                  <p className="nb-money-cell mt-0.5 text-left text-lg font-bold text-[#1C1C1E]">
+                  <p className="nb-money-cell mt-0.5 text-left text-xl sm:text-2xl font-bold tracking-tight text-[#1C1C1E]">
                     {formatNaira(kpiSummary.moneyIn, false)}
                   </p>
                 </div>
@@ -601,10 +601,10 @@ export function TransactionsHubWorkspace({
                 </span>
               </div>
 
-              <div className="nb-crisp-card-lift flex items-center justify-between rounded-[18px] border border-[#E5E5EA] bg-white px-4 py-3.5 shadow-[0_2px_10px_rgba(28,28,30,0.03)] hover:border-[#0F4C81]/50 hover:shadow-[0_10px_22px_rgba(15,76,129,0.08)]">
+              <div className="nb-crisp-card-lift flex items-center justify-between rounded-2xl border border-[#E5E5EA] bg-white px-4 py-3 sm:py-3.5 shadow-sm hover:border-[#0F4C81]/50">
                 <div>
                   <p className="text-[11px] font-semibold text-[#5E5E64]">Money Out Recorded</p>
-                  <p className="nb-money-cell mt-0.5 text-left text-lg font-bold text-[#1C1C1E]">
+                  <p className="nb-money-cell mt-0.5 text-left text-xl sm:text-2xl font-bold tracking-tight text-[#1C1C1E]">
                     {formatNaira(kpiSummary.moneyOut, false)}
                   </p>
                 </div>
@@ -614,10 +614,10 @@ export function TransactionsHubWorkspace({
                 </span>
               </div>
 
-              <div className="nb-crisp-card-lift flex items-center justify-between rounded-[18px] border border-[#E5E5EA] bg-white px-4 py-3.5 shadow-[0_2px_10px_rgba(28,28,30,0.03)] hover:border-amber-600/50 hover:shadow-[0_10px_22px_rgba(217,119,6,0.08)]">
+              <div className="nb-crisp-card-lift flex items-center justify-between rounded-2xl border border-[#E5E5EA] bg-white px-4 py-3 sm:py-3.5 shadow-sm hover:border-amber-600/50">
                 <div>
                   <p className="text-[11px] font-semibold text-[#5E5E64]">Open &amp; Pending Items</p>
-                  <p className="nb-money-cell mt-0.5 text-left text-lg font-bold text-[#1C1C1E]">
+                  <p className="nb-money-cell mt-0.5 text-left text-xl sm:text-2xl font-bold tracking-tight text-[#1C1C1E]">
                     {kpiSummary.pendingCount} items
                   </p>
                 </div>
@@ -631,13 +631,13 @@ export function TransactionsHubWorkspace({
             {/* Main Cupertino Workspace Register Card */}
             <section
               aria-labelledby="transactions-hub-section-heading"
-              className="rounded-[22px] border border-[#E5E5EA] bg-white p-4 shadow-[0_6px_22px_rgba(28,28,30,0.04)] sm:p-5"
+              className="rounded-2xl sm:rounded-[22px] border border-[#E5E5EA] bg-white p-3.5 sm:p-5 shadow-[0_6px_22px_rgba(28,28,30,0.04)]"
             >
               {/* 6 Pillar Segmented Tabs */}
               <div
                 role="tablist"
                 aria-label="Transaction pillars"
-                className="flex items-center gap-1.5 overflow-x-auto pb-2"
+                className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-2"
               >
                 {TRANSACTION_PILLARS.map((pillar) => {
                   const isSelected = pillar.id === activePillar;

@@ -86,11 +86,30 @@ body {
   outline-offset: 2px;
 }
 
-/* Monetary cells strictly right-aligned tabular figures using SF Mono / Geist Mono */
+/* Universal Naira Glyph Fallback for Android, Samsung Internet, Windows & Mobile WebKit */
+@font-face {
+  font-family: "NairaSystemGlyph";
+  src: local("Roboto"), local("Samsung Sans"), local("Segoe UI"), local("Arial"), local("-apple-system"), local("Helvetica Neue");
+  unicode-range: U+20A6;
+  font-display: swap;
+}
+
+/* Monetary cells strictly right-aligned tabular figures with guaranteed Naira U+20A6 rendering */
 .nb-money-cell {
-  font-family: "SF Mono", ui-monospace, SFMono-Regular, var(--font-ios-mono), monospace;
+  font-family: "NairaSystemGlyph", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Samsung Sans", "SF Pro Text", Inter, sans-serif;
   font-variant-numeric: tabular-nums;
+  -webkit-font-feature-settings: "tnum";
+  font-feature-settings: "tnum";
   text-align: right;
+}
+
+/* Hide scrollbars for sleek mobile horizontal pill lists */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* iOS Vibrancy Translucent Material */

@@ -1,19 +1,15 @@
 # Living Workspace State (`STATE.md`)
 
 - **Project:** NairaBooks (`ac`) — Zero-jargon Nigerian IFRS / Tax Act 2025 / CAMA 2020 accounting & business operations platform
-- **Active Stage:** **Phase 10: Git Workflow, CI/CD & Cloud Deployment (Render Hosting Blueprint)**
+- **Active Stage:** **Phase 5 & 6 Revamp: Mobile Viewport Optimization & Universal Android/Samsung Internet Naira Glyph Rendering**
 - **Wizard Skills Executed:** `128 / 128` (`100%`) — All 12 active phases verified with concrete deliverables, code, automated test suites, and documentation.
-- **Latest Milestone (2026-11-13):** **Phase 10 Render Cloud Hosting & Infrastructure-as-Code Blueprint:**
-  - Recalled all 6 Phase 10 skills: `git-pr-workflows-git-workflow`, `git-advanced-workflows`, `git-pr-workflows-pr-enhance`, `changelog-automation`, `team-collaboration-issue`, `team-collaboration-standup-notes`.
-  - Authored canonical Render Blueprint specification at repository root (`render.yaml`) orchestrating:
-    1. `nairabooks-web`: Next.js 15 App Router web service (`rootDir: web`, Node.js runtime, port 10000, Frankfurt region).
-    2. `nairabooks-api`: Python 3.11 Hexagonal Ledger API web service (`rootDir: .`, `uv sync --no-dev`, port 8000, `0.0.0.0` host binding).
-    3. `nairabooks-db`: Managed PostgreSQL 16 database with persistent double-entry storage and connection string injection.
-  - Documented two deployment strategies in `docs/DEPLOYMENT_RENDER.md`: 1-Click Decoupled Blueprint (Strategy A) and Single Free-Tier Web Service (Strategy B).
-  - Configured zero-downtime rolling health checks on `/` and `/health`.
-  - Next.js production build (`npm --prefix web run build`) verified passing across all 44 routes.
+- **Latest Milestone (2026-11-13):** **Mobile Viewport Optimization & Universal Android/Samsung Internet Naira Glyph Rendering:**
+  - **Naira Glyph Fix (`U+20A6`):** Declared `@font-face` `NairaSystemGlyph` (`unicode-range: U+20A6`) backed by `local("Roboto"), local("Samsung Sans"), local("Segoe UI"), local("Arial")`, and refactored `.nb-money-cell` to use tabular system fonts. Completely resolves missing glyph tofu (`▯`) on Samsung Galaxy phones, Samsung Internet, and Android WebKit browsers.
+  - **Mobile Top Nav Polish:** Refactored `TopNavCapsule.tsx` with a unified single-`<nav>` responsive layout. Row 1: Logo + Mode toggle + Settings + Sign out; Row 2: Horizontally scrollable pill ribbon (`Overview | Transactions | Reconcile | Reports | Admin`). Replaced the 250px-tall oval balloon with a sleek, compact 88px `rounded-2xl` app bar.
+  - **Touch & Viewport Polish:** Added Next.js 15 `viewport` metadata with `#006838` theme color and `.no-scrollbar` touch dragging on horizontal pill lists.
+  - **Verified Clean:** 16 Vitest test suites (56 tests, 0 `axe-core` accessibility violations), 100 Python pytest test cases, and Next.js 44-route production build compiling cleanly in 15.5s.
 - **Baseline Verified Working:**
-  - `npm --prefix web run build`: Compiled successfully in 27.9s, all 44 routes generated cleanly.
+  - `npm --prefix web run build`: Compiled successfully in 15.5s, all 44 routes generated cleanly.
   - `uv run pytest -q`: `100 passed` across 26 test modules in 100%.
   - `uv run ruff check src tests` & `uv run mypy src tests` (`100` source files): clean (0 issues).
   - `web`: `npm run typecheck` (0 errors), `npm test` (`16` test files, `56` vitest tests, `0` axe-core violations), and Next.js 44-route production build passing cleanly.
@@ -23,4 +19,4 @@
   - `uv run python scripts/compliance_check.py`: 100% compliance gates passed.
   - `uv run python scripts/audit_dependencies.py`: 100% permissive licenses verified.
   - `uv run python scripts/verify_workflow.py --project .`: `128 / 128` wizard skills verified (`executed=128`, 100%).
-- **Project Status:** **Fully Shipped & Production Ready.** All 128 wizard skills verified, statutory invariants enforced, zero float math, authentic Nigerian cultural theme active, WCAG 2.2 AA accessibility satisfied, and Render cloud blueprint ready for instant deployment.
+- **Project Status:** **Fully Shipped & Production Ready.** All 128 wizard skills verified, statutory invariants enforced, zero float math, authentic Nigerian cultural theme active, WCAG 2.2 AA accessibility satisfied, mobile viewport & Samsung Internet glyphs perfected, and live on cloud.

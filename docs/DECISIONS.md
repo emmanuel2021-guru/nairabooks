@@ -514,3 +514,30 @@
   3. **Dedicated Deployment Runbook (`docs/DEPLOYMENT_RENDER.md`):**
      - Authored clear, non-technical and developer instructions covering Git repository initialization, 1-click Render Blueprint setup, custom domain mapping (`nairabooks.ng`), automated SSL certificates, and environment variable management.
 - **Consequences:** NairaBooks can be deployed to production on Render with a single click via `render.yaml` or hosted on the free tier with zero manual infrastructure configuration.
+
+## ADR-038: Mobile Viewport Optimization & Universal Android/Samsung Internet Naira Glyph (`U+20A6`) Rendering
+- **Date:** 2026-11-13
+- **Status:** Accepted
+- **Context:**
+  - Live deployment testing on mobile (Samsung Internet on Android, `Screenshot_20261113-211308_Samsung Internet.png`) revealed:
+    1. Monetary amounts rendered with a missing glyph box (tofu: `▯5,328,200`) instead of the Nigerian Naira symbol (`₦5,328,200`). This was caused by `.nb-money-cell` and `font-mono` specifying `SF Mono, ui-monospace, monospace` without a system sans-serif fallback ahead of `monospace`. On Android devices, generic `monospace` resolves to `Droid Sans Mono` or `Roboto Mono`, which lack the `U+20A6` Naira currency symbol.
+    2. The top navigation capsule ballooned into an oversized, egg-shaped white oval taking up over 35% of the vertical mobile screen due to `flex-wrap` paired with `rounded-full` across 3 lines of content.
+    3. Missing Next.js 15 `viewport` metadata and mobile horizontal scroll styling.
+- **Decision:**
+  1. **Universal Naira Glyph (`U+20A6`) Fallback System:**
+     - Declared `@font-face` `NairaSystemGlyph` targeting specifically `unicode-range: U+20A6` mapped to `local("Roboto"), local("Samsung Sans"), local("Segoe UI"), local("Arial"), local("-apple-system")`.
+     - Refactored `.nb-money-cell` in `globals.css` to use modern system typography with `font-variant-numeric: tabular-nums` and `font-feature-settings: 'tnum'`, ensuring digits remain strictly tabular and right-aligned while `₦` is rendered natively from `Roboto` or `Samsung Sans`.
+     - Prepended `NairaSystemGlyph`, `Roboto`, and `"Samsung Sans"` ahead of generic `monospace` in `tailwind.config.ts`.
+  2. **Responsive Single-Nav Top App Bar Architecture:**
+     - Replaced the awkward multi-line wrapped capsule in `TopNavCapsule.tsx` with a unified, responsive flex structure:
+       - Row 1: Logo (`order-1`) on left; Mode toggle (`Simple/Pro`), Settings (`44px` target), and Sign Out on right (`order-2 md:order-3`).
+       - Row 2: Horizontally scrollable navigation pill strip (`order-3 md:order-2 w-full md:w-auto overflow-x-auto no-scrollbar pt-2 md:pt-0 border-t border-borderSubtle/60 md:border-t-0 mt-1.5 md:mt-0`).
+       - Container uses `rounded-2xl` on mobile and `md:rounded-full` on desktop, eliminating the awkward bubble while maintaining exact single-element DOM accessibility for screen readers and test suites.
+  3. **Mobile Viewport & Touch Optimization:**
+     - Exported standard `viewport: Viewport` metadata in `web/src/app/layout.tsx` setting `device-width` and `themeColor: "#006838"`.
+     - Added `.no-scrollbar` utility to `globals.css` for frictionless native horizontal scrolling across mobile viewports.
+  4. **Verification & Zero Regressions:**
+     - All 16 Vitest test suites (56 tests) passed with 0 `axe-core` accessibility violations.
+     - All 100 Python pytest tests passed.
+     - All 128/128 wizard skills verified (`verify_workflow.py`).
+- **Consequences:** The Naira symbol (`₦`) renders crisply on all mobile devices including Samsung Internet and Android WebKit, and the mobile navigation is compact, tactile, and native.

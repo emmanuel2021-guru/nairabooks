@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useWorkspaceMode } from "@/state/workspace-mode";
+import { NairaAmount } from "@/components/ui/NairaAmount";
 import {
   TRANSACTION_PILLARS,
   TRANSACTION_TYPES,
@@ -588,40 +589,40 @@ export function TransactionsHubWorkspace({
               aria-label="Transactions summary metrics"
               className="grid grid-cols-1 gap-2.5 sm:grid-cols-3"
             >
-              <div className="nb-crisp-card-lift flex items-center justify-between rounded-2xl border border-[#E5E5EA] bg-white px-4 py-3 sm:py-3.5 shadow-sm hover:border-[#006838]/50">
+              <div className="nb-crisp-card-lift flex items-center justify-between rounded-[18px] border border-[#E5E5EA] dark:border-neutral-800 bg-white dark:bg-[#1C1C1E] px-4 py-3 sm:py-3.5 shadow-[0_2px_10px_rgba(28,28,30,0.03)] hover:border-[#006838]/50">
                 <div>
-                  <p className="text-[11px] font-semibold text-[#5E5E64]">Money In Recorded</p>
-                  <p className="nb-money-cell mt-0.5 text-left text-xl sm:text-2xl font-bold tracking-tight text-[#1C1C1E]">
-                    {formatNaira(kpiSummary.moneyIn, false)}
+                  <p className="text-[11px] font-semibold text-[#5E5E64] dark:text-neutral-400">Money In Recorded</p>
+                  <p className="nb-money-cell mt-0.5 text-left text-lg sm:text-xl font-bold tracking-tight text-[#1C1C1E] dark:text-[#F2F2F7]">
+                    <NairaAmount amount={kpiSummary.moneyIn} showDecimals={false} />
                   </p>
                 </div>
-                <span className="inline-flex items-center gap-1 rounded-full bg-[#E6F5ED] px-2.5 py-1 text-[11px] font-semibold text-[#00582E]">
+                <span className="inline-flex items-center gap-1 rounded-full bg-[#E6F5ED] dark:bg-emerald-950/40 px-2.5 py-1 text-[11px] font-semibold text-[#00582E] dark:text-emerald-400">
                   <ArrowDownLeft className="h-3.5 w-3.5" aria-hidden="true" />
                   Inflow
                 </span>
               </div>
 
-              <div className="nb-crisp-card-lift flex items-center justify-between rounded-2xl border border-[#E5E5EA] bg-white px-4 py-3 sm:py-3.5 shadow-sm hover:border-[#0F4C81]/50">
+              <div className="nb-crisp-card-lift flex items-center justify-between rounded-[18px] border border-[#E5E5EA] dark:border-neutral-800 bg-white dark:bg-[#1C1C1E] px-4 py-3 sm:py-3.5 shadow-[0_2px_10px_rgba(28,28,30,0.03)] hover:border-[#0F4C81]/50">
                 <div>
-                  <p className="text-[11px] font-semibold text-[#5E5E64]">Money Out Recorded</p>
-                  <p className="nb-money-cell mt-0.5 text-left text-xl sm:text-2xl font-bold tracking-tight text-[#1C1C1E]">
-                    {formatNaira(kpiSummary.moneyOut, false)}
+                  <p className="text-[11px] font-semibold text-[#5E5E64] dark:text-neutral-400">Money Out Recorded</p>
+                  <p className="nb-money-cell mt-0.5 text-left text-lg sm:text-xl font-bold tracking-tight text-[#1C1C1E] dark:text-[#F2F2F7]">
+                    <NairaAmount amount={kpiSummary.moneyOut} showDecimals={false} />
                   </p>
                 </div>
-                <span className="inline-flex items-center gap-1 rounded-full bg-[#EAF3FC] px-2.5 py-1 text-[11px] font-semibold text-[#0F4C81]">
+                <span className="inline-flex items-center gap-1 rounded-full bg-[#EAF3FC] dark:bg-sky-950/40 px-2.5 py-1 text-[11px] font-semibold text-[#0F4C81] dark:text-sky-400">
                   <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
                   Outflow
                 </span>
               </div>
 
-              <div className="nb-crisp-card-lift flex items-center justify-between rounded-2xl border border-[#E5E5EA] bg-white px-4 py-3 sm:py-3.5 shadow-sm hover:border-amber-600/50">
+              <div className="nb-crisp-card-lift flex items-center justify-between rounded-[18px] border border-[#E5E5EA] dark:border-neutral-800 bg-white dark:bg-[#1C1C1E] px-4 py-3 sm:py-3.5 shadow-[0_2px_10px_rgba(28,28,30,0.03)] hover:border-amber-600/50">
                 <div>
-                  <p className="text-[11px] font-semibold text-[#5E5E64]">Open &amp; Pending Items</p>
-                  <p className="nb-money-cell mt-0.5 text-left text-xl sm:text-2xl font-bold tracking-tight text-[#1C1C1E]">
+                  <p className="text-[11px] font-semibold text-[#5E5E64] dark:text-neutral-400">Open &amp; Pending Items</p>
+                  <p className="nb-money-cell mt-0.5 text-left text-lg sm:text-xl font-bold tracking-tight text-[#1C1C1E] dark:text-[#F2F2F7]">
                     {kpiSummary.pendingCount} items
                   </p>
                 </div>
-                <span className="inline-flex items-center gap-1 rounded-full bg-[#FEF9E6] px-2.5 py-1 text-[11px] font-semibold text-[#784507]">
+                <span className="inline-flex items-center gap-1 rounded-full bg-[#FEF9E6] dark:bg-amber-950/40 px-2.5 py-1 text-[11px] font-semibold text-[#784507] dark:text-amber-400">
                   <Clock className="h-3.5 w-3.5" aria-hidden="true" />
                   Actionable
                 </span>

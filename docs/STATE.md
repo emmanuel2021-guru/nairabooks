@@ -1,15 +1,16 @@
 # Living Workspace State (`STATE.md`)
 
 - **Project:** NairaBooks (`ac`) — Zero-jargon Nigerian IFRS / Tax Act 2025 / CAMA 2020 accounting & business operations platform
-- **Active Stage:** **Phase 5 & 6 Revamp: Mobile Viewport Optimization & Universal Android/Samsung Internet Naira Glyph Rendering**
+- **Active Stage:** **Phase 5 & 6 Revamp: Cupertino Typography Restoration, Micro-Targeted Naira Glyph Isolation, Dark Mode & Native Mobile Bottom Bar**
 - **Wizard Skills Executed:** `128 / 128` (`100%`) — All 12 active phases verified with concrete deliverables, code, automated test suites, and documentation.
-- **Latest Milestone (2026-11-13):** **Mobile Viewport Optimization & Universal Android/Samsung Internet Naira Glyph Rendering:**
-  - **Naira Glyph Fix (`U+20A6`):** Declared `@font-face` `NairaSystemGlyph` (`unicode-range: U+20A6`) backed by `local("Roboto"), local("Samsung Sans"), local("Segoe UI"), local("Arial")`, and refactored `.nb-money-cell` to use tabular system fonts. Completely resolves missing glyph tofu (`▯`) on Samsung Galaxy phones, Samsung Internet, and Android WebKit browsers.
-  - **Mobile Top Nav Polish:** Refactored `TopNavCapsule.tsx` with a unified single-`<nav>` responsive layout. Row 1: Logo + Mode toggle + Settings + Sign out; Row 2: Horizontally scrollable pill ribbon (`Overview | Transactions | Reconcile | Reports | Admin`). Replaced the 250px-tall oval balloon with a sleek, compact 88px `rounded-2xl` app bar.
-  - **Touch & Viewport Polish:** Added Next.js 15 `viewport` metadata with `#006838` theme color and `.no-scrollbar` touch dragging on horizontal pill lists.
-  - **Verified Clean:** 16 Vitest test suites (56 tests, 0 `axe-core` accessibility violations), 100 Python pytest test cases, and Next.js 44-route production build compiling cleanly in 15.5s.
+- **Latest Milestone (2026-11-13):** **Cupertino Typography Restoration, Micro-Targeted Naira Glyph Isolation, Dark Mode & Native Mobile Bottom Bar:**
+  - **Cupertino Typography Restored:** Reverted global font overwrites in `tailwind.config.ts` and `globals.css` back to pure Apple Cupertino system fonts (`SF Pro Display`, `SF Pro Text`, `Geist Mono`, `SF Mono`). Headings, body text, and tabular digits look razor-sharp and beautiful again without generic system font pollution.
+  - **Micro-Targeted Naira Glyph Fix (`U+20A6`):** Created `<NairaAmount>` and `<NairaSign>` components that wrap `₦` in `font-sans` (guaranteed to render on Samsung Internet / Android) while keeping numeric figures strictly in tabular `font-mono`. Declared targeted `@font-face NairaGlyphFallback` for `.nb-money-cell` targeting only `unicode-range: U+20A6`.
+  - **Light & Dark Mode Switcher:** Implemented `ThemeModeProvider` (`theme-mode.tsx`), accessible `ThemeToggle` (Sun/Moon button), static anti-FOUC script (`/theme-init.js`), complete `.dark` tokens in `globals.css`, and dark-mode adaptation for `NigerianArtBackground`.
+  - **Native Mobile Bottom Navigation Bar:** Replaced awkward top capsule wrapping with an authentic native bottom navigation bar on mobile (`fixed bottom-0 inset-x-0 z-50 h-16`) featuring all 5 core tabs with icons and labels, while desktop retains the floating capsule. Added `pb-20 md:pb-6` body clearance.
+  - **Verified Clean:** 16 Vitest test suites (56 tests, 0 `axe-core` accessibility violations), 100 Python pytest test cases, 0 SAST findings, and Next.js 44-route production build compiling cleanly in 26.3s.
 - **Baseline Verified Working:**
-  - `npm --prefix web run build`: Compiled successfully in 15.5s, all 44 routes generated cleanly.
+  - `npm --prefix web run build`: Compiled successfully in 26.3s, all 44 routes generated cleanly.
   - `uv run pytest -q`: `100 passed` across 26 test modules in 100%.
   - `uv run ruff check src tests` & `uv run mypy src tests` (`100` source files): clean (0 issues).
   - `web`: `npm run typecheck` (0 errors), `npm test` (`16` test files, `56` vitest tests, `0` axe-core violations), and Next.js 44-route production build passing cleanly.
@@ -19,4 +20,4 @@
   - `uv run python scripts/compliance_check.py`: 100% compliance gates passed.
   - `uv run python scripts/audit_dependencies.py`: 100% permissive licenses verified.
   - `uv run python scripts/verify_workflow.py --project .`: `128 / 128` wizard skills verified (`executed=128`, 100%).
-- **Project Status:** **Fully Shipped & Production Ready.** All 128 wizard skills verified, statutory invariants enforced, zero float math, authentic Nigerian cultural theme active, WCAG 2.2 AA accessibility satisfied, mobile viewport & Samsung Internet glyphs perfected, and live on cloud.
+- **Project Status:** **Fully Shipped & Production Ready.** All 128 wizard skills verified, statutory invariants enforced, zero float math, authentic Nigerian cultural theme active, WCAG 2.2 AA accessibility satisfied, Cupertino aesthetics preserved, dark mode enabled, mobile bottom navigation perfected, and live on cloud.

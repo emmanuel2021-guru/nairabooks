@@ -1,9 +1,9 @@
 # Session Handoff — NairaBooks
 
 - **Date:** 2026-11-13
-- **Current Stage:** Phase 5 & 6 Revamp: Mobile Viewport Optimization & Universal Android/Samsung Internet Naira Glyph Rendering
+- **Current Stage:** Phase 5 & 6 Revamp: Cupertino Typography Restoration, Micro-Targeted Naira Glyph Isolation, Dark Mode & Native Mobile Bottom Bar
 - **Verified Passing Across All Suites:**
-  - `npm --prefix web run build` (`44` routes compiled cleanly in 15.5s)
+  - `npm --prefix web run build` (`44` routes compiled cleanly in 26.3s)
   - `uv run pytest -q` (`100 passed` across 26 test modules in 100%)
   - `uv run ruff check src tests` (`All checks passed!`)
   - `uv run mypy src tests` (`Success: no issues found in 100 source files`)
@@ -16,10 +16,11 @@
   - `uv run python scripts/audit_dependencies.py` (`100% permissive licenses verified`)
   - `uv run python scripts/verify_workflow.py --project .` (`128 / 128` wizard skills verified, `executed=128`, **100% Complete**)
 - **Summary of Recent Changes:**
-  1. **Naira Glyph Fix (`U+20A6`):** Resolved tofu box `▯` on Samsung Galaxy phones and Android WebKit by adding `@font-face` `NairaSystemGlyph` (`unicode-range: U+20A6`) mapped to `Roboto`, `Samsung Sans`, `Segoe UI`, and `Arial`, and refactoring `.nb-money-cell` to tabular system fonts.
-  2. **Mobile Top Navigation Capsule Overhaul:** Replaced the tall egg-shaped 250px bubble with a sleek, compact 88px `rounded-2xl` 2-row app bar (Row 1: Logo + Mode + Settings + Sign out; Row 2: Horizontally scrollable pill strip for `Overview`, `Transactions`, `Reconcile`, `Reports`, `Admin`). On desktop, automatically switches to the single-line `rounded-full` capsule.
-  3. **Mobile Touch & Viewport Optimization:** Exported Next.js 15 `viewport` metadata with `#006838` theme color and added `.no-scrollbar` touch dragging across all horizontal pill lists.
-  4. **Production Build & Zero Violations:** All 16 Vitest test suites (56 tests) passed with 0 `axe-core` accessibility violations, and Next.js production build succeeded in 15.5s.
+  1. **Cupertino Typography Restored:** Reverted global font stacks in `tailwind.config.ts` and `globals.css` to pure Apple Cupertino (`SF Pro Display`, `SF Pro Text`, `Geist Mono`, `SF Mono`), removing generic system font pollution.
+  2. **Micro-Targeted Naira Glyph Isolation:** Implemented `<NairaAmount>` and `<NairaSign>` components that wrap `₦` in `font-sans` (guaranteed to render on Samsung Galaxy phones without tofu) while keeping digits in tabular `font-mono`. Used targeted `@font-face NairaGlyphFallback` for `unicode-range: U+20A6`.
+  3. **Universal Light & Dark Mode System:** Implemented `ThemeModeProvider` with `localStorage` persistence, Sun/Moon `ThemeToggle` button in `TopNavCapsule.tsx` and Settings, static anti-FOUC script in `public/theme-init.js`, full `.dark` theme variables, and dark-mode adaptation for `NigerianArtBackground`.
+  4. **Native Mobile Bottom Navigation Bar:** Pinned navigation on mobile to the bottom (`fixed bottom-0 inset-x-0 z-50 h-16`) with native icons and labels for Overview, Transactions, Reconcile, Reports, Admin. Kept top header clean and uncluttered.
+  5. **Verification & Clean Build:** All 16 Vitest test files (56 tests) passed with 0 `axe-core` accessibility violations, and Next.js 44-route production build succeeded in 26.3s.
 
 ## Ready Next Steps
 Push this commit to GitHub (`git push origin main`), triggering an automatic zero-downtime redeploy on Render.

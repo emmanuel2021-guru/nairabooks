@@ -69,9 +69,6 @@ const config: Config = {
   				'BlinkMacSystemFont',
   				'"SF Pro Display"',
   				'"SF Pro Text"',
-  				'Roboto',
-  				'"Samsung Sans"',
-  				'"Segoe UI"',
   				'var(--font-ios-sans)',
   				'system-ui',
   				'sans-serif'
@@ -81,24 +78,15 @@ const config: Config = {
   				'BlinkMacSystemFont',
   				'"SF Pro Text"',
   				'"SF Pro Display"',
-  				'Roboto',
-  				'"Samsung Sans"',
-  				'"Segoe UI"',
   				'var(--font-ios-sans)',
   				'system-ui',
   				'sans-serif'
   			],
   			mono: [
-  				'NairaSystemGlyph',
-  				'var(--font-ios-mono)',
   				'"SF Mono"',
   				'ui-monospace',
   				'SFMono-Regular',
-  				'Roboto',
-  				'"Samsung Sans"',
-  				'"Segoe UI"',
-  				'Arial',
-  				'sans-serif',
+  				'var(--font-ios-mono)',
   				'monospace'
   			]
   		},

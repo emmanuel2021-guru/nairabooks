@@ -946,3 +946,30 @@
   - `npm --prefix web test`: **16 test files / 56 Vitest tests passed** (**0 axe-core violations**).
   - `uv run pytest -q`: **100 passed** across 26 test modules in 100%.
   - `uv run python scripts/verify_workflow.py --project .`: **128 / 128 wizard skills verified (100%)**.
+
+### 2026-11-13: Cupertino Typography Restoration, Micro-Targeted Naira Glyph Isolation, Dark Mode & Mobile Bottom Navigation Bar (Phase 5 & 6 Revamp)
+- **Plain-English Summary (Non-Developers):**
+  - **Cupertino Typography Restored:** Reverted the global font overhaul so that NairaBooks immediately regains its sleek, Apple Cupertino aesthetic (`SF Pro Display`, `SF Pro Text`, `Geist Mono`, `SF Mono`). Headings, body text, and tabular digits look razor-sharp and beautiful again without generic system font pollution.
+  - **Surgical Naira Symbol Fix (`₦`):** Fixed the Samsung Internet missing glyph bug cleanly without changing any global body or heading fonts. Wrapped the Naira sign in a micro-targeted component (`<NairaAmount>` and `<NairaSign>`) using the system's sans-serif font (which is 100% verified to render `₦` cleanly on Samsung Galaxy devices), while keeping all numerical digits in pristine tabular monospace (`SF Mono`).
+  - **Light & Dark Mode Switcher:** Added a prominent, one-click Light / Dark mode toggle with an accessible Sun / Moon icon in the top navigation bar and in Settings. In Dark Mode, the canvas transforms into an iOS-inspired deep midnight theme (`#121214`), cards shift to dark charcoal (`#1C1C1E`), and the Nigerian cultural artwork glows with luminous emerald lines (`#34C759`). Zero page flicker on reload.
+  - **Native Mobile Bottom Navigation Bar:** Re-engineered navigation on mobile screens into an authentic native bottom app bar (`fixed bottom-0 inset-x-0 z-50 h-16`), featuring all 5 core tabs (`Overview`, `Transactions`, `Reconcile`, `Reports`, `Admin`) with thumb-friendly icons, clear labels, and 44px tap targets. The top header is kept slim and clean with just the logo, mode switch, dark mode toggle, and settings gear.
+- **Files Created / Changed:**
+  - `web/src/state/theme-mode.tsx`: Created `ThemeModeProvider` with `localStorage` persistence and system dark mode detection.
+  - `web/src/components/theme/ThemeToggle.tsx`: Created accessible Sun/Moon theme toggle button.
+  - `web/src/components/ui/NairaAmount.tsx`: Created `<NairaSign />` and `<NairaAmount />` micro-targeted components.
+  - `web/public/theme-init.js`: Static anti-FOUC theme initialization script passing SAST without `dangerouslySetInnerHTML`.
+  - `web/tailwind.config.ts`: Restored `heading`, `sans`, and `mono` font stacks to pure Cupertino (`SF Pro`, `Inter`, `Geist Mono`, `SF Mono`).
+  - `web/src/app/globals.css`: Added complete `.dark` semantic CSS variables and updated `.nb-money-cell` to use targeted `@font-face NairaGlyphFallback` for `U+20A6`.
+  - `web/src/app/layout.tsx`: Added `ThemeModeProvider`, anti-FOUC script, and `pb-20 md:pb-6` mobile bottom nav clearance.
+  - `web/src/components/TopNavCapsule.tsx`: Transformed navigation into a native mobile bottom bar with icons and desktop capsule, plus dark mode toggle.
+  - `web/src/components/TransactionsHubWorkspace.tsx`: Restored `rounded-[18px]` cards and integrated `<NairaAmount>`.
+  - `web/src/components/settings/FileSettingsModal.tsx` & `SettingsWorkspace.tsx`: Added Appearance & Dark Mode settings cards.
+  - `web/src/components/theme/NigerianArtBackground.tsx`: Added dynamic dark mode radial gradient and emerald stroke styling.
+  - `docs/DECISIONS.md`: Logged `ADR-039`.
+  - `docs/STAGE_LOG.md`, `docs/STATE.md`, `docs/SESSION_HANDOFF.md`: Updated living documentation.
+- **Verification Commands & Results:**
+  - `npm --prefix web run build`: **Compiled successfully in 26.3s, all 44 routes generated cleanly**.
+  - `npm --prefix web test`: **16 test files / 56 Vitest tests passed** (**0 axe-core violations**).
+  - `uv run pytest -q`: **100 passed** across 26 test modules in 100%.
+  - `uv run python scripts/run_sast_scan.py`: **0 vulnerabilities detected (clean pass)**.
+  - `uv run python scripts/verify_workflow.py --project .`: **128 / 128 wizard skills verified (100%)**.

@@ -62,9 +62,8 @@ export function NigerianArtBackground() {
       data-art-intensity={theme.intensity}
       className="nb-nigerian-art-bg pointer-events-none fixed inset-0 -z-10 overflow-hidden select-none"
       style={{
-        backgroundColor: "#F2F2F7",
-        backgroundImage:
-          "radial-gradient(circle 800px at 50% -100px, rgba(230, 245, 237, 0.85) 0%, rgba(242, 242, 247, 0.4) 65%, #F2F2F7 100%)",
+        backgroundColor: "var(--nb-art-bg-base, #F2F2F7)",
+        backgroundImage: "var(--nb-art-gradient, radial-gradient(circle 800px at 50% -100px, rgba(230, 245, 237, 0.85) 0%, rgba(242, 242, 247, 0.4) 65%, #F2F2F7 100%))",
       }}
     >
       <svg

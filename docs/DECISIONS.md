@@ -541,3 +541,23 @@
      - All 100 Python pytest tests passed.
      - All 128/128 wizard skills verified (`verify_workflow.py`).
 - **Consequences:** The Naira symbol (`₦`) renders crisply on all mobile devices including Samsung Internet and Android WebKit, and the mobile navigation is compact, tactile, and native.
+
+## ADR-039: Restoration of Cupertino Typography, Micro-Targeted Naira Glyph Isolation, Dark Mode & Native Mobile Bottom Bar
+- **Date:** 2026-11-13
+- **Status:** Accepted
+- **Context:**
+  - User requested: (1) Reverting the global typography overhaul to restore the pristine Apple Cupertino aesthetic (`SF Pro Display`, `SF Pro Text`, `Geist Mono`, `SF Mono`); (2) Resolving the Samsung Internet Naira glyph (`₦`) tofu bug without polluting global body or heading fonts; (3) Adding a native Light/Dark mode toggle; and (4) Moving the mobile navigation bar to the bottom of the screen.
+- **Decision:**
+  1. **Typography Reversion & Cupertino Restoration:** Reverted `heading`, `sans`, and `mono` in `web/tailwind.config.ts` to strictly Apple Cupertino system fonts and Inter. Reverted card radii and typography sizing across `TransactionsHubWorkspace.tsx`.
+  2. **Micro-Targeted Naira (`U+20A6`) Glyph Isolation:**
+     - Created `web/src/components/ui/NairaAmount.tsx` (`<NairaSign />` and `<NairaAmount />`), rendering the Naira symbol `₦` inside `font-sans` (which natively includes `U+20A6` on Android/Samsung devices) while rendering all numeric digits in tabular `font-mono`.
+     - Declared `@font-face` `NairaGlyphFallback` in `globals.css` targeting strictly `unicode-range: U+20A6` with local fallback `local("Roboto"), local("Noto Sans"), local("-apple-system")`, ensuring `.nb-money-cell` tabular mono remains 100% SF Mono for all numbers with zero tofu on Samsung Internet.
+  3. **Universal Light & Dark Mode System:**
+     - Implemented `ThemeModeProvider` in `web/src/state/theme-mode.tsx` with `localStorage` persistence and fallback for `prefers-color-scheme: dark`.
+     - Created `web/src/components/theme/ThemeToggle.tsx` providing an accessible Sun/Moon toggle button in `TopNavCapsule.tsx` and in `FileSettingsModal.tsx` / `SettingsWorkspace.tsx`.
+     - Defined comprehensive `.dark` tokens in `globals.css` (`--nb-background: 20 20 22`, `--nb-surface: 28 28 30`, `--nb-primary: 52 199 89`, etc.) and adapted `NigerianArtBackground` to dynamically use dark radial gradients and luminous emerald strokes.
+     - Extracted zero-FOUC theme initialization script into `web/public/theme-init.js` ensuring 100% clean SAST security scan pass.
+  4. **Native Mobile Bottom Navigation Bar:**
+     - Restructured `TopNavCapsule.tsx` using a single responsive `<nav aria-label="Primary workspace navigation">`. On mobile (`max-md:`), the nav is pinned to the bottom of the screen (`max-md:fixed max-md:bottom-0 max-md:inset-x-0 max-md:z-50 max-md:h-16`) with native icons (`LayoutGrid`, `ArrowLeftRight`, `Scale`, `BarChart3`, `ShieldCheck`) and labels. On desktop (`md:`), it seamlessly renders as the centered floating pill capsule.
+     - Added `pb-20 md:pb-6` body padding clearance in `layout.tsx` to prevent content overlap.
+- **Consequences:** The application recovers its sleek Apple aesthetic, renders the Naira sign with 0 tofu across all devices, supports instant light/dark mode switching, and offers a thumb-friendly native mobile bottom navigation bar with 100% test pass (56/56 Vitest, 100/100 Pytest, 0 SAST issues, 128/128 wizard skills).

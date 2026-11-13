@@ -9,13 +9,16 @@ import {
   Download,
   ExternalLink,
   FileSpreadsheet,
+  Moon,
   Palette,
   Save,
   Scale,
   Settings,
   ShieldCheck,
+  Sun,
 } from "lucide-react";
 import { useWorkspaceMode } from "@/state/workspace-mode";
+import { useThemeMode } from "@/state/theme-mode";
 import {
   ART_INTENSITIES,
   ART_MOTIFS,
@@ -27,6 +30,7 @@ import {
 
 export function SettingsWorkspace() {
   const { mode, setMode } = useWorkspaceMode();
+  const { theme, setTheme: setThemeMode } = useThemeMode();
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [artTheme, setArtTheme] = useState(() => getInitialArtTheme());
@@ -305,6 +309,63 @@ export function SettingsWorkspace() {
                 Active
               </span>
             </div>
+          </div>
+        </section>
+
+        {/* Appearance & Color Scheme (Light / Dark Mode) */}
+        <section
+          aria-label="Appearance and Theme Mode"
+          className="rounded-2xl border border-borderSubtle bg-white dark:bg-[#1C1C1E] p-5 shadow-sm space-y-4"
+        >
+          <div className="flex items-center justify-between border-b border-[#E5E5EA] dark:border-neutral-800 pb-3">
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400">
+                {theme === "dark" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+              </div>
+              <div>
+                <h2 className="text-sm font-bold text-[#1C1C1E] dark:text-[#F2F2F7]">Appearance &amp; Dark Mode</h2>
+                <p className="text-[11px] text-[#5E5E64] dark:text-neutral-400">Switch between light paper theme and midnight dark theme</p>
+              </div>
+            </div>
+            <span className="rounded-full bg-surfaceAlt px-3 py-1 text-[11px] font-bold text-ink uppercase">
+              {theme} Mode
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <button
+              type="button"
+              aria-pressed={theme === "light"}
+              onClick={() => setThemeMode("light")}
+              className={`nb-crisp-card-lift flex items-center justify-between rounded-xl p-3.5 border transition ${
+                theme === "light"
+                  ? "border-[#006838] bg-[#F4FBF7] ring-2 ring-[#006838]/30 font-bold"
+                  : "border-[#E5E5EA] bg-[#FAFAFC] hover:border-[#D1D1D6] text-ink"
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <Sun className="h-4 w-4 text-amber-500" />
+                <span className="text-xs font-semibold">Light Mode</span>
+              </div>
+              {theme === "light" && <Check className="h-4 w-4 text-[#006838]" />}
+            </button>
+
+            <button
+              type="button"
+              aria-pressed={theme === "dark"}
+              onClick={() => setThemeMode("dark")}
+              className={`nb-crisp-card-lift flex items-center justify-between rounded-xl p-3.5 border transition ${
+                theme === "dark"
+                  ? "border-[#006838] bg-[#F4FBF7] dark:bg-emerald-950/40 ring-2 ring-[#006838]/30 font-bold"
+                  : "border-[#E5E5EA] bg-[#FAFAFC] hover:border-[#D1D1D6] text-ink"
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <Moon className="h-4 w-4 text-indigo-400" />
+                <span className="text-xs font-semibold">Dark Mode</span>
+              </div>
+              {theme === "dark" && <Check className="h-4 w-4 text-[#006838]" />}
+            </button>
           </div>
         </section>
 

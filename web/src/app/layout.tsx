@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Geist_Mono, Inter } from "next/font/google";
 import { RouteLoaderOverlay } from "@/components/RouteLoaderOverlay";
 import { WorkspaceModeProvider } from "@/state/workspace-mode";
+import { ThemeModeProvider } from "@/state/theme-mode";
 import { NigerianArtBackground } from "@/components/theme/NigerianArtBackground";
 import "./globals.css";
 
@@ -35,16 +36,22 @@ export default function RootLayout({ children }: { readonly children: ReactNode 
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${interSans.variable} ${geistMono.variable}`}
     >
-      <body className="min-h-screen bg-background font-sans text-foreground antialiased relative">
+      <head>
+        <script src="/theme-init.js" />
+      </head>
+      <body className="min-h-screen bg-background font-sans text-foreground antialiased relative pb-20 md:pb-6">
         <NigerianArtBackground />
         <a href="#main-content" className="nb-skip-link">
           Skip to main content
         </a>
-        <WorkspaceModeProvider>
-          <RouteLoaderOverlay>{children}</RouteLoaderOverlay>
-        </WorkspaceModeProvider>
+        <ThemeModeProvider>
+          <WorkspaceModeProvider>
+            <RouteLoaderOverlay>{children}</RouteLoaderOverlay>
+          </WorkspaceModeProvider>
+        </ThemeModeProvider>
       </body>
     </html>
   );

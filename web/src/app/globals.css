@@ -46,6 +46,66 @@
   --input: 240 8% 82%;
   --ring: 152 100% 20.4%;
   --radius: 0.875rem;
+
+  --nb-art-bg-base: #F2F2F7;
+  --nb-art-gradient: radial-gradient(circle 800px at 50% -100px, rgba(230, 245, 237, 0.85) 0%, rgba(242, 242, 247, 0.4) 65%, #F2F2F7 100%);
+}
+
+.dark {
+  --nb-background: 20 20 22;
+  --nb-surface: 28 28 30;
+  --nb-surface-muted: 44 44 46;
+  --nb-ink: 242 242 247;
+  --nb-ink-muted: 152 152 157;
+  --nb-border: 44 44 46;
+  --nb-border-interactive: 72 72 74;
+  --nb-primary: 52 199 89;
+  --nb-primary-hover: 48 180 80;
+  --nb-primary-soft-bg: 20 50 32;
+  --nb-primary-soft-foreground: 120 230 150;
+  --nb-secondary: 90 160 230;
+  --nb-secondary-soft-bg: 25 45 70;
+  --nb-secondary-soft-foreground: 140 195 255;
+  --nb-warning: 255 214 10;
+  --nb-warning-soft-bg: 60 50 15;
+  --nb-warning-soft-foreground: 255 225 100;
+  --nb-destructive: 255 69 58;
+  --nb-destructive-soft-bg: 65 22 22;
+  --nb-destructive-soft-foreground: 255 120 110;
+  --nb-focus-ring: 52 199 89;
+
+  /* HSL dark tokens */
+  --background: 240 5% 8%;
+  --foreground: 240 5% 96%;
+  --card: 240 4% 12%;
+  --card-foreground: 240 5% 96%;
+  --popover: 240 4% 12%;
+  --popover-foreground: 240 5% 96%;
+  --primary: 142 65% 48%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 240 4% 18%;
+  --secondary-foreground: 240 5% 96%;
+  --muted: 240 4% 18%;
+  --muted-foreground: 240 5% 65%;
+  --accent: 240 4% 20%;
+  --accent-foreground: 240 5% 96%;
+  --destructive: 0 75% 55%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 240 4% 20%;
+  --input: 240 4% 24%;
+  --ring: 142 65% 48%;
+
+  --nb-art-bg-base: #121214;
+  --nb-art-gradient: radial-gradient(circle 800px at 50% -100px, rgba(16, 50, 30, 0.5) 0%, rgba(18, 18, 20, 0.7) 65%, #121214 100%);
+}
+
+.dark body {
+  background-color: #121214;
+  color: #f2f2f7;
+}
+
+.dark .nb-ios-glass {
+  background-color: rgba(28, 28, 30, 0.85);
 }
 
 html {
@@ -86,17 +146,17 @@ body {
   outline-offset: 2px;
 }
 
-/* Universal Naira Glyph Fallback for Android, Samsung Internet, Windows & Mobile WebKit */
+/* Targeted Naira Glyph Fallback for Samsung Internet & Android - targets ONLY U+20A6 so all digits remain 100% SF Mono */
 @font-face {
-  font-family: "NairaSystemGlyph";
-  src: local("Roboto"), local("Samsung Sans"), local("Segoe UI"), local("Arial"), local("-apple-system"), local("Helvetica Neue");
+  font-family: "NairaGlyphFallback";
+  src: local("Roboto"), local("Noto Sans"), local("-apple-system"), local("Segoe UI"), local("Arial"), sans-serif;
   unicode-range: U+20A6;
   font-display: swap;
 }
 
-/* Monetary cells strictly right-aligned tabular figures with guaranteed Naira U+20A6 rendering */
+/* Monetary cells strictly right-aligned tabular figures using Apple SF Mono / Geist Mono */
 .nb-money-cell {
-  font-family: "NairaSystemGlyph", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Samsung Sans", "SF Pro Text", Inter, sans-serif;
+  font-family: "NairaGlyphFallback", "SF Mono", ui-monospace, SFMono-Regular, var(--font-ios-mono), monospace;
   font-variant-numeric: tabular-nums;
   -webkit-font-feature-settings: "tnum";
   font-feature-settings: "tnum";

@@ -14,6 +14,7 @@ import {
   FileText,
   HelpCircle,
   LogOut,
+  Moon,
   Palette,
   RefreshCw,
   Save,
@@ -22,9 +23,11 @@ import {
   ShieldCheck,
   Sliders,
   Sparkles,
+  Sun,
   X,
 } from "lucide-react";
 import { useWorkspaceMode } from "@/state/workspace-mode";
+import { useThemeMode } from "@/state/theme-mode";
 import {
   ART_INTENSITIES,
   ART_MOTIFS,
@@ -41,6 +44,7 @@ interface FileSettingsModalProps {
 
 export function FileSettingsModal({ isOpen, onClose }: FileSettingsModalProps) {
   const { mode, setMode } = useWorkspaceMode();
+  const { theme, setTheme: setThemeMode } = useThemeMode();
   const prefersReduced = useReducedMotion();
   const [activeTab, setActiveTab] = useState<"profile" | "tax" | "files" | "preferences">("profile");
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
@@ -378,6 +382,60 @@ export function FileSettingsModal({ isOpen, onClose }: FileSettingsModalProps) {
 
           {activeTab === "preferences" && (
             <div className="space-y-4">
+              {/* Appearance & Color Scheme (Light / Dark Mode) */}
+              <div className="rounded-2xl border border-borderSubtle bg-white dark:bg-[#1C1C1E] p-4 space-y-3 shadow-sm">
+                <div className="flex items-center justify-between border-b border-[#E5E5EA] dark:border-neutral-800 pb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400">
+                      {theme === "dark" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+                    </div>
+                    <div>
+                      <p className="font-bold text-[#1C1C1E] dark:text-[#F2F2F7]">Appearance &amp; Dark Mode</p>
+                      <p className="text-[11px] text-[#5E5E64] dark:text-neutral-400">Switch between light paper theme and midnight dark theme</p>
+                    </div>
+                  </div>
+                  <span className="rounded-full bg-surfaceAlt px-2.5 py-0.5 text-[10px] font-bold text-ink uppercase">
+                    {theme} Mode
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2.5">
+                  <button
+                    type="button"
+                    aria-pressed={theme === "light"}
+                    onClick={() => setThemeMode("light")}
+                    className={`nb-crisp-card-lift flex items-center justify-between rounded-xl p-3 border transition ${
+                      theme === "light"
+                        ? "border-[#006838] bg-[#F4FBF7] ring-2 ring-[#006838]/30 font-bold"
+                        : "border-[#E5E5EA] bg-[#FAFAFC] hover:border-[#D1D1D6] text-ink"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Sun className="h-4 w-4 text-amber-500" />
+                      <span className="text-xs">Light Mode</span>
+                    </div>
+                    {theme === "light" && <Check className="h-3.5 w-3.5 text-[#006838]" />}
+                  </button>
+
+                  <button
+                    type="button"
+                    aria-pressed={theme === "dark"}
+                    onClick={() => setThemeMode("dark")}
+                    className={`nb-crisp-card-lift flex items-center justify-between rounded-xl p-3 border transition ${
+                      theme === "dark"
+                        ? "border-[#006838] bg-[#F4FBF7] dark:bg-emerald-950/40 ring-2 ring-[#006838]/30 font-bold"
+                        : "border-[#E5E5EA] bg-[#FAFAFC] hover:border-[#D1D1D6] text-ink"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Moon className="h-4 w-4 text-indigo-400" />
+                      <span className="text-xs">Dark Mode</span>
+                    </div>
+                    {theme === "dark" && <Check className="h-3.5 w-3.5 text-[#006838]" />}
+                  </button>
+                </div>
+              </div>
+
               {/* Nigerian Cultural Artwork Theme Selector */}
               <div className="rounded-2xl border border-[#006838]/20 bg-white p-4 space-y-3 shadow-sm">
                 <div className="flex items-center justify-between border-b border-[#E5E5EA] pb-3">

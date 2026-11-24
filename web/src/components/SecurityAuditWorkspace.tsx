@@ -73,8 +73,11 @@ const ROLE_MATRIX_ROWS: readonly {
 
 export function SecurityAuditWorkspace({
   initialData,
+  demoPassword = null,
 }: {
   initialData: SecurityWorkspaceInitialData;
+  /** Shared demo password, or null when the server has no demo accounts. */
+  demoPassword?: string | null;
 }) {
   const { mode } = useWorkspaceMode();
 
@@ -96,7 +99,7 @@ export function SecurityAuditWorkspace({
 
   // Sign-in form
   const [loginEmail, setLoginEmail] = useState("cfo@lagostrading.ng");
-  const [loginPassword, setLoginPassword] = useState("NairaBooks#2026");
+  const [loginPassword, setLoginPassword] = useState(demoPassword ?? "");
 
   // Invite team member form
   const [inviteEmail, setInviteEmail] = useState("");
@@ -208,14 +211,22 @@ export function SecurityAuditWorkspace({
         role: inviteRole,
       }),
     });
-    const body = (await res.json()) as { message?: string; email?: string };
+    const body = (await res.json()) as {
+      message?: string;
+      email?: string;
+      temporaryPassword?: string;
+    };
     if (!res.ok) {
       setErrorMessage(body.message ?? "Unable to add team member.");
       return;
     }
     setInviteEmail("");
     setInviteFullName("");
-    setStatusMessage(`Assigned workspace access for ${body.email ?? "new member"}.`);
+    setStatusMessage(
+      body.temporaryPassword
+        ? `Assigned workspace access for ${body.email ?? "new member"}. One-time password: ${body.temporaryPassword} — share it with them privately; it won't be shown again.`
+        : `Assigned workspace access for ${body.email ?? "new member"}.`,
+    );
     await refreshSecurityState();
   }
 
@@ -330,7 +341,11 @@ export function SecurityAuditWorkspace({
             1. Sign In or Switch Role Persona
           </h2>
           <p className="mt-1 text-xs text-stone-600">
-            Demo password for all 5 Nigerian roles: <code>NairaBooks#2026</code>
+            {demoPassword ? (
+              <>Demo password for all 5 Nigerian roles: <code>{demoPassword}</code></>
+            ) : (
+              "Sign in with your own NairaBooks account."
+            )}
           </p>
           <form onSubmit={handleLogin} className="mt-4 space-y-3">
             <div>

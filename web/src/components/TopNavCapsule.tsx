@@ -48,6 +48,13 @@ export function TopNavCapsule({ activeTab }: { readonly activeTab: NavTabId }) {
     try {
       await fetch("/api/auth/logout", { method: "POST" });
     } finally {
+      if (typeof window !== "undefined") {
+        try {
+          window.localStorage.removeItem("nairabooks_active_workspace");
+        } catch {
+          // Ignore
+        }
+      }
       window.location.assign("/login");
     }
   }

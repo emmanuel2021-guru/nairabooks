@@ -9,9 +9,14 @@ import { TopNavCapsule } from "@/components/TopNavCapsule";
 import LoginPage from "@/app/login/page";
 import { SignupWorkspace } from "@/components/SignupWorkspace";
 import { OverviewLandingClient } from "@/components/OverviewLandingClient";
+import { TransactionsHubWorkspace } from "@/components/TransactionsHubWorkspace";
 import { AdminMaintainWorkspace } from "@/components/AdminMaintainWorkspace";
 import { AdminRecordEditorWorkspace } from "@/components/admin/AdminRecordEditorWorkspace";
+import { FrcnReportsDashboard } from "@/components/FrcnReportsDashboard";
+import { BankReconciliationWorkspace } from "@/components/BankReconciliationWorkspace";
+import { fetchFiscalPeriods, fetchFrcnPackage } from "@/lib/bff-client";
 import { resetAdminStore } from "@/components/admin/admin-store";
+import { resetTransactionsStore } from "@/components/transactions/transactions-store";
 import { LandingPageClient } from "@/components/LandingPageClient";
 import { LOADER_SCENES, NairaBooksLoader } from "@/components/NairaBooksLoader";
 import { RouteLoaderOverlay } from "@/components/RouteLoaderOverlay";
@@ -238,6 +243,125 @@ describe("Google Stitch Product Landing, Login & Create Account Flows", () => {
     const results = await axe.run(container);
     expect(results.violations).toHaveLength(0);
   }, 30000);
+
+  it("renders pure zero-state for new tenant workspace with zero mock bleed across Overview, Transactions, and Admin", async () => {
+    const customWsId = "cccccccc-cccc-4ccc-8ccc-cccccccc0001";
+
+    // 1. Overview in zero-state
+    const overview = render(
+      <WorkspaceModeProvider>
+        <OverviewLandingClient
+          authenticatedUser={{
+            id: "user-new-001",
+            fullName: "Amaka Eze",
+            email: "amaka@newbusiness.ng",
+            role: "OWNER_MANAGING_DIRECTOR",
+            designation: "OWNER_MANAGING_DIRECTOR",
+            frcRegNumber: null,
+          }}
+          workspaceName="New Ventures Nigeria Ltd"
+          workspaceRc="RC 3948120"
+          accountCount={6}
+          voucherCount={0}
+          bankBalanceNgn="0.00"
+          receivablesNgn="0.00"
+          payablesNgn="0.00"
+          netIncomeNgn="0.00"
+          isZeroState={true}
+        />
+      </WorkspaceModeProvider>,
+    );
+
+    expect(overview.getByText(/Fresh Organization Ledger Initialized/i)).toBeTruthy();
+    expect(overview.queryByText(/Eko Atlantic Suites Ltd/i)).toBeNull();
+    expect(overview.queryByText(/Zaria Agro Distributors/i)).toBeNull();
+    expect(overview.getByText(/No Overdue Invoices/i)).toBeTruthy();
+    expect(overview.getByText(/0 pending/i)).toBeTruthy();
+    expect(overview.getByText(/All accounts are balanced and up to date/i)).toBeTruthy();
+    expect(overview.getByText(/No Cash Movements Yet/i)).toBeTruthy();
+    expect(overview.getByText(/Zero Expenses Logged/i)).toBeTruthy();
+
+    const overviewAxe = await axe.run(overview.container);
+    expect(overviewAxe.violations).toHaveLength(0);
+    overview.unmount();
+
+    // 2. Transactions Hub in zero-state
+    const txHub = render(
+      <WorkspaceModeProvider>
+        <TransactionsHubWorkspace workspaceId={customWsId} />
+      </WorkspaceModeProvider>,
+    );
+    expect(txHub.getByText(/No matching transactions in this view/i)).toBeTruthy();
+    expect(txHub.queryByText(/Eko Atlantic Suites Ltd/i)).toBeNull();
+    expect(txHub.queryByText(/INV-2026-104/i)).toBeNull();
+    txHub.unmount();
+
+    // 3. Admin Maintain Studio in zero-state
+    const adminHub = render(
+      <WorkspaceModeProvider>
+        <AdminMaintainWorkspace
+          workspaceId={customWsId}
+          workspaceName="New Ventures Nigeria Ltd"
+          workspaceRc="RC 3948120"
+        />
+      </WorkspaceModeProvider>,
+    );
+    expect(adminHub.getByText(/No matching records found/i)).toBeTruthy();
+    expect(adminHub.queryByText(/Eko Atlantic Suites Ltd/i)).toBeNull();
+    expect(adminHub.queryByText(/CUS-104/i)).toBeNull();
+
+    // Verify tailored Chart of Accounts is present with ₦0.00 balances
+    fireEvent.click(adminHub.getByRole("tab", { name: /Books & Budgets/i }));
+    expect(adminHub.getByRole("heading", { name: /Chart of Accounts/i })).toBeTruthy();
+    expect(adminHub.getByText(/Cash in Hand & Till Float/i)).toBeTruthy();
+    adminHub.unmount();
+
+    // 4. Reports Hub in zero-state (Balance Sheet, P&L, Trial Balance zero proof)
+    const periods = await fetchFiscalPeriods(customWsId);
+    const targetPeriod = periods[0]!.id;
+    const frcnPkg = await fetchFrcnPackage(targetPeriod, customWsId);
+    expect(frcnPkg.status).toBe(200);
+    if ("financialPosition" in frcnPkg.body) {
+      expect(frcnPkg.body.financialPosition.totalAssetsNgn).toBe("0.00");
+      expect(frcnPkg.body.profitAndLoss.netProfitNgn).toBe("0.00");
+      expect(frcnPkg.body.isBalanced).toBe(true);
+
+      const reportsHub = render(
+        <WorkspaceModeProvider>
+          <FrcnReportsDashboard
+            periods={periods}
+            initialPackage={frcnPkg.body}
+            workspaceName="New Ventures Nigeria Ltd"
+            workspaceRc="RC 3948120"
+          />
+        </WorkspaceModeProvider>,
+      );
+      expect(reportsHub.getByText("Assets: ₦0.00")).toBeTruthy();
+      expect(reportsHub.getByText("Net: ₦0.00")).toBeTruthy();
+      expect(reportsHub.getByText("Balanced (0.00)")).toBeTruthy();
+      expect(reportsHub.queryByText("Assets: ₦2500000.00")).toBeNull();
+      expect(reportsHub.queryByText("2,500,000.00")).toBeNull();
+      reportsHub.unmount();
+    }
+
+    // 5. Bank Reconciliation Workspace in zero-state
+    const reconcileHub = render(
+      <WorkspaceModeProvider>
+        <BankReconciliationWorkspace
+          accounts={[{ id: "1010-01", code: "1010", name: "Operating Bank Account", category: "ASSET", ifrsTag: "CASH_AND_CASH_EQUIVALENTS", sourcePrimitive: "BOOKKEEPING_AND_LEDGER", isSystemLocked: true, isActive: true }]}
+          workspaceId={customWsId}
+        />
+      </WorkspaceModeProvider>,
+    );
+    expect(reconcileHub.getByText(/Awaiting Upload/i)).toBeTruthy();
+    expect(reconcileHub.getByText(/0 transactions ready for auto-matching/i)).toBeTruthy();
+    expect(reconcileHub.queryByText(/TRF\/Fund\/TO EMMANUEL OLADIMEJI/i)).toBeNull();
+    expect(reconcileHub.queryByText(/Taiye Adewole/i)).toBeNull();
+    reconcileHub.unmount();
+
+    resetAdminStore();
+    resetTransactionsStore();
+  }, 35000);
 
   it("renders authentic custom-shadcn Public LandingPageClient with simple copy, interactive workspace preview, cashflow split, and zero axe violations", async () => {
     const { container } = render(

@@ -25,3 +25,15 @@ services:
         value: "1"
       - key: PORT
         value: "10000"
+      # Required: HMAC key for login sessions. Render generates a random value once and
+      # keeps it across deploys, so users stay signed in after restarts.
+      - key: NAIRABOOKS_SESSION_SECRET
+        generateValue: true
+      # Optional public demo: set NAIRABOOKS_DEMO_PASSWORD in the Render dashboard to
+      # enable the 5 demo accounts and the "Try a demo role" drawer. Unset = no demo accounts.
+      - key: NAIRABOOKS_DEMO_PASSWORD
+        sync: false
+      # Required for durable data: Neon Postgres connection string (sslmode=require).
+      # Unset = data is written to the ephemeral disk and lost on every deploy/restart.
+      - key: DATABASE_URL
+        sync: false

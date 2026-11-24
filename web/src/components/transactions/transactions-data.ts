@@ -116,6 +116,8 @@ export interface TransactionLineItem {
   readonly creditNgn?: number;
   readonly selected?: boolean;
   readonly entryKind?: "invoice-link" | "manual-item";
+  /** Inventory item (Admin stock record id) when the line was picked from stock. */
+  readonly itemId?: string;
 }
 
 export interface TransactionRecord {

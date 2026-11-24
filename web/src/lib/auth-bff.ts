@@ -17,10 +17,22 @@ import type {
   WorkspaceMembershipSummary,
 } from "@/types/auth";
 import type { AuthSecurityError, CrossTenantAccessError, ValidationError } from "@/types/ledger";
+import { resolveAuthRuntimeConfig } from "@/lib/auth-config";
+import { readDocument, writeDocument } from "@/lib/persistence";
+
+const AUTH_DOCUMENT_KEY = "auth";
 
 export const PRIMARY_WORKSPACE_ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaa0001";
 export const SECONDARY_WORKSPACE_ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaa0002";
 export const SESSION_COOKIE_NAME = "nb_session";
+const DEMO_OWNER_USER_ID = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbb0001";
+const DEMO_USER_IDS: ReadonlySet<string> = new Set([
+  DEMO_OWNER_USER_ID,
+  "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbb0002",
+  "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbb0003",
+  "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbb0004",
+  "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbb0005",
+]);
 const GENESIS_HASH = "0".repeat(64);
 const SENSITIVE_KEY_PATTERN = /password|secret|token|cookie|credential|hash/i;
 
@@ -108,7 +120,10 @@ export interface AuthorizedActorContext {
 }
 
 interface LocalAuthState {
+  /** Empty string when no usable secret is configured in production: sessions fail closed. */
   signingSecret: string;
+  /** Cookie-less requests may act as the demo owner (local dev and tests only). */
+  allowAnonymousDemoContext: boolean;
   workspaces: AuthWorkspaceSummary[];
   users: InternalUserRecord[];
   memberships: InternalMembershipRecord[];
@@ -234,19 +249,115 @@ function appendImmutableEvent(
     occurredAt,
   });
   state.auditEvents.push(record);
+  // Seed events are written while the state is being built; later events are persisted.
+  if (globalAuthRef.__nairabooksAuthState === state) {
+    savePersistedAuthState(state);
+  }
   return record;
 }
 
-function getLocalAuthState(): LocalAuthState {
+
+interface PersistedAuthData {
+  users: InternalUserRecord[];
+  workspaces: AuthWorkspaceSummary[];
+  memberships: InternalMembershipRecord[];
+  auditEvents: AuditEventRecord[];
+  camaCertifications: CamaSec405CertificationRecord[];
+}
+
+function loadPersistedAuthState(baseline: LocalAuthState, demoEnabled: boolean): void {
+  try {
+    const data = readDocument<Partial<PersistedAuthData>>(AUTH_DOCUMENT_KEY);
+    if (!data) {
+      return;
+    }
+    if (Array.isArray(data.users)) {
+      for (const u of data.users) {
+        // Demo accounts always come from the current seed (or not at all), never from disk,
+        // so a stale file cannot revive them or their old password hashes.
+        if (DEMO_USER_IDS.has(u.id)) {
+          continue;
+        }
+        const existingIdx = baseline.users.findIndex(
+          (ex) => ex.id === u.id || ex.email.toLowerCase() === u.email.toLowerCase(),
+        );
+        if (existingIdx >= 0) {
+          baseline.users[existingIdx] = u;
+        } else {
+          baseline.users.push(u);
+        }
+      }
+    }
+    if (Array.isArray(data.workspaces)) {
+      for (const w of data.workspaces) {
+        if (!baseline.workspaces.some((ex) => ex.id === w.id)) {
+          baseline.workspaces.push(w);
+        }
+      }
+    }
+    if (Array.isArray(data.memberships)) {
+      for (const m of data.memberships) {
+        if (!demoEnabled && DEMO_USER_IDS.has(m.userId)) {
+          continue;
+        }
+        const existingIdx = baseline.memberships.findIndex(
+          (ex) => ex.workspaceId === m.workspaceId && ex.userId === m.userId,
+        );
+        if (existingIdx >= 0) {
+          baseline.memberships[existingIdx] = m;
+        } else {
+          baseline.memberships.push(m);
+        }
+      }
+    }
+    if (Array.isArray(data.auditEvents)) {
+      for (const e of data.auditEvents) {
+        if (e.workspaceId !== PRIMARY_WORKSPACE_ID && !baseline.auditEvents.some((ex) => ex.id === e.id)) {
+          baseline.auditEvents.push(e);
+        }
+      }
+    }
+    if (Array.isArray(data.camaCertifications)) {
+      for (const c of data.camaCertifications) {
+        if (c.workspaceId !== PRIMARY_WORKSPACE_ID && !baseline.camaCertifications.some((ex) => ex.id === c.id)) {
+          baseline.camaCertifications.push(c);
+        }
+      }
+    }
+  } catch {
+    // Non-fatal if parsing fails; preserve baseline
+  }
+}
+
+function savePersistedAuthState(state: LocalAuthState): void {
+  const data: PersistedAuthData = {
+    // Demo accounts are re-seeded from config on every boot; never store their hashes.
+    users: state.users.filter((u) => !DEMO_USER_IDS.has(u.id)),
+    workspaces: state.workspaces,
+    memberships: state.memberships,
+    auditEvents: state.auditEvents.filter((e) => e.workspaceId !== PRIMARY_WORKSPACE_ID),
+    camaCertifications: state.camaCertifications.filter((c) => c.workspaceId !== PRIMARY_WORKSPACE_ID),
+  };
+  writeDocument(AUTH_DOCUMENT_KEY, data);
+}
+
+export function resetLocalAuthStateForTesting(): void {
+  delete globalAuthRef.__nairabooksAuthState;
+}
+
+export function getLocalAuthState(): LocalAuthState {
   if (globalAuthRef.__nairabooksAuthState) {
     return globalAuthRef.__nairabooksAuthState;
   }
 
-  const demoPasswordPhc = hashPasswordScrypt("NairaBooks#2026");
+  const config = resolveAuthRuntimeConfig();
+  // Demo accounts exist only when a demo password is available (always in dev/test,
+  // opt-in via NAIRABOOKS_DEMO_PASSWORD in production).
+  const demoPasswordPhc = config.demoPassword ? hashPasswordScrypt(config.demoPassword) : null;
 
   const state: LocalAuthState = {
-    signingSecret:
-      process.env.NAIRABOOKS_SESSION_SECRET ?? randomBytes(32).toString("hex"),
+    signingSecret: config.sessionSecret ?? "",
+    allowAnonymousDemoContext: config.allowAnonymousDemoContext,
     workspaces: [
       {
         id: PRIMARY_WORKSPACE_ID,
@@ -261,7 +372,7 @@ function getLocalAuthState(): LocalAuthState {
         baseCurrency: "NGN",
       },
     ],
-    users: [
+    users: demoPasswordPhc === null ? [] : [
       {
         id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbb0001",
         email: "owner@lagostrading.ng",
@@ -298,7 +409,7 @@ function getLocalAuthState(): LocalAuthState {
         frcRegNumber: "FRC/2026/000412",
       },
     ],
-    memberships: [
+    memberships: demoPasswordPhc === null ? [] : [
       {
         workspaceId: PRIMARY_WORKSPACE_ID,
         userId: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbb0001",
@@ -341,28 +452,37 @@ function getLocalAuthState(): LocalAuthState {
     failedAttempts: new Map(),
   };
 
-  appendImmutableEvent(state, {
-    workspaceId: PRIMARY_WORKSPACE_ID,
-    actorUserId: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbb0001",
-    actorRole: "OWNER_MANAGING_DIRECTOR",
-    action: "WORKSPACE_INITIALIZED",
-    entityType: "Workspace",
-    entityId: PRIMARY_WORKSPACE_ID,
-    payload: { legalName: "Lagos Trading & Hospitality Ltd", compliance: "CAMA_2020_FRCN" },
-    occurredAt: "2026-01-01T08:00:00.000Z",
-  });
+  if (demoPasswordPhc !== null) {
+    appendImmutableEvent(state, {
+      workspaceId: PRIMARY_WORKSPACE_ID,
+      actorUserId: DEMO_OWNER_USER_ID,
+      actorRole: "OWNER_MANAGING_DIRECTOR",
+      action: "WORKSPACE_INITIALIZED",
+      entityType: "Workspace",
+      entityId: PRIMARY_WORKSPACE_ID,
+      payload: { legalName: "Lagos Trading & Hospitality Ltd", compliance: "CAMA_2020_FRCN" },
+      occurredAt: "2026-01-01T08:00:00.000Z",
+    });
+  }
 
+  loadPersistedAuthState(state, demoPasswordPhc !== null);
   globalAuthRef.__nairabooksAuthState = state;
   return state;
 }
 
 function signToken(claims: SignedTokenClaims, secret: string): string {
+  if (!secret) {
+    throw new Error("Session signing secret is not configured.");
+  }
   const payloadB64 = Buffer.from(JSON.stringify(claims), "utf8").toString("base64url");
   const sigB64 = createHmac("sha256", secret).update(payloadB64).digest("base64url");
   return `${payloadB64}.${sigB64}`;
 }
 
 function verifyToken(token: string, secret: string): SignedTokenClaims | null {
+  if (!secret) {
+    return null;
+  }
   const parts = token.split(".");
   if (parts.length !== 2) {
     return null;
@@ -477,6 +597,26 @@ function validationErr(message: string, field: string | null = null): Validation
   return { __typename: "ValidationError", code: "VALIDATION_ERROR", message, field };
 }
 
+/** Returned instead of a session when production has no usable NAIRABOOKS_SESSION_SECRET. */
+function sessionSecretUnavailable(): { status: 503; body: AuthSecurityError } {
+  return {
+    status: 503,
+    body: authError(
+      "AuthenticationError",
+      "SESSION_SECRET_NOT_CONFIGURED",
+      "Sign-in is unavailable: the server session secret is not configured.",
+    ),
+  };
+}
+
+/** The seeded demo owner, used for cookie-less requests in local dev and tests only. */
+function anonymousDemoOwner(state: LocalAuthState): InternalUserRecord | null {
+  if (!state.allowAnonymousDemoContext) {
+    return null;
+  }
+  return state.users.find((u) => u.id === DEMO_OWNER_USER_ID) ?? null;
+}
+
 export async function authorizeApiRequest(
   request?: NextRequest | Request,
   requiredPermission?: Permission,
@@ -563,8 +703,16 @@ export async function authorizeApiRequest(
     };
   }
 
-  // Backward-compatible local demo context for existing Slices 1-6 BFF workflow calls
-  const defaultOwner = state.users[0]!;
+  // Backward-compatible local demo context for existing Slices 1-6 BFF workflow calls.
+  // Local dev and tests only: production always requires a session cookie.
+  const defaultOwner = anonymousDemoOwner(state);
+  if (!defaultOwner) {
+    return {
+      ok: false,
+      status: 401,
+      body: authError("AuthenticationError", "AUTHENTICATION_ERROR", "Authentication cookie required."),
+    };
+  }
   const defaultRole: ActorRole = "OWNER_MANAGING_DIRECTOR";
   const permissions = ROLE_PERMISSIONS[defaultRole];
   if (requiredPermission && !permissions.includes(requiredPermission)) {
@@ -594,6 +742,9 @@ export function loginWithCredentialsViaBff(rawJsonText: string): {
   body: AuthSessionPayload | AuthSecurityError | ValidationError;
   setCookie?: string;
 } {
+  if (!getLocalAuthState().signingSecret) {
+    return sessionSecretUnavailable();
+  }
   let parsed: unknown;
   try {
     parsed = JSON.parse(rawJsonText);
@@ -696,8 +847,14 @@ export function getSessionFromRequestViaBff(request: NextRequest | Request): {
         body: authError("AuthenticationError", "AUTHENTICATION_ERROR", "No active session."),
       };
     }
-    const defaultUser = state.users[0]!;
-    const defaultWs = state.workspaces[0]!;
+    const defaultUser = anonymousDemoOwner(state);
+    const defaultWs = state.workspaces.find((w) => w.id === PRIMARY_WORKSPACE_ID);
+    if (!defaultUser || !defaultWs) {
+      return {
+        status: 401,
+        body: authError("AuthenticationError", "AUTHENTICATION_ERROR", "No active session."),
+      };
+    }
     return {
       status: 200,
       body: buildSessionPayload(state, defaultUser, defaultWs, "OWNER_MANAGING_DIRECTOR"),
@@ -834,7 +991,13 @@ export function listWorkspaceMembersViaBff(workspaceId: string): WorkspaceMember
 export function assignWorkspaceMemberViaBff(
   ctx: AuthorizedActorContext,
   rawJsonText: string,
-): { status: number; body: WorkspaceMemberRecord | ValidationError | AuthSecurityError } {
+): {
+  status: number;
+  body:
+    | (WorkspaceMemberRecord & { readonly temporaryPassword?: string })
+    | ValidationError
+    | AuthSecurityError;
+} {
   if (!ctx.permissions.includes("MEMBERS_MANAGE")) {
     return {
       status: 403,
@@ -877,12 +1040,15 @@ export function assignWorkspaceMemberViaBff(
 
   const state = getLocalAuthState();
   let user = state.users.find((u) => u.email.toLowerCase() === email);
+  // New members get a random one-time password, shown once to the inviter to hand over privately.
+  let temporaryPassword: string | undefined;
   if (!user) {
+    temporaryPassword = randomBytes(12).toString("base64url");
     user = {
       id: randomUUID(),
       email,
       fullName,
-      passwordPhc: hashPasswordScrypt("NairaBooks#2026"),
+      passwordPhc: hashPasswordScrypt(temporaryPassword),
       frcRegNumber,
     };
     state.users.push(user);
@@ -915,6 +1081,8 @@ export function assignWorkspaceMemberViaBff(
     payload: { email: user.email, assignedRole: role },
   });
 
+  savePersistedAuthState(state);
+
   return {
     status: 201,
     body: {
@@ -924,6 +1092,7 @@ export function assignWorkspaceMemberViaBff(
       role,
       frcRegNumber: user.frcRegNumber,
       isActive: true,
+      ...(temporaryPassword ? { temporaryPassword } : {}),
     },
   };
 }
@@ -1103,7 +1272,11 @@ export async function certifyCamaSec405ViaBff(
 
   try {
     const label = `${certifierDesignationRaw} (${certifierFrcNumber})`;
-    const { period, snapshotHash } = await certifyPeriodCamaInLocalLedger(periodId, label);
+    const { period, snapshotHash } = await certifyPeriodCamaInLocalLedger(
+      periodId,
+      label,
+      ctx.workspaceId,
+    );
     const certRecord: CamaSec405CertificationRecord = Object.freeze({
       id: randomUUID(),
       workspaceId: ctx.workspaceId,
@@ -1156,10 +1329,14 @@ export async function certifyCamaSec405ViaBff(
   }
 }
 
-export async function fetchSecurityWorkspaceInitialData(): Promise<SecurityWorkspaceInitialData> {
+/** Anonymous (demo) security dashboard data; `null` when there is no demo context to show. */
+export async function fetchSecurityWorkspaceInitialData(): Promise<SecurityWorkspaceInitialData | null> {
   const state = getLocalAuthState();
-  const owner = state.users[0]!;
-  const primaryWs = state.workspaces[0]!;
+  const owner = anonymousDemoOwner(state);
+  const primaryWs = state.workspaces.find((w) => w.id === PRIMARY_WORKSPACE_ID);
+  if (!owner || !primaryWs) {
+    return null;
+  }
   const periods = await fetchFiscalPeriods();
   return {
     session: buildSessionPayload(state, owner, primaryWs, "OWNER_MANAGING_DIRECTOR"),
@@ -1196,6 +1373,9 @@ export function registerWorkspaceAccountViaBff(rawJsonText: string): {
   body: AuthSessionPayload | ValidationError | AuthSecurityError;
   setCookie?: string;
 } {
+  if (!getLocalAuthState().signingSecret) {
+    return sessionSecretUnavailable();
+  }
   let parsed: unknown;
   try {
     parsed = JSON.parse(rawJsonText);
@@ -1278,30 +1458,56 @@ export function registerWorkspaceAccountViaBff(rawJsonText: string): {
   }
 
   const state = getLocalAuthState();
-  if (state.users.some((u) => u.email.toLowerCase() === email)) {
-    return {
-      status: 409,
-      body: validationErr("An account with this email address already exists.", "email"),
-    };
+  // One login can own several companies: an existing account adds this company when the
+  // password proves it is theirs (failures count towards the sign-in rate limit).
+  const existingUser = state.users.find((u) => u.email.toLowerCase() === email);
+  if (existingUser) {
+    const now = Date.now();
+    const recentFailures = (state.failedAttempts.get(email) ?? []).filter((ts) => now - ts < 60_000);
+    if (recentFailures.length >= 5) {
+      state.failedAttempts.set(email, recentFailures);
+      return {
+        status: 429,
+        body: authError(
+          "RateLimitExceededError",
+          "RATE_LIMIT_EXCEEDED",
+          "Too many failed attempts. Please wait 60 seconds and retry.",
+        ),
+      };
+    }
+    if (!verifyPasswordScrypt(password, existingUser.passwordPhc)) {
+      recentFailures.push(now);
+      state.failedAttempts.set(email, recentFailures);
+      return {
+        status: 409,
+        body: validationErr(
+          "An account with this email already exists. Enter that account's password to add this company to it, or sign in instead.",
+          "email",
+        ),
+      };
+    }
+    state.failedAttempts.delete(email);
   }
 
-  const userId = randomUUID();
   const workspaceId = randomUUID();
-  const newUser: InternalUserRecord = {
-    id: userId,
+  const newUser: InternalUserRecord = existingUser ?? {
+    id: randomUUID(),
     email,
     fullName,
     passwordPhc: hashPasswordScrypt(password),
     frcRegNumber: null,
   };
+  const userId = newUser.id;
   const newWorkspace: AuthWorkspaceSummary = {
     id: workspaceId,
     legalName: workspaceName,
     rcNumber,
     baseCurrency: "NGN",
+    businessType,
+    customModules,
   };
 
-  state.users.push(newUser);
+  if (!existingUser) state.users.push(newUser);
   state.workspaces.push(newWorkspace);
   state.memberships.push({
     workspaceId,
@@ -1309,6 +1515,8 @@ export function registerWorkspaceAccountViaBff(rawJsonText: string): {
     role: "OWNER_MANAGING_DIRECTOR",
     isActive: true,
   });
+
+  savePersistedAuthState(state);
 
   appendImmutableEvent(state, {
     workspaceId,
@@ -1364,5 +1572,52 @@ export function registerWorkspaceAccountViaBff(rawJsonText: string): {
     status: 201,
     body: buildSessionPayload(state, newUser, newWorkspace, "OWNER_MANAGING_DIRECTOR"),
     setCookie: formatSessionCookieHeader(token, 900),
+  };
+}
+
+
+export function resetPasswordViaBff(rawJsonText: string): {
+  status: number;
+  body: { success: boolean; message: string } | ValidationError;
+} {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(rawJsonText);
+  } catch {
+    return { status: 400, body: validationErr("Malformed JSON reset payload.", "body") };
+  }
+  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+    return { status: 400, body: validationErr("Request body must be a JSON object.", "body") };
+  }
+  // Without emailed reset links, anyone knowing an address could take the account over.
+  // Disabled in production until verified password reset exists; dev/test keep the shortcut.
+  if (resolveAuthRuntimeConfig().isProduction) {
+    return {
+      status: 403,
+      body: {
+        success: false,
+        message: "Password reset is disabled until email verification is configured.",
+      },
+    };
+  }
+  const obj = parsed as Record<string, unknown>;
+  const email = typeof obj.email === "string" ? obj.email.trim().toLowerCase() : "";
+  const password = typeof obj.password === "string" ? obj.password : "";
+  if (!email || !email.includes("@")) {
+    return { status: 400, body: validationErr("Valid email is required.", "email") };
+  }
+  if (!password || password.length < 8) {
+    return { status: 400, body: validationErr("Password must be at least 8 characters long.", "password") };
+  }
+  const state = getLocalAuthState();
+  const user = state.users.find((u) => u.email.toLowerCase() === email);
+  if (!user) {
+    return { status: 404, body: validationErr("No account found with this email address.", "email") };
+  }
+  user.passwordPhc = hashPasswordScrypt(password);
+  savePersistedAuthState(state);
+  return {
+    status: 200,
+    body: { success: true, message: "Password updated successfully." },
   };
 }

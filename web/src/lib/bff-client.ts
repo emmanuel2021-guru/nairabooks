@@ -1,11 +1,27 @@
 /**
- * Next.js Server BFF adapter delegating to Python NAIRABOOKS_API_URL when configured,
- * with a parity-checked local transactional Ledger fallback for standalone runs and Vitest.
+ * Next.js server ledger: per-workspace double-entry books, persisted as one document per
+ * workspace (`ledger:<workspaceId>`) through `@/lib/persistence` (Postgres in production).
  */
 
 import { createHash } from "node:crypto";
+import { readDocument, writeDocument } from "@/lib/persistence";
 import { convertToNgnKobo, formatKobo, parseMoneyToKobo, parseRateScaled } from "@/lib/decimal";
+import {
+  SECTOR_TEMPLATES,
+  getIfrsGroupForAccount,
+} from "@/components/onboarding/company-wizard-data";
+import {
+  buildPostingPlan,
+  categoryFromIfrsElement,
+  koboToDecimalString,
+  toAmount,
+  toKobo,
+  type PlannedLine,
+  type PostingStockItem,
+  type PostingTransactionInput,
+} from "@/lib/posting-rules";
 import type {
+  AccountCategory,
   BankReconciliationReport,
   BankStatementLineDraft,
   ChartOfAccount,
@@ -24,6 +40,7 @@ import type {
   StatementLineItem,
   TrialBalanceRow,
   ValueAddedStatementRow,
+  WorkspaceKpiSummary,
 } from "@/types/ledger";
 
 const WORKSPACE_ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaa0001";
@@ -35,6 +52,13 @@ interface LocalBffState {
   vouchers: JournalVoucher[];
   idempotency: Map<string, JournalVoucher>;
   sequence: number;
+  /** Transactions Hub record id -> the voucher currently carrying it in the books. */
+  postedTransactions: Map<string, PostedTransactionLink>;
+}
+
+interface PostedTransactionLink {
+  readonly voucherId: string;
+  readonly fingerprint: string;
 }
 
 function createInitialState(): LocalBffState {
@@ -186,24 +210,109 @@ function createInitialState(): LocalBffState {
     vouchers: [openingVoucher],
     idempotency: new Map(),
     sequence: 1,
+    postedTransactions: new Map(),
+  };
+}
+
+/**
+ * A freshly registered workspace starts with its sector chart of accounts, the shared
+ * fiscal calendar, and an empty journal — never the demo company's vouchers.
+ */
+function createTenantState(workspaceId: string): LocalBffState {
+  return {
+    accounts: getTailoredBffAccounts(workspaceId),
+    periods: createInitialState().periods.map((p) => ({ ...p })),
+    vouchers: [],
+    idempotency: new Map(),
+    sequence: 0,
+    postedTransactions: new Map(),
+  };
+}
+
+/** Stored shape of a workspace ledger (the idempotency Map becomes an entry list). */
+interface PersistedLedgerState {
+  readonly accounts: ChartOfAccount[];
+  readonly periods: FiscalPeriod[];
+  readonly vouchers: JournalVoucher[];
+  readonly idempotency: Array<[string, string]>; // idempotency key -> voucher id
+  readonly sequence: number;
+  readonly postedTransactions?: Array<[string, PostedTransactionLink]>;
+}
+
+function ledgerDocumentKey(workspaceId: string): string {
+  return `ledger:${workspaceId}`;
+}
+
+function deserializeLedger(doc: PersistedLedgerState): LocalBffState {
+  const byId = new Map(doc.vouchers.map((v) => [v.id, v]));
+  const idempotency = new Map<string, JournalVoucher>();
+  for (const [key, voucherId] of doc.idempotency) {
+    const voucher = byId.get(voucherId);
+    if (voucher) idempotency.set(key, voucher);
+  }
+  return {
+    accounts: doc.accounts,
+    periods: doc.periods,
+    vouchers: doc.vouchers,
+    idempotency,
+    sequence: doc.sequence,
+    postedTransactions: new Map(doc.postedTransactions ?? []),
+  };
+}
+
+function serializeLedger(state: LocalBffState): PersistedLedgerState {
+  return {
+    accounts: state.accounts,
+    periods: state.periods,
+    vouchers: state.vouchers,
+    idempotency: [...state.idempotency].map(([key, v]) => [key, v.id]),
+    sequence: state.sequence,
+    postedTransactions: [...state.postedTransactions],
   };
 }
 
 const globalForLedger = globalThis as unknown as {
-  __nairabooksBffState?: LocalBffState;
+  __nairabooksBffStates?: Map<string, LocalBffState>;
 };
 
-function getLocalState(): LocalBffState {
-  if (!globalForLedger.__nairabooksBffState) {
-    globalForLedger.__nairabooksBffState = createInitialState();
+/** Per-workspace ledger: loaded from the stored document, or seeded on first use. */
+function getLocalState(workspaceId: string = WORKSPACE_ID): LocalBffState {
+  if (!globalForLedger.__nairabooksBffStates) {
+    globalForLedger.__nairabooksBffStates = new Map();
   }
-  return globalForLedger.__nairabooksBffState;
+  const states = globalForLedger.__nairabooksBffStates;
+  let state = states.get(workspaceId);
+  if (!state) {
+    const stored = readDocument<PersistedLedgerState>(ledgerDocumentKey(workspaceId));
+    state = stored
+      ? deserializeLedger(stored)
+      : workspaceId === WORKSPACE_ID
+        ? createInitialState()
+        : createTenantState(workspaceId);
+    states.set(workspaceId, state);
+  }
+  return state;
 }
 
-function getUpstreamBaseUrl(): string | null {
-  const url = process.env.NAIRABOOKS_API_URL?.trim();
-  return url && url.length > 0 ? url.replace(/\/$/, "") : null;
+/** Read-only view of a workspace's chart and vouchers, for dashboards. */
+export function getWorkspaceLedgerForReporting(workspaceId: string): {
+  readonly accounts: readonly ChartOfAccount[];
+  readonly vouchers: readonly JournalVoucher[];
+} {
+  const state = getLocalState(workspaceId);
+  return { accounts: [...state.accounts], vouchers: [...state.vouchers] };
 }
+
+/** Queue a save of the workspace's books; call after every mutation. */
+function persistLedger(workspaceId: string, state: LocalBffState): void {
+  writeDocument(ledgerDocumentKey(workspaceId), serializeLedger(state));
+}
+
+/** Tests: drop live ledger objects so the next access reloads from stored documents. */
+export function resetLocalLedgerStateForTesting(): void {
+  delete globalForLedger.__nairabooksBffStates;
+}
+
 
 function validationError(message: string, field: string | null = null): MutationError {
   return {
@@ -287,73 +396,78 @@ function httpStatusForError(err: MutationError): number {
   }
 }
 
-export async function fetchChartOfAccounts(): Promise<ChartOfAccount[]> {
-  const upstream = getUpstreamBaseUrl();
-  if (upstream) {
+function getTailoredBffAccounts(targetWs: string): ChartOfAccount[] {
+  let resolvedType: string | undefined;
+  if (typeof window !== "undefined") {
     try {
-      const res = await fetch(`${upstream}/api/v1/ledger/accounts`, {
-        headers: {
-          "X-Workspace-Id": WORKSPACE_ID,
-          "X-Actor-User-Id": ACTOR_USER_ID,
-        },
-        cache: "no-store",
-      });
-      if (res.ok) {
-        const body = (await res.json()) as { items: ChartOfAccount[] };
-        return body.items;
-      }
+      resolvedType =
+        window.localStorage.getItem(`nairabooks_workspace_business_type_${targetWs}`) ||
+        window.sessionStorage.getItem(`nairabooks_workspace_business_type_${targetWs}`) ||
+        undefined;
     } catch {
-      // Fall back to local BFF store when Python server is offline in dev/test
+      // Ignore
     }
   }
-  return [...getLocalState().accounts];
-}
 
-export async function fetchFiscalPeriods(): Promise<FiscalPeriod[]> {
-  const upstream = getUpstreamBaseUrl();
-  if (upstream) {
-    try {
-      const res = await fetch(`${upstream}/api/v1/ledger/periods`, {
-        headers: {
-          "X-Workspace-Id": WORKSPACE_ID,
-          "X-Actor-User-Id": ACTOR_USER_ID,
-        },
-        cache: "no-store",
-      });
-      if (res.ok) {
-        const body = (await res.json()) as { items: FiscalPeriod[] };
-        return body.items;
-      }
-    } catch {
-      // Fallback
-    }
+  if (!resolvedType && typeof window === "undefined") {
+    const auth = readDocument<{ workspaces?: Array<{ id: string; businessType?: string }> }>("auth");
+    resolvedType = auth?.workspaces?.find((w) => w.id === targetWs)?.businessType;
   }
-  return [...getLocalState().periods];
+
+  const template =
+    (resolvedType ? SECTOR_TEMPLATES.find((t) => t.code === resolvedType) : null) ??
+    SECTOR_TEMPLATES[0]!;
+
+  return template.accounts.map((acc) => {
+    const groupMeta = getIfrsGroupForAccount(acc);
+    const category: AccountCategory =
+      acc.group === "Assets"
+        ? "ASSET"
+        : acc.group === "Liabilities"
+        ? "LIABILITY"
+        : acc.group === "Equity"
+        ? "EQUITY"
+        : acc.group === "Income"
+        ? "REVENUE"
+        : "EXPENSE";
+
+    return {
+      id: `coa-${targetWs.slice(0, 8)}-${acc.code}`,
+      code: acc.code,
+      name: acc.accountName,
+      category,
+      ifrsTag: groupMeta.ifrsStandard,
+      sourcePrimitive: "BOOKKEEPING_AND_LEDGER",
+      isSystemLocked: ["1010", "1110", "2210", "3010"].includes(acc.code),
+      isActive: true,
+    };
+  });
 }
 
-export async function fetchJournalVouchers(first = 25): Promise<JournalVoucherConnection> {
+export async function fetchChartOfAccounts(
+  workspaceId?: string,
+  sessionToken?: string,
+): Promise<ChartOfAccount[]> {
+  const targetWs = workspaceId || WORKSPACE_ID;
+  return [...getLocalState(targetWs).accounts];
+}
+
+export async function fetchFiscalPeriods(
+  workspaceId?: string,
+  sessionToken?: string,
+): Promise<FiscalPeriod[]> {
+  const targetWs = workspaceId || WORKSPACE_ID;
+  return [...getLocalState(targetWs).periods];
+}
+
+export async function fetchJournalVouchers(
+  first = 25,
+  workspaceId?: string,
+  sessionToken?: string,
+): Promise<JournalVoucherConnection> {
+  const targetWs = workspaceId || WORKSPACE_ID;
   const boundedFirst = Math.min(Math.max(first, 1), 100);
-  const upstream = getUpstreamBaseUrl();
-  if (upstream) {
-    try {
-      const res = await fetch(
-        `${upstream}/api/v1/ledger/vouchers?first=${boundedFirst}`,
-        {
-          headers: {
-            "X-Workspace-Id": WORKSPACE_ID,
-            "X-Actor-User-Id": ACTOR_USER_ID,
-          },
-          cache: "no-store",
-        },
-      );
-      if (res.ok) {
-        return (await res.json()) as JournalVoucherConnection;
-      }
-    } catch {
-      // Fallback
-    }
-  }
-  const state = getLocalState();
+  const state = getLocalState(targetWs);
   const sliced = state.vouchers.slice(0, boundedFirst);
   const edges = sliced.map((node) => ({
     cursor: Buffer.from(node.id, "utf-8").toString("base64url"),
@@ -370,8 +484,65 @@ export async function fetchJournalVouchers(first = 25): Promise<JournalVoucherCo
   };
 }
 
+export async function fetchKpiSummary(
+  workspaceId?: string,
+  sessionToken?: string,
+): Promise<WorkspaceKpiSummary> {
+  const targetWs = workspaceId || WORKSPACE_ID;
+
+  // Every real company's KPIs come straight from its own books.
+  if (targetWs !== WORKSPACE_ID) {
+    const state = getLocalState(targetWs);
+    const nets = aggregateNetKobo(state.accounts, state.vouchers);
+    let bank = 0n;
+    let receivables = 0n;
+    let payables = 0n;
+    let netIncome = 0n;
+    for (const acct of state.accounts) {
+      const net = nets.get(acct.id) ?? 0n;
+      if (acct.category === "ASSET" && /bank|cash/i.test(acct.name) && !/receivable|clearing/i.test(acct.name)) {
+        bank += net;
+      } else if (acct.category === "ASSET" && /receivable/i.test(acct.name) && !/wht|tax/i.test(acct.name)) {
+        receivables += net;
+      } else if (acct.category === "LIABILITY" && /payable/i.test(acct.name) && /trade|supplier/i.test(acct.name)) {
+        payables += -net;
+      }
+      if (acct.category === "REVENUE") netIncome += -net;
+      if (acct.category === "EXPENSE") netIncome -= net;
+    }
+    const withCommas = (kobo: bigint) => {
+      const [whole, cents] = formatKobo(kobo).split(".");
+      return `${whole!.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}.${cents}`;
+    };
+    return {
+      workspaceId: targetWs,
+      bankBalanceNgn: withCommas(bank),
+      receivablesNgn: withCommas(receivables),
+      payablesNgn: withCommas(payables),
+      netIncomeNgn: withCommas(netIncome),
+      accountCount: state.accounts.length,
+      voucherCount: state.vouchers.length,
+      isZeroState: state.vouchers.length === 0,
+    };
+  }
+
+  return {
+    workspaceId: WORKSPACE_ID,
+    bankBalanceNgn: "48,250,000.00",
+    receivablesNgn: "12,480,000.00",
+    payablesNgn: "4,920,000.00",
+    netIncomeNgn: "6,940,000.00",
+    accountCount: getLocalState().accounts.length,
+    voucherCount: getLocalState().vouchers.length,
+    isZeroState: false,
+  };
+}
+
 export async function postJournalVoucherViaBff(
   rawJsonText: string,
+  workspaceId?: string,
+  sessionToken?: string,
+  actorUserId?: string,
 ): Promise<{ status: number; body: JournalVoucher | MutationError }> {
   let parsed: unknown;
   try {
@@ -383,28 +554,11 @@ export async function postJournalVoucherViaBff(
     return { status: 400, body: validationError("Request body must be a JSON object.", "body") };
   }
 
-  const upstream = getUpstreamBaseUrl();
-  if (upstream) {
-    try {
-      const res = await fetch(`${upstream}/api/v1/ledger/vouchers`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Workspace-Id": WORKSPACE_ID,
-          "X-Actor-User-Id": ACTOR_USER_ID,
-        },
-        body: rawJsonText,
-        cache: "no-store",
-      });
-      const body = (await res.json()) as JournalVoucher | MutationError;
-      return { status: res.status, body };
-    } catch {
-      // Fallback to local engine
-    }
-  }
+  const targetWs = workspaceId || WORKSPACE_ID;
+  const targetActor = actorUserId || ACTOR_USER_ID;
 
   const payload = parsed as Record<string, unknown>;
-  const state = getLocalState();
+  const state = getLocalState(targetWs);
 
   try {
     const idempotencyKey = assertStringField(payload.idempotencyKey, "idempotencyKey");
@@ -535,13 +689,14 @@ export async function postJournalVoucherViaBff(
       lines: builtLines,
       totalDebitNgn: formatKobo(totalDebitNgn),
       totalCreditNgn: formatKobo(totalCreditNgn),
-      createdByUserId: ACTOR_USER_ID,
+      createdByUserId: targetActor,
       approvedByUserId: null,
       reversedByVoucherId: null,
       createdAt: new Date().toISOString(),
     };
     state.vouchers = [voucher, ...state.vouchers];
     state.idempotency.set(idempotencyKey, voucher);
+    persistLedger(targetWs, state);
     return { status: 201, body: voucher };
   } catch (err) {
     if (isMutationError(err)) {
@@ -556,6 +711,9 @@ export async function postJournalVoucherViaBff(
 
 export async function reverseJournalVoucherViaBff(
   rawJsonText: string,
+  workspaceId?: string,
+  sessionToken?: string,
+  actorUserId?: string,
 ): Promise<{ status: number; body: JournalVoucher | MutationError }> {
   let parsed: unknown;
   try {
@@ -567,28 +725,11 @@ export async function reverseJournalVoucherViaBff(
     return { status: 400, body: validationError("Request body must be a JSON object.", "body") };
   }
 
-  const upstream = getUpstreamBaseUrl();
-  if (upstream) {
-    try {
-      const res = await fetch(`${upstream}/api/v1/ledger/vouchers/reverse`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Workspace-Id": WORKSPACE_ID,
-          "X-Actor-User-Id": ACTOR_USER_ID,
-        },
-        body: rawJsonText,
-        cache: "no-store",
-      });
-      const body = (await res.json()) as JournalVoucher | MutationError;
-      return { status: res.status, body };
-    } catch {
-      // Fallback
-    }
-  }
+  const targetWs = workspaceId || WORKSPACE_ID;
+  const targetActor = actorUserId || ACTOR_USER_ID;
 
   const payload = parsed as Record<string, unknown>;
-  const state = getLocalState();
+  const state = getLocalState(targetWs);
 
   try {
     const idempotencyKey = assertStringField(payload.idempotencyKey, "idempotencyKey");
@@ -647,6 +788,9 @@ export async function reverseJournalVoucherViaBff(
         sourceModule: "REVERSAL",
         lines: flippedLines,
       }),
+      targetWs,
+      sessionToken,
+      targetActor,
     );
 
     if (res.status !== 201 || res.body.__typename !== "JournalVoucher") {
@@ -659,6 +803,7 @@ export async function reverseJournalVoucherViaBff(
         ? { ...v, status: "REVERSED", reversedByVoucherId: reversalVoucher.id }
         : v,
     );
+    persistLedger(targetWs, state);
     return { status: 200, body: reversalVoucher };
   } catch (err) {
     if (isMutationError(err)) {
@@ -676,6 +821,15 @@ const TAX_TAGS = new Set(["INCOME_TAX_EXPENSE", "TAX_EXPENSE", "CORPORATE_INCOME
 const EMP_TAGS = new Set(["EMPLOYEE_BENEFITS", "STAFF_COSTS", "PAYROLL_EXPENSE"]);
 const FIN_TAGS = new Set(["FINANCE_COSTS", "INTEREST_EXPENSE"]);
 const DEPR_TAGS = new Set(["DEPRECIATION_AND_AMORTISATION", "DEPRECIATION"]);
+
+/** Value-added bucket for an expense account: by IFRS tag, else by its name. */
+function classifyExpense(acct: ChartOfAccount): "tax" | "employees" | "finance" | "depreciation" | "bought-in" {
+  if (TAX_TAGS.has(acct.ifrsTag) || /income tax|cit/i.test(acct.name)) return "tax";
+  if (EMP_TAGS.has(acct.ifrsTag) || /salar|payroll|wage|staff/i.test(acct.name)) return "employees";
+  if (FIN_TAGS.has(acct.ifrsTag) || /interest|finance cost/i.test(acct.name)) return "finance";
+  if (DEPR_TAGS.has(acct.ifrsTag) || /depreciation|amorti/i.test(acct.name)) return "depreciation";
+  return "bought-in";
+}
 
 function aggregateNetKobo(
   accounts: readonly ChartOfAccount[],
@@ -713,28 +867,12 @@ function shareRateString(part: bigint, total: bigint): string {
 
 export async function fetchFrcnPackage(
   fiscalPeriodId: string,
+  workspaceId?: string,
+  sessionToken?: string,
 ): Promise<{ status: number; body: FrcnFinancialStatementPackage | MutationError }> {
-  const upstream = getUpstreamBaseUrl();
-  if (upstream) {
-    try {
-      const res = await fetch(
-        `${upstream}/api/v1/ledger/reports/frcn?fiscalPeriodId=${encodeURIComponent(fiscalPeriodId)}`,
-        {
-          headers: {
-            "X-Workspace-Id": WORKSPACE_ID,
-            "X-Actor-User-Id": ACTOR_USER_ID,
-          },
-          cache: "no-store",
-        },
-      );
-      const body = (await res.json()) as FrcnFinancialStatementPackage | MutationError;
-      return { status: res.status, body };
-    } catch {
-      // Fallback
-    }
-  }
+  const targetWs = workspaceId || WORKSPACE_ID;
 
-  const state = getLocalState();
+  const state = getLocalState(targetWs);
   const period = state.periods.find((p) => p.id === fiscalPeriodId);
   if (!period) {
     return {
@@ -789,7 +927,8 @@ export async function fetchFrcnPackage(
         amountNgn: formatKobo(-net),
       });
     } else if (acct.category === "EXPENSE") {
-      if (TAX_TAGS.has(acct.ifrsTag)) {
+      const expenseKind = classifyExpense(acct);
+      if (expenseKind === "tax") {
         govtTax += net;
         taxExpLines.push({
           accountCode: acct.code,
@@ -804,11 +943,11 @@ export async function fetchFrcnPackage(
           ifrsTag: acct.ifrsTag,
           amountNgn: formatKobo(net),
         });
-        if (EMP_TAGS.has(acct.ifrsTag)) {
+        if (expenseKind === "employees") {
           employees += net;
-        } else if (FIN_TAGS.has(acct.ifrsTag)) {
+        } else if (expenseKind === "finance") {
           capProviders += net;
-        } else if (DEPR_TAGS.has(acct.ifrsTag)) {
+        } else if (expenseKind === "depreciation") {
           depr += net;
         } else {
           boughtIn += net;
@@ -909,7 +1048,7 @@ export async function fetchFrcnPackage(
       const n = colNets.get(acct.id) ?? 0n;
       if (acct.category === "REVENUE") {
         yRev += -n;
-      } else if (acct.category === "EXPENSE" && !TAX_TAGS.has(acct.ifrsTag)) {
+      } else if (acct.category === "EXPENSE" && classifyExpense(acct) !== "tax") {
         yOpExp += n;
       }
     }
@@ -992,6 +1131,7 @@ export async function fetchFrcnPackage(
       isBalanced,
       snapshotHash,
       trialBalanceCsv: `${csvRows}\n`,
+      journalVouchers: periodVouchers,
       generatedAt: new Date().toISOString(),
     },
   };
@@ -999,6 +1139,9 @@ export async function fetchFrcnPackage(
 
 export async function reconcileBankStatementViaBff(
   rawJsonText: string,
+  workspaceId?: string,
+  sessionToken?: string,
+  actorUserId?: string,
 ): Promise<{ status: number; body: BankReconciliationReport | MutationError }> {
   let parsed: unknown;
   try {
@@ -1010,27 +1153,10 @@ export async function reconcileBankStatementViaBff(
     return { status: 400, body: validationError("Request body must be a JSON object.", "body") };
   }
 
-  const upstream = getUpstreamBaseUrl();
-  if (upstream) {
-    try {
-      const res = await fetch(`${upstream}/api/v1/ledger/reconcile/bank`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Workspace-Id": WORKSPACE_ID,
-          "X-Actor-User-Id": ACTOR_USER_ID,
-        },
-        body: rawJsonText,
-        cache: "no-store",
-      });
-      const body = (await res.json()) as BankReconciliationReport | MutationError;
-      return { status: res.status, body };
-    } catch {
-      // Fallback
-    }
-  }
+  const targetWs = workspaceId || WORKSPACE_ID;
+  const targetActor = actorUserId || ACTOR_USER_ID;
 
-  const state = getLocalState();
+  const state = getLocalState(targetWs);
   const payload = parsed as Record<string, unknown>;
   try {
     const accountId = assertStringField(payload.accountId, "accountId");
@@ -1204,6 +1330,9 @@ export async function reconcileBankStatementViaBff(
 
 export async function calculateFxRevaluationViaBff(
   rawJsonText: string,
+  workspaceId?: string,
+  sessionToken?: string,
+  actorUserId?: string,
 ): Promise<{ status: number; body: FxRevaluationReport | MutationError }> {
   let parsed: unknown;
   try {
@@ -1215,27 +1344,10 @@ export async function calculateFxRevaluationViaBff(
     return { status: 400, body: validationError("Request body must be a JSON object.", "body") };
   }
 
-  const upstream = getUpstreamBaseUrl();
-  if (upstream) {
-    try {
-      const res = await fetch(`${upstream}/api/v1/ledger/reconcile/fx-revaluation`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Workspace-Id": WORKSPACE_ID,
-          "X-Actor-User-Id": ACTOR_USER_ID,
-        },
-        body: rawJsonText,
-        cache: "no-store",
-      });
-      const body = (await res.json()) as FxRevaluationReport | MutationError;
-      return { status: res.status, body };
-    } catch {
-      // Fallback
-    }
-  }
+  const targetWs = workspaceId || WORKSPACE_ID;
+  const targetActor = actorUserId || ACTOR_USER_ID;
 
-  const state = getLocalState();
+  const state = getLocalState(targetWs);
   const payload = parsed as Record<string, unknown>;
   try {
     const accountId = assertStringField(payload.accountId, "accountId");
@@ -1312,12 +1424,13 @@ export async function calculateFxRevaluationViaBff(
 export async function certifyPeriodCamaInLocalLedger(
   periodId: string,
   certificationLabel: string,
+  workspaceId: string = WORKSPACE_ID,
 ): Promise<{ period: FiscalPeriod; snapshotHash: string }> {
-  const frcn = await fetchFrcnPackage(periodId);
+  const frcn = await fetchFrcnPackage(periodId, workspaceId);
   if (frcn.status !== 200 || !("snapshotHash" in frcn.body)) {
     throw validationError(`Fiscal period '${periodId}' not found.`, "periodId");
   }
-  const state = getLocalState();
+  const state = getLocalState(workspaceId);
   const idx = state.periods.findIndex((p) => p.id === periodId);
   const existing = idx >= 0 ? state.periods[idx] : undefined;
   if (!existing) {
@@ -1329,14 +1442,20 @@ export async function certifyPeriodCamaInLocalLedger(
     camaCertification: certificationLabel,
   };
   state.periods[idx] = updated;
+  persistLedger(workspaceId, state);
   return {
     period: updated,
     snapshotHash: frcn.body.snapshotHash,
   };
 }
 
+// ---------------------------------------------------------------------------------------
+// Transactions Hub → ledger
+// ---------------------------------------------------------------------------------------
+
 export interface StandardTransactionPostingResponse {
-  readonly ok: boolean;
+  readonly ok: true;
+  readonly posted: true;
   readonly voucherId: string;
   readonly voucherNumber: string;
   readonly reference: string;
@@ -1346,11 +1465,165 @@ export interface StandardTransactionPostingResponse {
   readonly totalDebitNgn: string;
   readonly totalCreditNgn: string;
   readonly linesCount: number;
+  /** Voucher that was reversed because this record was edited. */
+  readonly replacedVoucherId?: string;
+}
+
+/** The record was saved but is not an accounting event (draft, quote, letter, …). */
+export interface StandardTransactionSkippedResponse {
+  readonly ok: true;
+  readonly posted: false;
+  readonly reason: string;
+  readonly reversedVoucherId?: string;
+}
+
+const OPENING_BALANCES_KEY = "__opening_balances__";
+
+function accountIdFor(workspaceId: string, code: string): string {
+  return `coa-${workspaceId.slice(0, 8)}-${code}`;
+}
+
+function addAccountToChart(
+  state: LocalBffState,
+  workspaceId: string,
+  spec: { code: string; name: string; category: AccountCategory; ifrsTag: string },
+): ChartOfAccount {
+  const existing = state.accounts.find((a) => a.code === spec.code);
+  if (existing) return existing;
+  const account: ChartOfAccount = {
+    id: accountIdFor(workspaceId, spec.code),
+    code: spec.code,
+    name: spec.name,
+    category: spec.category,
+    ifrsTag: spec.ifrsTag,
+    sourcePrimitive: "BOOKKEEPING_AND_LEDGER",
+    isSystemLocked: false,
+    isActive: true,
+  };
+  state.accounts.push(account);
+  return account;
+}
+
+function stockItemsForWorkspace(workspaceId: string): PostingStockItem[] {
+  const records = readDocument<unknown>(`records:admin-records:${workspaceId}`);
+  if (!Array.isArray(records)) return [];
+  return records.filter(
+    (r): r is PostingStockItem =>
+      typeof r === "object" && r !== null && (r as { module?: unknown }).module === "inventory",
+  );
+}
+
+function isIsoDate(value: string): boolean {
+  return /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(value));
+}
+
+/** Reverse a voucher on its own posting date so the period it hit nets to zero. */
+async function reverseLinkedVoucher(
+  state: LocalBffState,
+  workspaceId: string,
+  voucherId: string,
+  reason: string,
+  actorUserId: string,
+): Promise<MutationError | null> {
+  const original = state.vouchers.find((v) => v.id === voucherId);
+  if (!original || original.status !== "POSTED") return null; // already gone
+  const res = await reverseJournalVoucherViaBff(
+    JSON.stringify({
+      idempotencyKey: `rev-${voucherId}`,
+      originalVoucherId: voucherId,
+      reversalDate: original.postingDate,
+      reason,
+    }),
+    workspaceId,
+    undefined,
+    actorUserId,
+  );
+  return res.status === 200 ? null : (res.body as MutationError);
+}
+
+interface LinkedPostingInput {
+  readonly linkKey: string;
+  readonly postingDate: string;
+  readonly reference: string;
+  readonly sourceModule: string;
+  readonly lines: readonly PlannedLine[];
+}
+
+/**
+ * Make the books hold exactly one live voucher for `linkKey` with these lines: unchanged
+ * re-saves are no-ops, edits reverse the old voucher and post the new one.
+ */
+async function postLinkedVoucher(
+  state: LocalBffState,
+  workspaceId: string,
+  actorUserId: string,
+  input: LinkedPostingInput,
+): Promise<
+  | { readonly ok: true; readonly voucher: JournalVoucher; readonly replacedVoucherId?: string }
+  | { readonly ok: false; readonly status: number; readonly error: MutationError }
+> {
+  const fingerprint = createHash("sha256")
+    .update(JSON.stringify([input.postingDate, input.reference, input.lines]))
+    .digest("hex");
+  const link = state.postedTransactions.get(input.linkKey);
+  const linked = link ? state.vouchers.find((v) => v.id === link.voucherId) : undefined;
+  if (link && linked?.status === "POSTED" && link.fingerprint === fingerprint) {
+    return { ok: true, voucher: linked };
+  }
+
+  try {
+    ensurePeriodOpen(state.periods, input.postingDate);
+  } catch (err) {
+    const error = isMutationError(err) ? err : validationError("Invalid posting date.", "date");
+    return { ok: false, status: httpStatusForError(error), error };
+  }
+
+  const lines = input.lines.map((l) => {
+    const account = state.accounts.find((a) => a.code === l.accountCode);
+    return {
+      accountId: account?.id ?? "",
+      debitAmount: koboToDecimalString(l.debitKobo),
+      creditAmount: koboToDecimalString(l.creditKobo),
+      memo: l.memo,
+    };
+  });
+
+  let replacedVoucherId: string | undefined;
+  if (linked?.status === "POSTED") {
+    const err = await reverseLinkedVoucher(state, workspaceId, linked.id, "Record edited", actorUserId);
+    if (err) return { ok: false, status: httpStatusForError(err), error: err };
+    replacedVoucherId = linked.id;
+  }
+
+  const res = await postJournalVoucherViaBff(
+    JSON.stringify({
+      idempotencyKey: `${input.linkKey}:${state.sequence + 1}:${fingerprint.slice(0, 12)}`,
+      postingDate: input.postingDate,
+      reference: input.reference,
+      sourceModule: input.sourceModule,
+      lines,
+    }),
+    workspaceId,
+    undefined,
+    actorUserId,
+  );
+  if (res.status !== 201 || res.body.__typename !== "JournalVoucher") {
+    return { ok: false, status: res.status, error: res.body as MutationError };
+  }
+  state.postedTransactions.set(input.linkKey, { voucherId: res.body.id, fingerprint });
+  persistLedger(workspaceId, state);
+  return { ok: true, voucher: res.body, ...(replacedVoucherId ? { replacedVoucherId } : {}) };
 }
 
 export async function postStandardTransactionViaBff(
   rawJsonText: string,
-): Promise<{ status: number; body: StandardTransactionPostingResponse | MutationError }> {
+  workspaceId?: string,
+  _sessionToken?: string,
+  actorUserId?: string,
+): Promise<{
+  status: number;
+  body: StandardTransactionPostingResponse | StandardTransactionSkippedResponse | MutationError;
+}> {
   let parsed: unknown;
   try {
     parsed = JSON.parse(rawJsonText);
@@ -1361,198 +1634,223 @@ export async function postStandardTransactionViaBff(
     return { status: 400, body: validationError("Request body must be a JSON object.", "body") };
   }
 
-  const upstream = getUpstreamBaseUrl();
-  if (upstream) {
-    try {
-      const res = await fetch(`${upstream}/api/v1/ledger/transactions/post`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Workspace-Id": WORKSPACE_ID,
-          "X-Actor-User-Id": ACTOR_USER_ID,
-        },
-        body: rawJsonText,
-        cache: "no-store",
-      });
-      const data = (await res.json()) as StandardTransactionPostingResponse | MutationError;
-      return { status: res.status, body: data };
-    } catch {
-      // Fallback gracefully to local ledger if upstream unavailable
-    }
-  }
-
-  const state = getLocalState();
+  const targetWs = workspaceId || WORKSPACE_ID;
+  const targetActor = actorUserId || ACTOR_USER_ID;
+  const state = getLocalState(targetWs);
   const tx = parsed as Record<string, unknown>;
-  const txType = assertStringField(tx.transactionType ?? tx.typeId, "transactionType");
-  const reference = assertStringField(tx.reference, "reference").trim();
-  const counterparty = String(tx.counterparty ?? "General Counterparty").trim();
-  const postingDate = assertStringField(tx.date ?? tx.postingDate, "date");
-  const vatEnabled = Boolean(tx.vatEnabled);
-  const whtRatePct = Number(tx.whtRatePct ?? 0);
 
-  // Find or map standard accounts
-  const bankAcct = state.accounts.find((a) => a.code === "1010") ?? state.accounts[0]!;
-  const arAcct = state.accounts.find((a) => a.code === "1120") ?? bankAcct;
-  const apAcct = state.accounts.find((a) => a.code === "2120") ?? bankAcct;
-  const revAcct = state.accounts.find((a) => a.code === "4010") ?? state.accounts[0]!;
-  const expAcct = state.accounts.find((a) => a.code === "5010") ?? state.accounts[0]!;
-  const vatAcct = state.accounts.find((a) => a.code === "2010") ?? revAcct;
+  let typeId: string;
+  let reference: string;
+  let postingDate: string;
+  try {
+    typeId = assertStringField(tx.typeId ?? tx.transactionType, "typeId");
+    reference = assertStringField(tx.reference, "reference").trim();
+    postingDate = assertStringField(tx.date ?? tx.postingDate, "date");
+  } catch (err) {
+    return { status: 400, body: err as MutationError };
+  }
+  if (!reference) {
+    return { status: 400, body: validationError("Reference cannot be blank.", "reference") };
+  }
+  if (!isIsoDate(postingDate)) {
+    return { status: 400, body: validationError("Date must be YYYY-MM-DD.", "date") };
+  }
+  const recordId = typeof tx.id === "string" && tx.id.trim() ? tx.id.trim() : null;
+  const counterparty = String(tx.counterparty ?? "").trim() || "General";
 
-  const rawLines = Array.isArray(tx.lineItems) ? tx.lineItems : Array.isArray(tx.lines) ? tx.lines : [];
-  let subtotalKobo = 0n;
-  for (const rawL of rawLines) {
-    const l = rawL as Record<string, unknown>;
-    const qty = BigInt(Math.max(1, Math.round(Number(l.quantity ?? 1))));
-    const unitPrice = typeof l.unitPriceNgn === "number"
-      ? BigInt(Math.round(l.unitPriceNgn * 100))
-      : parseMoneyToKobo(String(l.unitPriceNgn ?? "0.00"));
-    subtotalKobo += qty * unitPrice;
-  }
-  if (subtotalKobo === 0n && typeof tx.amountNgn === "number") {
-    subtotalKobo = BigInt(Math.round(tx.amountNgn * 100));
-  }
-  if (subtotalKobo === 0n) {
-    subtotalKobo = 10_000_00n; // Default fallback: 10,000 NGN
+  const input = { ...(tx as object), typeId, reference, date: postingDate } as PostingTransactionInput;
+  const plan = buildPostingPlan(input, {
+    chart: state.accounts,
+    stockItems: stockItemsForWorkspace(targetWs),
+  });
+
+  if (plan.kind === "error") {
+    return { status: 422, body: validationError(plan.message, "lineItems") };
   }
 
-  const vatKobo = vatEnabled ? (subtotalKobo * 75n) / 1000n : 0n;
-  const whtKobo = whtRatePct > 0 ? (subtotalKobo * BigInt(whtRatePct)) / 100n : 0n;
-  const grossKobo = subtotalKobo + vatKobo;
-
-  const journalLines: Array<{ accountId: string; debitAmount: string; creditAmount: string; memo: string }> = [];
-
-  if (txType === "sales-invoicing" || txType === "invoice-time-expenses") {
-    journalLines.push({
-      accountId: revAcct.id,
-      debitAmount: "0.00",
-      creditAmount: formatKobo(subtotalKobo),
-      memo: `Sales Revenue - ${reference} (${counterparty})`,
-    });
-    if (vatKobo > 0n) {
-      journalLines.push({
-        accountId: vatAcct.id,
-        debitAmount: "0.00",
-        creditAmount: formatKobo(vatKobo),
-        memo: `Output VAT 7.5% - ${reference}`,
-      });
+  const linkKey = recordId ? `tx:${recordId}` : null;
+  if (plan.kind === "skip") {
+    const link = linkKey ? state.postedTransactions.get(linkKey) : undefined;
+    if (link && linkKey) {
+      const err = await reverseLinkedVoucher(state, targetWs, link.voucherId, plan.reason, targetActor);
+      if (err) return { status: httpStatusForError(err), body: err };
+      state.postedTransactions.delete(linkKey);
+      persistLedger(targetWs, state);
+      return {
+        status: 200,
+        body: { ok: true, posted: false, reason: plan.reason, reversedVoucherId: link.voucherId },
+      };
     }
-    const netArKobo = grossKobo - whtKobo;
-    journalLines.push({
-      accountId: arAcct.id,
-      debitAmount: formatKobo(netArKobo),
-      creditAmount: "0.00",
-      memo: `Trade Receivables - ${reference} (${counterparty})`,
-    });
-    if (whtKobo > 0n) {
-      const whtAcct = state.accounts.find((a) => a.code === "1150") ?? arAcct;
-      journalLines.push({
-        accountId: whtAcct.id,
-        debitAmount: formatKobo(whtKobo),
-        creditAmount: "0.00",
-        memo: `WHT Deducted at Source - ${reference}`,
-      });
-    }
-  } else if (txType === "receive-money" || txType === "select-for-deposit") {
-    journalLines.push({
-      accountId: bankAcct.id,
-      debitAmount: formatKobo(subtotalKobo),
-      creditAmount: "0.00",
-      memo: `Bank Receipt - ${reference} from ${counterparty}`,
-    });
-    journalLines.push({
-      accountId: arAcct.id,
-      debitAmount: "0.00",
-      creditAmount: formatKobo(subtotalKobo),
-      memo: `Clear AR - ${reference} (${counterparty})`,
-    });
-  } else if (txType === "bills" || txType === "purchases-receive-inventory") {
-    journalLines.push({
-      accountId: expAcct.id,
-      debitAmount: formatKobo(subtotalKobo),
-      creditAmount: "0.00",
-      memo: `Purchase Expense - ${reference} from ${counterparty}`,
-    });
-    if (vatKobo > 0n) {
-      journalLines.push({
-        accountId: vatAcct.id,
-        debitAmount: formatKobo(vatKobo),
-        creditAmount: "0.00",
-        memo: `Input VAT 7.5% - ${reference}`,
-      });
-    }
-    const netApKobo = grossKobo - whtKobo;
-    journalLines.push({
-      accountId: apAcct.id,
-      debitAmount: "0.00",
-      creditAmount: formatKobo(netApKobo),
-      memo: `Trade Payables - ${reference} to ${counterparty}`,
-    });
-    if (whtKobo > 0n) {
-      const whtPayableAcct = state.accounts.find((a) => a.code === "2130") ?? apAcct;
-      journalLines.push({
-        accountId: whtPayableAcct.id,
-        debitAmount: "0.00",
-        creditAmount: formatKobo(whtKobo),
-        memo: `WHT Payable - ${reference}`,
-      });
-    }
-  } else if (txType === "payments" || txType === "write-checks") {
-    journalLines.push({
-      accountId: apAcct.id,
-      debitAmount: formatKobo(subtotalKobo),
-      creditAmount: "0.00",
-      memo: `Clear AP - ${reference} to ${counterparty}`,
-    });
-    journalLines.push({
-      accountId: bankAcct.id,
-      debitAmount: "0.00",
-      creditAmount: formatKobo(subtotalKobo),
-      memo: `Bank Payment - ${reference} to ${counterparty}`,
-    });
-  } else {
-    // Default balanced entry
-    journalLines.push({
-      accountId: bankAcct.id,
-      debitAmount: formatKobo(subtotalKobo),
-      creditAmount: "0.00",
-      memo: `${reference} Clearing`,
-    });
-    journalLines.push({
-      accountId: revAcct.id,
-      debitAmount: "0.00",
-      creditAmount: formatKobo(subtotalKobo),
-      memo: `${reference} Clearing Entry`,
-    });
+    return { status: 200, body: { ok: true, posted: false, reason: plan.reason } };
   }
 
-  const vRes = await postJournalVoucherViaBff(
-    JSON.stringify({
-      idempotencyKey: String(tx.idempotencyKey ?? `idem-${Date.now()}`),
-      postingDate,
-      reference,
-      sourceModule: `TRANSACTIONS_HUB:${txType}`,
-      lines: journalLines,
-    }),
-  );
+  for (const spec of plan.newAccounts) addAccountToChart(state, targetWs, spec);
 
-  if (vRes.status !== 201 || !("voucherNumber" in vRes.body)) {
-    return { status: vRes.status, body: vRes.body as MutationError };
-  }
+  const result = await postLinkedVoucher(state, targetWs, targetActor, {
+    linkKey: linkKey ?? `tx:anon-${crypto.randomUUID()}`,
+    postingDate,
+    reference,
+    sourceModule: `TRANSACTIONS_HUB:${typeId}`,
+    lines: plan.lines,
+  });
+  if (!result.ok) return { status: result.status, body: result.error };
 
-  const voucher = vRes.body;
+  const voucher = result.voucher;
   return {
     status: 201,
     body: {
       ok: true,
+      posted: true,
       voucherId: voucher.id,
       voucherNumber: voucher.voucherNumber,
       reference,
-      transactionType: txType,
+      transactionType: typeId,
       counterparty,
       postingDate,
       totalDebitNgn: voucher.totalDebitNgn,
       totalCreditNgn: voucher.totalCreditNgn,
       linesCount: voucher.lines.length,
+      ...(result.replacedVoucherId ? { replacedVoucherId: result.replacedVoucherId } : {}),
     },
   };
+}
+
+/** A Transactions Hub record was deleted: take its voucher back out of the books. */
+export async function removeStandardTransactionViaBff(
+  recordId: string,
+  workspaceId?: string,
+  actorUserId?: string,
+): Promise<{ status: number; body: StandardTransactionSkippedResponse | MutationError }> {
+  const targetWs = workspaceId || WORKSPACE_ID;
+  const state = getLocalState(targetWs);
+  const linkKey = `tx:${recordId}`;
+  const link = state.postedTransactions.get(linkKey);
+  if (!link) {
+    return { status: 200, body: { ok: true, posted: false, reason: "Nothing was posted for this record." } };
+  }
+  const err = await reverseLinkedVoucher(
+    state,
+    targetWs,
+    link.voucherId,
+    "Record deleted",
+    actorUserId || ACTOR_USER_ID,
+  );
+  if (err) return { status: httpStatusForError(err), body: err };
+  state.postedTransactions.delete(linkKey);
+  persistLedger(targetWs, state);
+  return {
+    status: 200,
+    body: { ok: true, posted: false, reason: "Record deleted.", reversedVoucherId: link.voucherId },
+  };
+}
+
+// ---------------------------------------------------------------------------------------
+// Admin chart of accounts → ledger
+// ---------------------------------------------------------------------------------------
+
+interface AdminAccountLike {
+  readonly module?: unknown;
+  readonly code?: unknown;
+  readonly name?: unknown;
+  readonly category?: unknown;
+  readonly ifrsElement?: unknown;
+  readonly ifrsStandard?: unknown;
+  readonly accountLevel?: unknown;
+  readonly primaryMetricValue?: unknown;
+  readonly balanceSide?: unknown;
+}
+
+/**
+ * Keep the ledger's chart in step with the Admin chart of accounts: new accounts become
+ * postable, renamed accounts are renamed, and typed beginning balances are posted as one
+ * "Opening Balances" voucher offset to Opening Balance Equity (replaced when they change).
+ * Accounts are never removed from the ledger, so posted history stays intact.
+ */
+export async function syncChartFromAdminRecords(
+  workspaceId: string,
+  records: readonly unknown[],
+  actorUserId?: string,
+): Promise<{ readonly ok: true } | { readonly ok: false; readonly error: MutationError }> {
+  const state = getLocalState(workspaceId);
+  const actor = actorUserId || ACTOR_USER_ID;
+  const accounts = records.filter(
+    (r): r is AdminAccountLike =>
+      typeof r === "object" &&
+      r !== null &&
+      (r as AdminAccountLike).module === "accounts" &&
+      (r as AdminAccountLike).accountLevel !== "GROUP",
+  );
+
+  const opening: PlannedLine[] = [];
+  for (const rec of accounts) {
+    const code = typeof rec.code === "string" ? rec.code.trim() : "";
+    const name = typeof rec.name === "string" ? rec.name.trim() : "";
+    if (!/^\d{3,6}$/.test(code) || !name) continue;
+    const category = categoryFromIfrsElement(String(rec.ifrsElement ?? rec.category ?? ""));
+    if (!category) continue;
+    const idx = state.accounts.findIndex((a) => a.code === code);
+    if (idx === -1) {
+      addAccountToChart(state, workspaceId, {
+        code,
+        name,
+        category,
+        ifrsTag: typeof rec.ifrsStandard === "string" ? rec.ifrsStandard : "IAS 1",
+      });
+    } else if (state.accounts[idx]!.name !== name) {
+      state.accounts[idx] = { ...state.accounts[idx]!, name };
+    }
+
+    const metric = typeof rec.primaryMetricValue === "string" ? rec.primaryMetricValue : "";
+    const kobo = toKobo(toAmount(metric));
+    if (kobo > 0) {
+      const side = rec.balanceSide === "CR" || /\bCR\s*$/i.test(metric) ? "CR" : "DR";
+      opening.push({
+        accountCode: code,
+        debitKobo: side === "DR" ? kobo : 0,
+        creditKobo: side === "CR" ? kobo : 0,
+        memo: `Opening balance - ${name}`,
+      });
+    }
+  }
+
+  // The demo company's Admin balances are illustrative; its books carry their own history.
+  if (workspaceId !== WORKSPACE_ID) {
+    const lines = [...opening];
+    const net = opening.reduce((s, l) => s + l.debitKobo - l.creditKobo, 0);
+    if (net !== 0) {
+      const equity =
+        state.accounts.find((a) => a.code === "3900") ??
+        addAccountToChart(state, workspaceId, {
+          code: "3900",
+          name: "Opening Balance Equity",
+          category: "EQUITY",
+          ifrsTag: "OTHER_RESERVES",
+        });
+      lines.push({
+        accountCode: equity.code,
+        debitKobo: net < 0 ? -net : 0,
+        creditKobo: net > 0 ? net : 0,
+        memo: "Opening balance offset",
+      });
+    }
+    const openPeriod = state.periods.find((p) => p.status === "OPEN");
+    const link = state.postedTransactions.get(OPENING_BALANCES_KEY);
+    if (lines.length >= 2 && openPeriod) {
+      const res = await postLinkedVoucher(state, workspaceId, actor, {
+        linkKey: OPENING_BALANCES_KEY,
+        postingDate: openPeriod.startDate,
+        reference: "OPENING-BALANCES",
+        sourceModule: "OPENING_BALANCES",
+        lines,
+      });
+      if (!res.ok) return { ok: false, error: res.error };
+    } else if (link) {
+      const err = await reverseLinkedVoucher(state, workspaceId, link.voucherId, "Opening balances cleared", actor);
+      if (err) return { ok: false, error: err };
+      state.postedTransactions.delete(OPENING_BALANCES_KEY);
+    }
+  }
+
+  persistLedger(workspaceId, state);
+  return { ok: true };
 }

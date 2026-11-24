@@ -1,4 +1,5 @@
 import { formatKobo, parseMoneyToKobo, parseRateScaled } from "@/lib/decimal";
+import { readDocument, writeDocument } from "@/lib/persistence";
 import type { MutationError } from "@/types/ledger";
 import type {
   MultiLayerIndirectTaxBreakdown,
@@ -206,31 +207,41 @@ interface LocalTaxState {
   profile: NigerianTaxProfile;
 }
 
+const DEFAULT_TAX_WORKSPACE_ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaa0001";
+
 const globalForTax = globalThis as unknown as {
-  __nairabooksTaxState?: LocalTaxState;
+  __nairabooksTaxStates?: Map<string, LocalTaxState>;
 };
 
-function getLocalTaxState(): LocalTaxState {
-  if (!globalForTax.__nairabooksTaxState) {
-    const initial = buildProfile({
-      legalForm: "PRIVATE_LIMITED",
-      tinNumber: "10459821-0001",
-      vatRegistered: true,
-      annualTurnoverNgn: "42000000.00",
-      fixedAssetsNgn: "65000000.00",
-      stateOfOperation: "LAGOS",
-      isProfessionalServices: false,
-      effectiveFrom: "2026-01-01",
-    });
-    globalForTax.__nairabooksTaxState = { profile: initial };
-  }
-  return globalForTax.__nairabooksTaxState;
+function taxDocumentKey(workspaceId: string): string {
+  return `tax:${workspaceId}`;
 }
 
-function getUpstreamBaseUrl(): string | null {
-  const url = process.env.NAIRABOOKS_API_URL?.trim();
-  return url && url.length > 0 ? url.replace(/\/$/, "") : null;
+function createDefaultTaxState(): LocalTaxState {
+  const initial = buildProfile({
+    legalForm: "PRIVATE_LIMITED",
+    tinNumber: "10459821-0001",
+    vatRegistered: true,
+    annualTurnoverNgn: "42000000.00",
+    fixedAssetsNgn: "65000000.00",
+    stateOfOperation: "LAGOS",
+    isProfessionalServices: false,
+    effectiveFrom: "2026-01-01",
+  });
+  return { profile: initial };
 }
+
+/** Per-workspace tax profile, loaded from the stored document or seeded with defaults. */
+function getLocalTaxState(workspaceId: string = DEFAULT_TAX_WORKSPACE_ID): LocalTaxState {
+  globalForTax.__nairabooksTaxStates ??= new Map();
+  let state = globalForTax.__nairabooksTaxStates.get(workspaceId);
+  if (!state) {
+    state = readDocument<LocalTaxState>(taxDocumentKey(workspaceId)) ?? createDefaultTaxState();
+    globalForTax.__nairabooksTaxStates.set(workspaceId, state);
+  }
+  return state;
+}
+
 
 function validationError(message: string, field: string | null = null): MutationError {
   return {
@@ -537,21 +548,9 @@ function computeLocalTaxPreview(
 
 export async function fetchTaxProfile(
   asOfDate = "2026-03-01",
+  workspaceId?: string,
 ): Promise<{ status: number; body: TaxProfilePayload | MutationError }> {
-  const baseUrl = getUpstreamBaseUrl();
-  if (baseUrl) {
-    const res = await fetch(
-      `${baseUrl}/api/v1/tax/profile?asOfDate=${encodeURIComponent(asOfDate)}`,
-      {
-        headers: { "X-Workspace-Id": WORKSPACE_ID, "X-Actor-User-Id": ACTOR_USER_ID },
-        cache: "no-store",
-      },
-    );
-    const body = (await res.json()) as TaxProfilePayload | MutationError;
-    return { status: res.status, body };
-  }
-
-  const state = getLocalTaxState();
+  const state = getLocalTaxState(workspaceId);
   return {
     status: 200,
     body: {
@@ -563,23 +562,8 @@ export async function fetchTaxProfile(
 
 export async function updateTaxProfileViaBff(
   rawBody: string,
+  workspaceId: string = DEFAULT_TAX_WORKSPACE_ID,
 ): Promise<{ status: number; body: TaxProfilePayload | MutationError }> {
-  const baseUrl = getUpstreamBaseUrl();
-  if (baseUrl) {
-    const res = await fetch(`${baseUrl}/api/v1/tax/profile`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Workspace-Id": WORKSPACE_ID,
-        "X-Actor-User-Id": ACTOR_USER_ID,
-      },
-      body: rawBody,
-      cache: "no-store",
-    });
-    const body = (await res.json()) as TaxProfilePayload | MutationError;
-    return { status: res.status, body };
-  }
-
   try {
     const payload = parseStrictJsonObject(rawBody);
     const annualTurnover = payload.annualTurnoverNgn;
@@ -600,8 +584,9 @@ export async function updateTaxProfileViaBff(
       isProfessionalServices: Boolean(payload.isProfessionalServices),
       effectiveFrom: String(payload.effectiveFrom ?? "2026-01-01"),
     });
-    const state = getLocalTaxState();
+    const state = getLocalTaxState(workspaceId);
     state.profile = updated;
+    writeDocument(taxDocumentKey(workspaceId), state);
     return {
       status: 200,
       body: {
@@ -622,26 +607,11 @@ export async function updateTaxProfileViaBff(
 
 export async function previewNigerianTaxViaBff(
   rawBody: string,
+  workspaceId?: string,
 ): Promise<{ status: number; body: TaxComputationPreview | MutationError }> {
-  const baseUrl = getUpstreamBaseUrl();
-  if (baseUrl) {
-    const res = await fetch(`${baseUrl}/api/v1/tax/preview`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Workspace-Id": WORKSPACE_ID,
-        "X-Actor-User-Id": ACTOR_USER_ID,
-      },
-      body: rawBody,
-      cache: "no-store",
-    });
-    const body = (await res.json()) as TaxComputationPreview | MutationError;
-    return { status: res.status, body };
-  }
-
   try {
     const payload = parseStrictJsonObject(rawBody);
-    const { profile } = getLocalTaxState();
+    const { profile } = getLocalTaxState(workspaceId);
     return { status: 200, body: computeLocalTaxPreview(profile, payload) };
   } catch (err) {
     if (err && typeof err === "object" && "__typename" in err) {
@@ -656,23 +626,8 @@ export async function previewNigerianTaxViaBff(
 
 export async function previewIndirectTaxViaBff(
   rawBody: string,
+  workspaceId?: string,
 ): Promise<{ status: number; body: MultiLayerIndirectTaxBreakdown | MutationError }> {
-  const baseUrl = getUpstreamBaseUrl();
-  if (baseUrl) {
-    const res = await fetch(`${baseUrl}/api/v1/tax/nrs-indirect-preview`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Workspace-Id": WORKSPACE_ID,
-        "X-Actor-User-Id": ACTOR_USER_ID,
-      },
-      body: rawBody,
-      cache: "no-store",
-    });
-    const body = (await res.json()) as MultiLayerIndirectTaxBreakdown | MutationError;
-    return { status: res.status, body };
-  }
-
   try {
     const payload = parseStrictJsonObject(rawBody);
     if ("appliedRate" in payload || "vatRate" in payload || "whtRate" in payload) {
@@ -710,7 +665,7 @@ export async function previewIndirectTaxViaBff(
     const direction = String(payload.transactionDirection ?? "SALES") as TransactionDirection;
     const monthlyCumulative = String(payload.monthlyCumulativeWithSupplierNgn ?? "0.00");
 
-    const { profile } = getLocalTaxState();
+    const { profile } = getLocalTaxState(workspaceId);
 
     const vatPreview = computeLocalTaxPreview(profile, {
       transactionDate,

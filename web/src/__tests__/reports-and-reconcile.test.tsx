@@ -238,7 +238,7 @@ describe("Slice 2 BFF routes and FRCN Reports + Reconcile A11Y", () => {
     expect(screen.getByText(/Report Filters/i)).toBeInTheDocument();
     const searchInput = screen.getByPlaceholderText(/Search any field\.\.\./i);
     await user.type(searchInput, "Zenith");
-    expect(screen.getByText(/Zenith Bank/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Zenith Bank/i).length).toBeGreaterThan(0);
     await user.click(screen.getByRole("switch", { name: /Hide Zero Balances/i }));
 
     // 6. View Options: Open drawer and switch to Compact Ledger + Short Naira

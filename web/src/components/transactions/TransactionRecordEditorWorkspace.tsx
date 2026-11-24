@@ -6,6 +6,7 @@ import { AnimatePresence, MotionConfig, motion, useReducedMotion } from "framer-
 import {
   ArrowLeft,
   CheckCircle2,
+  ChevronDown,
   Lock,
   Plus,
   Save,
@@ -35,6 +36,50 @@ import {
   loadTransactions,
   upsertTransaction,
 } from "@/components/transactions/transactions-store";
+import { loadAdminRecords } from "@/components/admin/admin-store";
+import type { AdminRecord } from "@/components/admin/admin-maintain-data";
+import {
+  categoryFromIfrsElement,
+  computePayslip,
+  computeStockCount,
+  parseAccountCode,
+  suggestLineAccountCode,
+  type PostingChartAccount,
+} from "@/lib/posting-rules";
+
+/** The company's postable accounts, as the ledger sees them. */
+function chartFromAdminRecords(records: readonly AdminRecord[]): PostingChartAccount[] {
+  const chart: PostingChartAccount[] = [];
+  for (const r of records) {
+    if (r.module !== "accounts" || r.accountLevel === "GROUP" || !r.isActive) continue;
+    const category = categoryFromIfrsElement(r.ifrsElement ?? r.category);
+    if (category && /^\d{3,6}$/.test(r.code)) chart.push({ code: r.code, name: r.name, category });
+  }
+  return chart.sort((a, b) => a.code.localeCompare(b.code));
+}
+
+/** Point a line at a real account in this company's chart ("" = choose automatically). */
+function normalizeLineAccount(
+  line: TransactionLineItem,
+  typeId: TransactionTypeId,
+  chart: readonly PostingChartAccount[],
+): TransactionLineItem {
+  const code = parseAccountCode(line.accountCode);
+  const own = code ? chart.find((a) => a.code === code) : undefined;
+  if (own) return { ...line, accountCode: `${own.code} ${own.name}` };
+  const suggested = suggestLineAccountCode(typeId, chart);
+  const match = suggested ? chart.find((a) => a.code === suggested) : undefined;
+  return { ...line, accountCode: match ? `${match.code} ${match.name}` : "" };
+}
+
+function isoDate(offsetDays = 0): string {
+  const d = new Date();
+  d.setDate(d.getDate() + offsetDays);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+import type { RecordModuleId } from "@/components/admin/admin-maintain-data";
+import { getNextTransactionReference } from "@/lib/numbering-service";
 
 export type TxCreationDetailMode = "simple" | "full";
 
@@ -119,17 +164,20 @@ function createInitialFormState(
 ): EditorFormState {
   const meta = getTransactionTypeMeta(typeId);
   const blueprint = TRANSACTION_EDITOR_BLUEPRINTS[typeId];
-  const randomSuffix = Math.floor(200 + Math.random() * 750);
+  const nextReference =
+    mode === "edit" && existing
+      ? existing.reference
+      : getNextTransactionReference(typeId);
 
   return {
     id:
       mode === "edit" && existing
         ? existing.id
-        : `tx-${typeId}-${Date.now()}-${randomSuffix}`,
-    reference: existing?.reference ?? `${meta.refPrefix}2026-${randomSuffix}`,
+        : `tx-${typeId}-${Date.now()}`,
+    reference: nextReference,
     counterparty: existing?.counterparty ?? "",
-    date: existing?.date ?? "2026-10-20",
-    dueDate: existing?.dueDate ?? "2026-11-19",
+    date: existing?.date ?? isoDate(),
+    dueDate: existing?.dueDate ?? isoDate(30),
     status: existing?.status ?? "Posted",
     paymentMethod: existing?.paymentMethod ?? blueprint.defaultPaymentMethod,
     vatEnabled: existing ? existing.vatAmountNgn > 0 : blueprint.defaultVatEnabled,
@@ -171,11 +219,78 @@ export function TransactionRecordEditorWorkspace({
     [mode, recordId],
   );
 
+  const targetCounterpartyModule = useMemo<RecordModuleId>(() => {
+    if (
+      meta.pillar === "money-in" ||
+      typeId === "quotes-sales-orders" ||
+      typeId === "sales-invoicing" ||
+      typeId === "receive-money" ||
+      typeId === "credit-memos" ||
+      typeId === "invoice-time-expenses"
+    ) {
+      return "customers";
+    }
+    if (meta.pillar === "time-payroll") {
+      return "employees";
+    }
+    return "vendors";
+  }, [meta.pillar, typeId]);
+
+  const [liveAdminRecords, setLiveAdminRecords] = useState(() => loadAdminRecords());
+  useEffect(() => {
+    setLiveAdminRecords(loadAdminRecords());
+  }, []);
+
+  const liveCounterparties = useMemo(() => {
+    return liveAdminRecords.filter((r) => r.module === targetCounterpartyModule);
+  }, [liveAdminRecords, targetCounterpartyModule]);
+
+  const liveChart = useMemo(() => chartFromAdminRecords(liveAdminRecords), [liveAdminRecords]);
+  const accountOptions = useMemo(
+    () =>
+      liveChart.length > 0
+        ? liveChart.map((a) => `${a.code} ${a.name}`)
+        : blueprint.defaultAccountOptions,
+    [liveChart, blueprint.defaultAccountOptions],
+  );
+
   const [form, setForm] = useState<EditorFormState>(() =>
     createInitialFormState(typeId, mode, initialRecord),
   );
+
+  // New records start on accounts that exist in this company's chart.
+  useEffect(() => {
+    if (mode !== "create" || liveChart.length === 0) return;
+    setForm((prev) => ({
+      ...prev,
+      lineItems: prev.lineItems.map((l) => normalizeLineAccount(l, typeId, liveChart)),
+    }));
+  }, [mode, typeId, liveChart]);
   const [statusBanner, setStatusBanner] = useState<string | null>(null);
   const [errorBanner, setErrorBanner] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  const [counterpartySearchOpen, setCounterpartySearchOpen] = useState(false);
+
+  const filteredCounterparties = useMemo(() => {
+    if (!form.counterparty.trim()) {
+      return liveCounterparties.slice(0, 8);
+    }
+    const q = form.counterparty.toLowerCase();
+    return liveCounterparties.filter(
+      (c) =>
+        c.name.toLowerCase().includes(q) ||
+        c.code.toLowerCase().includes(q) ||
+        (c.contactOrNote && c.contactOrNote.toLowerCase().includes(q)),
+    );
+  }, [liveCounterparties, form.counterparty]);
+
+  const displayChips = useMemo(() => {
+    if (liveCounterparties.length > 0) {
+      return liveCounterparties.slice(0, 5).map((c) => c.name);
+    }
+    return blueprint.counterpartySuggestions;
+  }, [liveCounterparties, blueprint.counterpartySuggestions]);
 
   useEffect(() => {
     const records = loadTransactions();
@@ -189,22 +304,13 @@ export function TransactionRecordEditorWorkspace({
 
   const computedTotals = useMemo(() => {
     if (blueprint.editorLayout === "payroll-slip") {
-      const basic = parseAmountNumber(form.details.basicSalary ?? "390000");
-      const housing = parseAmountNumber(form.details.housingAllowance ?? "160000");
-      const transport = parseAmountNumber(form.details.transportAllowance ?? "100000");
-      const gross = basic + housing + transport;
+      const { gross } = computePayslip(form.details);
       return { subtotal: gross, vatAmount: 0, whtAmount: 0, grandTotal: gross, isBalanced: true };
     }
 
     if (blueprint.editorLayout === "inventory-bom") {
-      const isAsm = typeId === "assemblies";
-      const sysQty = parseAmountNumber(form.details.systemQty ?? "206");
-      const actQty = parseAmountNumber(form.details.actualQty ?? "200");
-      const yieldQty = parseAmountNumber(form.details.yieldQuantity ?? "50");
-      const unitCost = parseAmountNumber(form.details.unitCost ?? "7600");
-      const qty = isAsm ? yieldQty : Math.abs(actQty - sysQty);
-      const val = qty * unitCost;
-      return { subtotal: val, vatAmount: 0, whtAmount: 0, grandTotal: val, isBalanced: true };
+      const { value } = computeStockCount(typeId, form.details);
+      return { subtotal: value, vatAmount: 0, whtAmount: 0, grandTotal: value, isBalanced: true };
     }
 
     if (blueprint.editorLayout === "journal-grid") {
@@ -341,7 +447,7 @@ export function TransactionRecordEditorWorkspace({
     );
   }
 
-  function handleSave(saveAndNew = false) {
+  async function handleSave(saveAndNew = false) {
     setErrorBanner(null);
 
     if (blueprint.editorLayout === "journal-grid" && !computedTotals.isBalanced) {
@@ -372,37 +478,20 @@ export function TransactionRecordEditorWorkspace({
     };
 
     upsertTransaction(savedRecord);
-
-    if (typeof window !== "undefined") {
-      fetch("/api/transactions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(savedRecord),
-      })
-        .then((res) => (res.ok ? res.json() : null))
-        .then((data: unknown) => {
-          if (data && typeof data === "object" && "voucherNumber" in data) {
-            const resp = data as Record<string, unknown>;
-            const vNum = typeof resp.voucherNumber === "string" ? resp.voucherNumber : "";
-            const vId = typeof resp.voucherId === "string" ? resp.voucherId : "";
-            upsertTransaction({
-              ...savedRecord,
-              voucherId: vId,
-              voucherNumber: vNum,
-              isPostedToLedger: true,
-            });
-          }
-        })
-        .catch(() => {
-          // Gracefully continue with local state
-        });
-    }
+    setSaving(true);
+    const posted = await postToLedger(savedRecord);
+    setSaving(false);
+    if (!posted) return; // stay on the form so the error can be read and fixed
 
     if (saveAndNew && mode === "create") {
       setStatusBanner(
         `Saved ${savedRecord.reference} (${formatNaira(savedRecord.amountNgn)}) — ready for your next ${meta.singularLabel}.`,
       );
-      setForm(createInitialFormState(typeId, "create"));
+      const fresh = createInitialFormState(typeId, "create");
+      setForm({
+        ...fresh,
+        lineItems: fresh.lineItems.map((l) => normalizeLineAccount(l, typeId, liveChart)),
+      });
       return;
     }
 
@@ -419,9 +508,52 @@ export function TransactionRecordEditorWorkspace({
     }
   }
 
+  /** Post (or re-post) the record to the server ledger and report what happened. */
+  async function postToLedger(record: TransactionRecord): Promise<boolean> {
+    if (typeof window === "undefined") return true;
+    try {
+      const res = await fetch("/api/transactions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...record, vatEnabled: form.vatEnabled }),
+      });
+      const data = (await res.json().catch(() => null)) as Record<string, unknown> | null;
+      if (res.ok && data && data.posted === true) {
+        upsertTransaction({
+          ...record,
+          voucherId: String(data.voucherId ?? ""),
+          voucherNumber: String(data.voucherNumber ?? ""),
+          isPostedToLedger: true,
+        });
+        return true;
+      }
+      if (res.ok && data && data.posted === false) {
+        const { voucherId: _voucherId, voucherNumber: _voucherNumber, ...rest } = record;
+        upsertTransaction({ ...rest, isPostedToLedger: false });
+        return true;
+      }
+      upsertTransaction({ ...record, isPostedToLedger: false });
+      const message =
+        data && typeof data.message === "string" ? data.message : `HTTP ${res.status}`;
+      setStatusBanner(null);
+      setErrorBanner(`${record.reference} was saved but NOT posted to the ledger: ${message}`);
+      return false;
+    } catch {
+      setErrorBanner(
+        `${record.reference} was saved on this device but could not reach the ledger. Open it and save again when you are back online.`,
+      );
+      return false;
+    }
+  }
+
   function handleDeleteOrVoid() {
     if (mode !== "edit") return;
     deleteTransaction(form.id);
+    if (typeof window !== "undefined") {
+      void fetch(`/api/transactions?id=${encodeURIComponent(form.id)}`, { method: "DELETE" }).catch(
+        () => undefined,
+      );
+    }
     setStatusBanner(`Removed ${form.reference} from ${meta.label}.`);
     if (onNavigateBack) {
       window.setTimeout(() => {
@@ -576,25 +708,83 @@ export function TransactionRecordEditorWorkspace({
         <div className="rounded-[22px] border border-[#E5E5EA] bg-white p-5 shadow-[0_6px_22px_rgba(28,28,30,0.04)]">
           {/* Core Identity Fields */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="sm:col-span-2">
-              <label htmlFor="tx-counterparty" className="block text-xs font-semibold text-[#1C1C1E]">
-                {blueprint.counterpartyLabel}
-              </label>
-              <input
-                id="tx-counterparty"
-                type="text"
-                value={form.counterparty}
-                onChange={(e) => setForm((p) => ({ ...p, counterparty: e.target.value }))}
-                placeholder={blueprint.counterpartyPlaceholder}
-                className="mt-1.5 min-h-[44px] w-full rounded-[12px] border border-[#D1D1D6] bg-white px-3.5 text-sm font-semibold text-[#1C1C1E]"
-              />
-              {/* Quick Nigerian Party Suggestions */}
+            <div className="relative sm:col-span-2">
+              <div className="flex items-center justify-between">
+                <label htmlFor="tx-counterparty" className="block text-xs font-semibold text-[#1C1C1E]">
+                  {blueprint.counterpartyLabel}
+                </label>
+                {liveCounterparties.length > 0 && (
+                  <span className="text-[11px] font-medium text-[#006838]">
+                    {liveCounterparties.length} available
+                  </span>
+                )}
+              </div>
+              <div className="relative mt-1.5">
+                <input
+                  id="tx-counterparty"
+                  type="text"
+                  value={form.counterparty}
+                  onChange={(e) => {
+                    setForm((p) => ({ ...p, counterparty: e.target.value }));
+                    setCounterpartySearchOpen(true);
+                  }}
+                  onFocus={() => setCounterpartySearchOpen(true)}
+                  placeholder={blueprint.counterpartyPlaceholder}
+                  className="min-h-[44px] w-full rounded-[12px] border border-[#D1D1D6] bg-white px-3.5 pr-10 text-sm font-semibold text-[#1C1C1E] focus:border-[#006838] focus:outline-none focus:ring-2 focus:ring-[#006838]/20"
+                />
+                {liveCounterparties.length > 0 && (
+                  <button
+                    type="button"
+                    aria-label="Toggle Counterparty Picker"
+                    onClick={() => setCounterpartySearchOpen((v) => !v)}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-[#5E5E64] hover:bg-[#F2F2F7]"
+                  >
+                    <ChevronDown className="h-4 w-4" />
+                  </button>
+                )}
+
+                {/* Searchable Picker Dropdown Popover */}
+                {counterpartySearchOpen && filteredCounterparties.length > 0 && (
+                  <div
+                    role="listbox"
+                    aria-label={`Matching ${targetCounterpartyModule}`}
+                    className="absolute z-30 mt-1 max-h-56 w-full overflow-y-auto rounded-[14px] border border-[#E5E5EA] bg-white py-1.5 shadow-lg"
+                  >
+                    {filteredCounterparties.map((c) => (
+                      <button
+                        key={c.id}
+                        type="button"
+                        role="option"
+                        aria-selected={form.counterparty === c.name}
+                        onClick={() => {
+                          setForm((p) => ({ ...p, counterparty: c.name }));
+                          setCounterpartySearchOpen(false);
+                        }}
+                        className="flex w-full items-center justify-between px-3.5 py-2 text-left text-xs transition hover:bg-[#E6F5ED]"
+                      >
+                        <div>
+                          <p className="font-semibold text-[#1C1C1E]">{c.name}</p>
+                          <p className="text-[11px] text-[#5E5E64]">{c.contactOrNote || c.category}</p>
+                        </div>
+                        <Badge variant="outline" className="font-mono text-[10px]">
+                          {c.code}
+                        </Badge>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Quick Party Suggestions / Registered Chips */}
               <div className="mt-2 flex flex-wrap gap-1.5">
-                {blueprint.counterpartySuggestions.map((chip) => (
+                {displayChips.map((chip) => (
                   <button
                     key={chip}
                     type="button"
-                    onClick={() => setForm((p) => ({ ...p, counterparty: chip }))}
+                    onClick={() => {
+                      setForm((p) => ({ ...p, counterparty: chip }));
+                      setCounterpartySearchOpen(false);
+                    }}
                     className="rounded-full border border-[#E5E5EA] bg-[#FAFAFC] px-2.5 py-1 text-[11px] font-medium text-[#5E5E64] transition hover:border-[#006838] hover:bg-[#E6F5ED] hover:text-[#00582E]"
                   >
                     + {chip}
@@ -643,7 +833,7 @@ export function TransactionRecordEditorWorkspace({
                 layout={blueprint.editorLayout}
                 typeId={typeId}
                 isFullMode={false}
-                accountOptions={blueprint.defaultAccountOptions}
+                accountOptions={accountOptions}
                 lineItems={form.lineItems}
                 onUpdateLine={updateLine}
                 onAddLine={addLine}
@@ -720,7 +910,7 @@ export function TransactionRecordEditorWorkspace({
                     layout={blueprint.editorLayout}
                     typeId={typeId}
                     isFullMode={true}
-                    accountOptions={blueprint.defaultAccountOptions}
+                    accountOptions={accountOptions}
                     lineItems={form.lineItems}
                     onUpdateLine={updateLine}
                     onAddLine={addLine}
@@ -945,7 +1135,8 @@ export function TransactionRecordEditorWorkspace({
               {mode === "create" && (
                 <button
                   type="button"
-                  onClick={() => handleSave(true)}
+                  onClick={() => void handleSave(true)}
+                  disabled={saving}
                   className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-[#D1D1D6] bg-white px-4 py-2 text-xs font-semibold text-[#1C1C1E] transition hover:bg-[#F2F2F7]"
                 >
                   <Plus className="h-3.5 w-3.5 text-[#006838]" aria-hidden="true" />
@@ -955,7 +1146,8 @@ export function TransactionRecordEditorWorkspace({
 
               <button
                 type="button"
-                onClick={() => handleSave(false)}
+                onClick={() => void handleSave(false)}
+                disabled={saving}
                 className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-[#006838] px-5 py-2 text-xs font-semibold text-white shadow-[0_6px_16px_rgba(0,104,56,0.24)] transition hover:bg-[#00582E] active:scale-[0.97]"
               >
                 <Save className="h-4 w-4" aria-hidden="true" />

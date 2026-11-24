@@ -29,6 +29,8 @@ export interface AuthWorkspaceSummary {
   readonly legalName: string;
   readonly rcNumber: string;
   readonly baseCurrency: "NGN";
+  readonly businessType?: string;
+  readonly customModules?: readonly string[];
 }
 
 export interface WorkspaceMembershipSummary {

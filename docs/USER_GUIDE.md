@@ -43,11 +43,10 @@ Need **Hotels/Hospitality**, **Diners/Restaurants**, Healthcare, Logistics, or a
 
 ## Using the Double-Entry Journal Composer (Slice 1)
 
-1. **Start the Web App (and Optional Python API Server):**
+1. **Start the Web App:**
    - Run the Next.js workspace directly inside `web/`:
      `cd web && npm run dev` (starts with built-in demo Nigerian SME accounts `1010..5010` and `FY2025` locked / `FY2026` open periods).
-   - Optionally start the Python Ledger API server (`http://127.0.0.1:8000`) and set `NAIRABOOKS_API_URL=http://127.0.0.1:8000` in `web/.env.local`:
-     `uv run python -m nairabooks.api.http_server`.
+   - Your data is saved to `web/.data/documents/`, or to Postgres if `DATABASE_URL` is set in `web/.env.local`, so it survives restarts. See `docs/DEPLOYMENT_RENDER.md`.
 2. **Navigate Without Sidebars (`ADR-012`):**
    - Use the floating top capsule (`Overview | Books | People & Stock | Reconcile | Reports | Admin`) or press `Tab` to activate the `Skip to main content` link (`A11Y-01`).
    - Switch between **`Simple`** (plain-English *Money In / Money Out* labels) and **`Pro`** (full FX currency rates and audit reversal controls) at any time.
@@ -187,11 +186,21 @@ Click **`Reconcile`** in the top navigation bar to reconcile your bank and POS a
 ---
 
 ## 13. Live Transaction Posting & General Ledger Integration
-Whenever you create or save any operational transaction in **Transactions** (`/transactions/[type]/new`):
-- **Automatic Double-Entry Generation:** NairaBooks converts your entry into balanced Nigerian IFRS debits and credits with exact kobo precision. When creating a Sales Invoice with VAT, NairaBooks credits your Sales Revenue (`4010`), credits NRS Output VAT (`2010`), and debits Trade Receivables (`1120`). If client WHT is deducted, it splits into `1150 WHT Credit Notes Receivable`.
-- **Live Sequential Voucher Number:** As soon as you save, NairaBooks assigns an official journal voucher number (`JV-2026-XXXXX`) and marks the entry `Posted`.
-- **Immediate Statement & Reconciliation Update:** Your transaction automatically appears in the General Ledger, updates your Customer or Vendor balances in **Admin** (`/admin`), reflects in your **Overview** KPIs (`Cash on Hand`, `Net Income`, `Total Receivables`), flows into the Trial Balance and FRCN reports on **`/reports`**, and is ready for 1-click matching on **`/reconcile`**.
-
+When you save a transaction in **Transactions** (`/transactions/[type]/new`), NairaBooks posts it to your company's own ledger:
+- **Correct double entry for every type, using your own chart of accounts.** For example:
+  - **Sales invoice:** debits Receivables and credits Revenue and Output VAT.
+  - **Bill:** debits the expense (or stock), and Input VAT. It credits Payables and WHT Payable.
+  - **Payslip:** debits Salaries for gross pay plus the employer's 10% pension. It credits PAYE, pension (8% + 10%), NHF, and Bank for net pay.
+  - **Stock count:** posts the shortage or gain against Inventory.
+- **What does not post:** quotes, purchase orders, requisitions, deposit selections, reconciliations, letters, action items, system tasks, and anything saved as **Draft**.
+- **Editing or deleting:** saving the same record again changes nothing; an edit reverses the old voucher and posts the new one; deleting reverses it. Nothing is ever double-counted.
+- **If posting fails** (for example, a closed year or an unbalanced journal), the editor stays open and shows the reason.
+- **Admin accounts:** new or renamed accounts in **Admin → Chart of Accounts** become postable straight away. Beginning balances you type there are posted as one "Opening Balances" entry against *Opening Balance Equity*.
+- **Stock and payroll:** pick an item from the inventory list on a line to move its stock and post cost of sales automatically. Payslips appear in the **Payroll Register**.
+- **Reports** (`/reports`) all read these postings:
+  - Trial Balance, Profit & Loss, Balance Sheet, General Journal
+  - Aged Receivables/Payables (payments settle the oldest invoices first)
+  - Inventory Valuation, Payroll Register
 
 ---
 
@@ -280,3 +289,37 @@ NairaBooks is proudly Nigerian-themed with authentic cultural artwork woven into
    - **Minimalist Whisper:** Barely-there texture for high-density spreadsheet auditing.
 5. Your choice is saved instantly to your device and applied live across all tabs and routes!
 6. When printing A4 financial reports or exporting PDFs, the background pattern is automatically removed so documents print on clean, professional white paper with zero ink or toner waste.
+
+---
+
+## 18. New Organization Registration & Clean Zero-State Ledger
+When you sign up as a new business owner or managing director:
+- **Clean Slate Guarantee:** Your new organization starts in an immaculate zero-state. All dashboard cards (Cash on Hand, Total Receivables, Total Payables, Net Income) read strictly **₦0.00**, and the voucher count is **0**. There is zero data bleed from sample/demo companies.
+- **Auto-Provisioned Chart of Accounts:** Your company is automatically provisioned with the standard Nigerian SME Chart of Accounts:
+  - `1010` Zenith Bank Current Account (NGN)
+  - `1020` Access Bank Domiciliary Account (USD)
+  - `2010` NRS Output VAT Payable (7.5%)
+  - `3010` Owner Share Capital
+  - `4010` Trading & Operating Revenue
+  - `5010` Logistics & Operating Expenses
+- **Active Fiscal Period:** An open fiscal period (`FY2026`) is initialized automatically, allowing you to record transactions immediately without manual fiscal configuration.
+- **Onboarding Banner:** A helpful green banner on `/overview` confirms your ledger is active and offers direct 1-click shortcuts to **Post First Voucher** or **Import Statement**. Once your first transaction is posted, the cards update dynamically to reflect live general ledger totals.
+
+---
+
+## 19. 1-Based Sequential Numbering, Searchable Pickers & Live Reports
+
+### 1-Based Sequential Numbering
+In every newly registered organization, all numbering starts cleanly from **1**:
+- **Transactions:** Starts at `INV-2026-001` (Sales Invoices), `QUO-2026-001` (Quotes), `BIL-2026-001` (Bills), `JV-2026-001` (Journal Vouchers), `REC-2026-001` (Customer Receipts), `PAY-2026-001` (Vendor Payments), etc., and increments strictly by one (`002`, `003`...).
+- **Admin Records:** Starts at `CUS-001` (Customers), `VND-001` (Vendors), `SKU-001` (Inventory Items), `JOB-001` (Jobs/Projects), `EMP-001` (Employees), `FA-001` (Fixed Assets), etc.
+
+### Searchable Counterparties & Inventory Catalog Picker
+- **Searchable Customer / Vendor / Staff Combobox:** When creating any transaction, click or type in the Customer/Vendor field. A popover opens showing your registered counterparties, lets you filter by typing part of the name or code, and displays quick-pick chips for 1-click selection. You can also type a new counterparty name directly.
+- **Inventory Item Auto-Complete:** When adding line items to an invoice, quote, or bill, select an item from the **Inventory Item Picker** dropdown (`code — name (price)`). NairaBooks will automatically populate the item description, standard unit price, and general ledger account code.
+- **Relational Pickers in Admin Studio:** When creating inventory items, fixed assets, or jobs in the Admin tab, relational dropdowns let you pick preferred vendors, client customers, sales reps, and ledger accounts directly from your live company records.
+
+### Live Financial Reports & Zero-Balance Accounts Display
+- **All 15 Reports Connected to Live Data:** Trial Balance, Balance Sheet, Income Statement, Statement of Value Added, 5-Year Financial Performance, Aged Receivables, Aged Payables, General Journal, Inventory Valuation, Payroll Register, and CAMA Audit Trail now compute directly from your live company transactions and Chart of Accounts.
+- **Complete Chart of Accounts Visibility:** By default, financial statements display all related accounts from your company's Chart of Accounts even if they currently have a zero balance (`₦0.00`). This gives business owners and auditors complete visibility into the structure of their accounts before and after posting transactions.
+- **Hide Zero Balances (Optional):** If you prefer a more compact document showing only accounts with non-zero activity, open the **Filters** drawer on any report and enable the **"Hide Zero-Balance Accounts"** toggle.

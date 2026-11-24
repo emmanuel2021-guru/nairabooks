@@ -724,7 +724,7 @@ export const MODULE_EDITOR_BLUEPRINTS: Record<RecordModuleId, ModuleEditorBluepr
         label: "Quantity on Hand",
         tab: "gl-stock",
         type: "number",
-        defaultValue: "42",
+        defaultValue: "0",
         includeInSimple: true,
       },
       {
@@ -732,14 +732,14 @@ export const MODULE_EDITOR_BLUEPRINTS: Record<RecordModuleId, ModuleEditorBluepr
         label: "Quantity Committed on Sales Orders",
         tab: "gl-stock",
         type: "number",
-        defaultValue: "6",
+        defaultValue: "0",
       },
       {
         key: "minStock",
         label: "Minimum Reorder Stock",
         tab: "gl-stock",
         type: "number",
-        defaultValue: "15",
+        defaultValue: "0",
       },
       {
         key: "warehouseLocation",

@@ -10,6 +10,53 @@ import {
   type TransactionTypeId,
 } from "@/components/transactions/transactions-data";
 import type { EditorLayoutKind } from "@/components/transactions/transaction-editor-schemas";
+import { loadAdminRecords } from "@/components/admin/admin-store";
+import { loadTransactions } from "@/components/transactions/transactions-store";
+import {
+  computePayslip,
+  computeStockCount,
+  computeStockOnHand,
+  isTrackedStockItem,
+  parseAccountCode,
+  stockItemUnitCost,
+  stockItemUnitPrice,
+} from "@/lib/posting-rules";
+
+/** Types whose lines buy stock in (priced at cost) rather than sell it (priced at list). */
+const PURCHASE_LINE_TYPES: ReadonlySet<string> = new Set([
+  "purchase-orders",
+  "select-for-purchase-orders",
+  "purchases-receive-inventory",
+  "bills",
+  "write-checks",
+  "vendor-credit-memos",
+]);
+
+/**
+ * Account choices for a line: the company's chart, plus the line's current value if it is
+ * not in the chart (older records) and an empty "automatic" choice.
+ */
+function AccountOptions({
+  options,
+  value,
+  emptyLabel,
+}: {
+  readonly options: readonly string[];
+  readonly value: string;
+  readonly emptyLabel: string;
+}) {
+  return (
+    <>
+      <option value="">{emptyLabel}</option>
+      {value && !options.includes(value) && <option value={value}>{value}</option>}
+      {options.map((opt) => (
+        <option key={opt} value={opt}>
+          {opt}
+        </option>
+      ))}
+    </>
+  );
+}
 
 interface LayoutCanvasProps {
   readonly layout: EditorLayoutKind;
@@ -36,6 +83,7 @@ interface LineItemsTableProps {
   readonly title: string;
   readonly addButtonLabel: string;
   readonly rowAriaPrefix: string;
+  readonly typeId: TransactionTypeId;
   readonly descriptionPlaceholder: string;
   readonly emptyMessage?: string;
   readonly rows: readonly IndexedLineRow[];
@@ -53,6 +101,7 @@ function LineItemsTable({
   title,
   addButtonLabel,
   rowAriaPrefix,
+  typeId,
   descriptionPlaceholder,
   emptyMessage,
   rows,
@@ -65,6 +114,9 @@ function LineItemsTable({
   onUpdateLine,
   onRemoveLine,
 }: LineItemsTableProps) {
+  const inventoryItems = React.useMemo(() => {
+    return loadAdminRecords().filter((r) => r.module === "inventory");
+  }, []);
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -110,6 +162,45 @@ function LineItemsTable({
                       exit={prefersReduced ? undefined : { opacity: 0 }}
                     >
                       <td className="px-3 py-2">
+                        {inventoryItems.length > 0 && (
+                          <div className="mb-1">
+                            <select
+                              aria-label={`${rowAriaPrefix} ${rowNum} Inventory Item Picker`}
+                              onChange={(e) => {
+                                const selectedId = e.target.value;
+                                if (!selectedId) return;
+                                const item = inventoryItems.find((i) => i.id === selectedId);
+                                if (item) {
+                                  const isPurchase = PURCHASE_LINE_TYPES.has(typeId);
+                                  const price = isPurchase
+                                    ? stockItemUnitCost(item)
+                                    : stockItemUnitPrice(item);
+                                  const glCode = parseAccountCode(
+                                    isPurchase ? item.details?.glInventoryAcct : item.details?.glSalesAcct,
+                                  );
+                                  const glOption = glCode
+                                    ? accountOptions.find((opt) => parseAccountCode(opt) === glCode)
+                                    : undefined;
+                                  onUpdateLine(originalIndex, {
+                                    description: item.name,
+                                    unitPriceNgn: price > 0 ? price : line.unitPriceNgn,
+                                    accountCode: glOption ?? line.accountCode,
+                                    itemId: item.id,
+                                  });
+                                }
+                              }}
+                              className="min-h-[26px] w-full rounded-[6px] border border-[#E5E5EA] bg-[#FAFAFC] px-1.5 text-[11px] font-medium text-[#006838]"
+                              value={line.itemId ?? ""}
+                            >
+                              <option value="">-- Pick from Inventory ({inventoryItems.length}) --</option>
+                              {inventoryItems.map((inv) => (
+                                <option key={inv.id} value={inv.id}>
+                                  {inv.code} — {inv.name} ({inv.primaryMetricValue || "₦0.00"})
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        )}
                         <input
                           aria-label={`${rowAriaPrefix} ${rowNum} Description`}
                           type="text"
@@ -131,11 +222,11 @@ function LineItemsTable({
                             }
                             className="min-h-[38px] w-full rounded-[10px] border border-[#D1D1D6] bg-white px-2 text-xs font-medium text-[#1C1C1E]"
                           >
-                            {accountOptions.map((opt) => (
-                              <option key={opt} value={opt}>
-                                {opt}
-                              </option>
-                            ))}
+                            <AccountOptions
+                              options={accountOptions}
+                              value={line.accountCode}
+                              emptyLabel="Default account (automatic)"
+                            />
                           </select>
                         </td>
                       )}
@@ -225,15 +316,12 @@ export function TransactionLayoutCanvas({
   const prefersReduced = useReducedMotion();
 
   if (layout === "payroll-slip") {
-    const basic = parseAmountNumber(details.basicSalary ?? "390000");
-    const housing = parseAmountNumber(details.housingAllowance ?? "160000");
-    const transport = parseAmountNumber(details.transportAllowance ?? "100000");
-    const gross = basic + housing + transport;
-    const empPencom = Math.round(gross * 0.08);
-    const erPencom = Math.round(gross * 0.1);
-    const nhf = Math.round(basic * 0.025);
-    const paye = parseAmountNumber(details.payeTax ?? "68400");
-    const netPay = Math.max(0, gross - empPencom - nhf - paye);
+    const slip = computePayslip(details);
+    const gross = slip.gross;
+    const empPencom = slip.employeePension;
+    const erPencom = slip.employerPension;
+    const nhf = slip.nhf;
+    const netPay = Math.max(0, slip.netPay);
 
     return (
       <div className="space-y-4">
@@ -330,15 +418,49 @@ export function TransactionLayoutCanvas({
 
   if (layout === "inventory-bom") {
     const isAssembly = typeId === "assemblies";
-    const sysQty = parseAmountNumber(details.systemQty ?? "206");
-    const actualQty = parseAmountNumber(details.actualQty ?? "200");
-    const yieldQty = parseAmountNumber(details.yieldQuantity ?? "50");
-    const unitCost = parseAmountNumber(details.unitCost ?? "7600");
-    const deltaQty = isAssembly ? yieldQty : actualQty - sysQty;
-    const totalImpact = Math.abs(deltaQty) * unitCost;
+    const count = computeStockCount(typeId, details);
+    const yieldQty = count.deltaQty;
+    const deltaQty = count.deltaQty;
+    const totalImpact = count.value;
+    const stockItems = loadAdminRecords().filter(
+      (r) => r.module === "inventory" && isTrackedStockItem(r),
+    );
+
+    function pickStockItem(itemId: string) {
+      onUpdateDetail("itemId", itemId);
+      const item = stockItems.find((i) => i.id === itemId);
+      if (!item) return;
+      const cost = stockItemUnitCost(item);
+      if (cost > 0) onUpdateDetail("unitCost", String(cost));
+      if (!isAssembly) {
+        const onHand = computeStockOnHand(stockItems, loadTransactions()).get(item.id) ?? 0;
+        onUpdateDetail("systemQty", String(onHand));
+        onUpdateDetail("actualQty", String(onHand));
+      }
+    }
 
     return (
       <div className="space-y-4">
+        {stockItems.length > 0 && (
+          <div>
+            <label htmlFor="inv-item" className="block text-xs font-semibold text-[#1C1C1E]">
+              {isAssembly ? "Finished Item Built" : "Stock Item Counted"}
+            </label>
+            <select
+              id="inv-item"
+              value={details.itemId ?? ""}
+              onChange={(e) => pickStockItem(e.target.value)}
+              className="mt-1.5 min-h-[44px] w-full rounded-[12px] border border-[#D1D1D6] bg-white px-3 text-sm font-medium text-[#1C1C1E]"
+            >
+              <option value="">-- Choose a stock item ({stockItems.length}) --</option>
+              {stockItems.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.code} — {item.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           {isAssembly ? (
             <div>
@@ -434,6 +556,7 @@ export function TransactionLayoutCanvas({
       <div className="space-y-5">
         {supportsDirectManualItems && (
           <LineItemsTable
+            typeId={typeId}
             title={
               isReceipt
                 ? "Direct Items Received (No Invoice Needed)"
@@ -631,11 +754,11 @@ export function TransactionLayoutCanvas({
                       onChange={(e) => onUpdateLine(index, { accountCode: e.target.value })}
                       className="min-h-[38px] w-full rounded-[10px] border border-[#D1D1D6] bg-white px-2.5 text-xs font-semibold text-[#1C1C1E]"
                     >
-                      {accountOptions.map((opt) => (
-                        <option key={opt} value={opt}>
-                          {opt}
-                        </option>
-                      ))}
+                      <AccountOptions
+                        options={accountOptions}
+                        value={line.accountCode}
+                        emptyLabel="Choose an account…"
+                      />
                     </select>
                   </td>
                   <td className="px-3 py-2">
@@ -750,6 +873,7 @@ export function TransactionLayoutCanvas({
   // Default: "line-items" (Invoices, Quotes, POs, Bills, Credit Memos, Checks, Register, Time/Expense)
   return (
     <LineItemsTable
+      typeId={typeId}
       title="Line Items & Amounts"
       addButtonLabel="Add Line Item"
       rowAriaPrefix="Line"

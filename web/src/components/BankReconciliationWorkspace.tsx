@@ -51,11 +51,30 @@ import { ReconcileIconBadge } from "./reconcile/ReconcileIconBadge";
 import { BankStatementUploader } from "./reconcile/BankStatementUploader";
 import { QuickPostModal } from "./reconcile/QuickPostModal";
 
+const DEMO_MATCHED_PAIRS: Readonly<Record<string, string>> = {
+  "STMT-014": "LEDGER-001",
+  "STMT-022": "LEDGER-002",
+  "STMT-011": "LEDGER-003",
+  "STMT-033": "LEDGER-004",
+  "STMT-038": "LEDGER-005",
+  "STMT-004": "LEDGER-006",
+  "STMT-019": "LEDGER-007",
+  "STMT-006": "LEDGER-008",
+  "STMT-034": "LEDGER-009",
+  "STMT-039": "LEDGER-010",
+  "STMT-015": "LEDGER-011",
+  "STMT-013": "LEDGER-012",
+  "STMT-023": "LEDGER-013",
+  "STMT-012": "LEDGER-014",
+};
+
 export function BankReconciliationWorkspace({
   accounts,
+  workspaceId,
   headingLevel = "h1",
 }: {
   readonly accounts: readonly ChartOfAccount[];
+  readonly workspaceId?: string;
   readonly headingLevel?: "h1" | "h2";
 }) {
   const { mode } = useWorkspaceMode();
@@ -70,46 +89,78 @@ export function BankReconciliationWorkspace({
   // Active Workspace Tab: Bank Statement Reconcile vs FX Revaluation
   const [activeTab, setActiveTab] = useState<"reconcile" | "fx">("reconcile");
 
+  const isDemo = !workspaceId || workspaceId === "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaa0001";
+
   // Guided 4-Task Workflow State & Collapsible Uploader
-  const [activeTask, setActiveTask] = useState<"connect" | "match" | "resolve" | "audit">("match");
-  const [isUploaderOpen, setIsUploaderOpen] = useState(false);
+  const [activeTask, setActiveTask] = useState<"connect" | "match" | "resolve" | "audit">(
+    isDemo ? "match" : "connect",
+  );
+  const [isUploaderOpen, setIsUploaderOpen] = useState(!isDemo);
   const [isAuditRegisterOpen, setIsAuditRegisterOpen] = useState(false);
 
-  // Bank Statement Uploaded State (preloads verified commercial bank statement by default for instant delight)
-  const [statementMeta, setStatementMeta] = useState<BankStatementMetadata | null>(
-    ACCESS_BANK_SAMPLE_METADATA,
-  );
+  // Bank Statement Uploaded State (only preloaded for demo company)
+  const [statementMeta, setStatementMeta] = useState<BankStatementMetadata | null>(() => {
+    if (!isDemo && typeof window !== "undefined" && workspaceId) {
+      try {
+        const saved = window.sessionStorage.getItem(`nairabooks_reconcile_${workspaceId}`);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          return parsed.meta ?? null;
+        }
+      } catch {}
+      return null;
+    }
+    return isDemo ? ACCESS_BANK_SAMPLE_METADATA : null;
+  });
 
   // Dynamic universal bank account derivation
   const selectedBankAccount = bankAccounts.find((a) => a.id === selectedBankId);
   const activeBankName =
-    statementMeta?.bankName ?? selectedBankAccount?.name ?? "Commercial Bank Corporate Account";
-  const activeAccountNumber = statementMeta?.accountNumber ?? "0123456789";
-  const activeAccountName = statementMeta?.accountName ?? "NairaBooks Operating Account";
+    statementMeta?.bankName ?? (isDemo ? "Access Bank Plc" : (selectedBankAccount?.name ?? "Commercial Bank Corporate Account"));
+  const activeAccountNumber = statementMeta?.accountNumber ?? (isDemo ? "0123456789" : "—");
+  const activeAccountName = statementMeta?.accountName ?? (isDemo ? "NairaBooks Operating Account" : (selectedBankAccount?.name ?? "Operating Account"));
 
-  const [statementLines, setStatementLines] = useState<readonly ParsedStatementLine[]>(
-    ACCESS_BANK_PARSED_TRANSACTIONS,
-  );
-  const [ledgerEntries, setLedgerEntries] = useState<readonly CompanyLedgerEntry[]>(
-    INITIAL_COMPANY_LEDGER_ENTRIES,
-  );
+  const [statementLines, setStatementLines] = useState<readonly ParsedStatementLine[]>(() => {
+    if (!isDemo && typeof window !== "undefined" && workspaceId) {
+      try {
+        const saved = window.sessionStorage.getItem(`nairabooks_reconcile_${workspaceId}`);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed.lines)) return parsed.lines;
+        }
+      } catch {}
+      return [];
+    }
+    return isDemo ? ACCESS_BANK_PARSED_TRANSACTIONS : [];
+  });
+
+  const [ledgerEntries, setLedgerEntries] = useState<readonly CompanyLedgerEntry[]>(() => {
+    if (!isDemo && typeof window !== "undefined" && workspaceId) {
+      try {
+        const saved = window.sessionStorage.getItem(`nairabooks_reconcile_${workspaceId}`);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed.ledger)) return parsed.ledger;
+        }
+      } catch {}
+      return [];
+    }
+    return isDemo ? INITIAL_COMPANY_LEDGER_ENTRIES : [];
+  });
 
   // Match Tracking State: map statementLineId -> ledgerEntryId
-  const [matchedPairs, setMatchedPairs] = useState<Record<string, string>>({
-    "STMT-014": "LEDGER-001", // Taiye Adewole 6,000.00
-    "STMT-022": "LEDGER-002", // Akinkunmi 2,000.00
-    "STMT-011": "LEDGER-003", // Adobe thanks 5,000.00
-    "STMT-033": "LEDGER-004", // Emmanuel Ogunsola 6,000.00
-    "STMT-038": "LEDGER-005", // Emmanuel Ogunsola 6,000.00
-    "STMT-004": "LEDGER-006", // Aina Ruth 200.00
-    "STMT-019": "LEDGER-007", // Emmanuel Ogunsola 1,500.00
-    "STMT-006": "LEDGER-008", // Paystack 500.81
-    "STMT-034": "LEDGER-009", // Over Under Digital 5,999.00
-    "STMT-039": "LEDGER-010", // Over Under Digital 5,999.00
-    "STMT-015": "LEDGER-011", // B99 6,026.88
-    "STMT-013": "LEDGER-012", // B99 3,960.75
-    "STMT-023": "LEDGER-013", // B99 2,810.75
-    "STMT-012": "LEDGER-014", // Akinkunmi 1,010.75
+  const [matchedPairs, setMatchedPairs] = useState<Record<string, string>>(() => {
+    if (!isDemo && typeof window !== "undefined" && workspaceId) {
+      try {
+        const saved = window.sessionStorage.getItem(`nairabooks_reconcile_${workspaceId}`);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed.matched) return parsed.matched;
+        }
+      } catch {}
+      return {};
+    }
+    return isDemo ? DEMO_MATCHED_PAIRS : {};
   });
 
   // Filters & Search
@@ -395,7 +446,7 @@ export function BankReconciliationWorkspace({
           <div
             role="tablist"
             aria-label="Reconciliation workspace tabs"
-            className="inline-flex items-center rounded-full border border-[#E5E5EA] bg-[#E5E5EA]/70 p-0.5 text-xs font-semibold"
+            className="inline-flex items-center rounded-full border border-[#E5E5EA] dark:border-[#2C2C2E] bg-[#E5E5EA]/70 dark:!bg-[#18181A] p-0.5 text-xs font-semibold"
           >
             <button
               type="button"
@@ -404,8 +455,8 @@ export function BankReconciliationWorkspace({
               onClick={() => setActiveTab("reconcile")}
               className={`min-h-[44px] rounded-full px-4 py-1.5 transition ${
                 activeTab === "reconcile"
-                  ? "bg-white text-[#1C1C1E] shadow-sm"
-                  : "text-[#5E5E64] hover:text-[#1C1C1E]"
+                  ? "bg-white dark:!bg-[#2C2C2E] text-[#1C1C1E] dark:!text-white shadow-sm dark:border dark:border-[#3A3A3C]"
+                  : "text-[#5E5E64] dark:!text-[#A1A1AA] hover:text-[#1C1C1E] dark:hover:!text-white"
               }`}
             >
               Bank Statement Matching
@@ -417,8 +468,8 @@ export function BankReconciliationWorkspace({
               onClick={() => setActiveTab("fx")}
               className={`min-h-[44px] rounded-full px-4 py-1.5 transition ${
                 activeTab === "fx"
-                  ? "bg-white text-[#1C1C1E] shadow-sm"
-                  : "text-[#5E5E64] hover:text-[#1C1C1E]"
+                  ? "bg-white dark:!bg-[#2C2C2E] text-[#1C1C1E] dark:!text-white shadow-sm dark:border dark:border-[#3A3A3C]"
+                  : "text-[#5E5E64] dark:!text-[#A1A1AA] hover:text-[#1C1C1E] dark:hover:!text-white"
               }`}
             >
               Foreign FX Revaluation (IAS 21)
@@ -687,7 +738,7 @@ export function BankReconciliationWorkspace({
                     </div>
                     <div className="flex items-center justify-between border-t border-[#E5E5EA] pt-1">
                       <span className="text-[#5E5E64]">Closing Balance:</span>
-                      <span className="font-mono font-bold text-[#006838]">₦{statementMeta?.closingBalanceNgn ?? "4.41"}</span>
+                      <span className="font-mono font-bold text-[#006838]">₦{statementMeta?.closingBalanceNgn ?? "0.00"}</span>
                     </div>
                   </div>
                 </div>
@@ -749,7 +800,7 @@ export function BankReconciliationWorkspace({
                     <span className="text-[#5E5E64]">{activeAccountName}</span>
                     <span className="text-[#5E5E64]">&middot;</span>
                     <span className="font-mono font-bold text-[#006838]">
-                      Ending: ₦{statementMeta?.closingBalanceNgn ?? "4.41"}
+                      Ending: ₦{statementMeta?.closingBalanceNgn ?? "0.00"}
                     </span>
                   </div>
 
@@ -1327,7 +1378,7 @@ export function BankReconciliationWorkspace({
                         Bank Ending Balance
                       </span>
                       <p className="mt-1 font-mono text-lg font-bold text-[#1C1C1E]">
-                        ₦{statementMeta?.closingBalanceNgn ?? "4.41"}
+                        ₦{statementMeta?.closingBalanceNgn ?? "0.00"}
                       </p>
                       <p className="text-[10px] text-[#5E5E64]">Per verified statement feed</p>
                     </div>

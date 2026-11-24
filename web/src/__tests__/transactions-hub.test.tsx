@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import axe from "axe-core";
 import { TopNavCapsule } from "@/components/TopNavCapsule";
@@ -7,6 +7,21 @@ import { TransactionRecordEditorWorkspace } from "@/components/transactions/Tran
 import { TRANSACTION_TYPES } from "@/components/transactions/transactions-data";
 import { resetTransactionsStore } from "@/components/transactions/transactions-store";
 import { WorkspaceModeProvider } from "@/state/workspace-mode";
+
+// The editor waits for the ledger to accept a record before confirming it was saved.
+beforeEach(() => {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async () =>
+      new Response(JSON.stringify({ ok: true, posted: true, voucherId: "v-1", voucherNumber: "JV-2026-0001" }), {
+        status: 201,
+      }),
+    ),
+  );
+});
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
 describe("Transactions Hub & Dedicated Create/Edit Pages (Phase 5 Enterprise)", () => {
   it("renders TransactionsHubWorkspace with 6 pillars, all 27 enterprise transaction types, outline list, and zero axe violations", async () => {
@@ -99,7 +114,7 @@ describe("Transactions Hub & Dedicated Create/Edit Pages (Phase 5 Enterprise)", 
     expect(screen.getByText(/Automatic Double-Entry Impact Preview/i)).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: /Post Sales Invoice/i }));
-    expect(screen.getByText(/Created .* for Victoria Island Suites Ltd/i)).toBeTruthy();
+    expect(await screen.findByText(/Created .* for Victoria Island Suites Ltd/i)).toBeTruthy();
 
     const createAxe = await axe.run(container);
     expect(createAxe.violations).toHaveLength(0);
@@ -203,7 +218,7 @@ describe("Transactions Hub & Dedicated Create/Edit Pages (Phase 5 Enterprise)", 
 
     // Enable optional 7.5% VAT -> 100,000 -> wait VAT checkbox on new lines matches vatEnabled
     fireEvent.click(screen.getByRole("button", { name: /Post Customer Receipt/i }));
-    expect(screen.getByText(/Created .* for Lekki Walk-In Buyer/i)).toBeTruthy();
+    expect(await screen.findByText(/Created .* for Lekki Walk-In Buyer/i)).toBeTruthy();
 
     const rcptAxe = await axe.run(rcpt.container);
     expect(rcptAxe.violations).toHaveLength(0);
@@ -235,7 +250,7 @@ describe("Transactions Hub & Dedicated Create/Edit Pages (Phase 5 Enterprise)", 
     expect(screen.getByText(/₦16,125\.00/i)).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: /Post Vendor Payment/i }));
-    expect(screen.getByText(/Created .* for Yaba Logistics Riders/i)).toBeTruthy();
+    expect(await screen.findByText(/Created .* for Yaba Logistics Riders/i)).toBeTruthy();
 
     const payAxe = await axe.run(pay.container);
     expect(payAxe.violations).toHaveLength(0);

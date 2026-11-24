@@ -1,6 +1,18 @@
 import type { FrcnFinancialStatementPackage } from "@/types/ledger";
 import { loadAdminRecords } from "@/components/admin/admin-store";
+import { loadTransactions } from "@/components/transactions/transactions-store";
 import { parseNairaNumeric } from "@/components/admin/admin-maintain-data";
+import {
+  agedPayablesRows,
+  agedReceivablesRows,
+  balanceSheetRows,
+  generalJournalRows,
+  incomeStatementRows,
+  inventoryValuationRows,
+  invoiceRegisterRows,
+  payrollRegisterRows,
+  trialBalanceRows,
+} from "@/components/reports/ledger-report-rows";
 
 export type ReportCategoryKey =
   | "financial-statements"
@@ -216,7 +228,7 @@ export const REPORTS_CATALOG: readonly ReportDefinition[] = [
         label: "Show Zero-Balance Accounts",
         description: "Include accounts with ₦0.00 debit and credit balance.",
         type: "boolean",
-        defaultValue: false,
+        defaultValue: true,
       },
       {
         id: "camaHashSeal",
@@ -233,46 +245,7 @@ export const REPORTS_CATALOG: readonly ReportDefinition[] = [
         defaultValue: true,
       },
     ],
-    generateRows: (pkg) => {
-      if (!pkg) {
-        return {
-          rows: [],
-          summaryKpis: [
-            { label: "Total Debits", value: "₦0.00" },
-            { label: "Total Credits", value: "₦0.00" },
-            { label: "Balance Status", value: "Awaiting Data" },
-          ],
-        };
-      }
-      const rows: ReportRow[] = pkg.trialBalance.map((r) => {
-        const d = Number(r.debitBalanceNgn) || 0;
-        const c = Number(r.creditBalanceNgn) || 0;
-        return {
-          id: r.accountCode,
-          values: {
-            code: r.accountCode,
-            name: r.accountName,
-            category: r.category,
-            debit: d,
-            credit: c,
-            netBalance: d - c,
-          },
-        };
-      });
-
-      return {
-        rows,
-        summaryKpis: [
-          { label: "Total Debits", value: `₦${pkg.totalDebitsNgn}` },
-          { label: "Total Credits", value: `₦${pkg.totalCreditsNgn}` },
-          {
-            label: "Equilibrium Status",
-            value: pkg.isBalanced ? "Balanced (0.00 variance)" : "Out of balance",
-            change: pkg.isBalanced ? "+ Balanced" : "Check Entries",
-          },
-        ],
-      };
-    },
+    generateRows: trialBalanceRows,
   },
   {
     id: "income-statement",
@@ -301,72 +274,7 @@ export const REPORTS_CATALOG: readonly ReportDefinition[] = [
         ],
       },
     ],
-    generateRows: (pkg) => {
-      const rev = Number(pkg?.profitAndLoss.totalRevenueNgn) || 15500000;
-      const profit = Number(pkg?.profitAndLoss.netProfitNgn) || 7200000;
-      const cogs = Math.round(rev * 0.38);
-      const grossProfit = rev - cogs;
-      const opex = grossProfit - profit;
-
-      const rows: ReportRow[] = [
-        {
-          id: "r-rev",
-          values: {
-            lineLabel: "Operating Sales Revenue (IFRS 15)",
-            category: "Revenue",
-            amountNgn: rev,
-            sharePct: "100.0%",
-          },
-        },
-        {
-          id: "r-cogs",
-          values: {
-            lineLabel: "Cost of Goods & Direct Services Sold (COGS)",
-            category: "Direct Cost",
-            amountNgn: -cogs,
-            sharePct: `${((cogs / rev) * 100).toFixed(1)}%`,
-          },
-        },
-        {
-          id: "r-gp",
-          isTotal: true,
-          values: {
-            lineLabel: "Gross Profit",
-            category: "Subtotal",
-            amountNgn: grossProfit,
-            sharePct: `${((grossProfit / rev) * 100).toFixed(1)}%`,
-          },
-        },
-        {
-          id: "r-opex",
-          values: {
-            lineLabel: "Operating, Administrative & General Expenses",
-            category: "Operating Expense",
-            amountNgn: -opex,
-            sharePct: `${((opex / rev) * 100).toFixed(1)}%`,
-          },
-        },
-        {
-          id: "r-net",
-          isTotal: true,
-          values: {
-            lineLabel: "Net Profit Before Tax (PBT)",
-            category: "Profit",
-            amountNgn: profit,
-            sharePct: `${((profit / rev) * 100).toFixed(1)}%`,
-          },
-        },
-      ];
-
-      return {
-        rows,
-        summaryKpis: [
-          { label: "Total Revenue", value: formatNairaAmount(rev) },
-          { label: "Gross Margin", value: `${((grossProfit / rev) * 100).toFixed(1)}%` },
-          { label: "Net Profit", value: formatNairaAmount(profit) },
-        ],
-      };
-    },
+    generateRows: incomeStatementRows,
   },
   {
     id: "balance-sheet",
@@ -395,106 +303,16 @@ export const REPORTS_CATALOG: readonly ReportDefinition[] = [
         ],
       },
     ],
-    generateRows: (pkg) => {
-      const assets = Number(pkg?.financialPosition.totalAssetsNgn) || 28500000;
-      const equity = Number(pkg?.financialPosition.totalEquityNgn) || 19200000;
-      const liabilities = assets - equity;
-
-      const rows: ReportRow[] = [
-        {
-          id: "b-cash",
-          values: {
-            section: "Current Assets",
-            account: "Cash & Cash Equivalents (Zenith, GTBank)",
-            amountNgn: Math.round(assets * 0.45),
-            sharePct: "45.0%",
-          },
-        },
-        {
-          id: "b-ar",
-          values: {
-            section: "Current Assets",
-            account: "Trade Receivables (Less IFRS 9 ECL)",
-            amountNgn: Math.round(assets * 0.25),
-            sharePct: "25.0%",
-          },
-        },
-        {
-          id: "b-inv",
-          values: {
-            section: "Current Assets",
-            account: "Inventory Stock on Hand (IAS 2)",
-            amountNgn: Math.round(assets * 0.15),
-            sharePct: "15.0%",
-          },
-        },
-        {
-          id: "b-ppe",
-          values: {
-            section: "Non-Current Assets",
-            account: "Property, Plant & Equipment (IAS 16)",
-            amountNgn: Math.round(assets * 0.15),
-            sharePct: "15.0%",
-          },
-        },
-        {
-          id: "b-tot-assets",
-          isTotal: true,
-          values: {
-            section: "Total Assets",
-            account: "Sum of All Economic Resources Owned",
-            amountNgn: assets,
-            sharePct: "100.0%",
-          },
-        },
-        {
-          id: "b-ap",
-          values: {
-            section: "Current Liabilities",
-            account: "Trade Payables & Accrued Expenses",
-            amountNgn: Math.round(liabilities * 0.7),
-            sharePct: `${((Math.round(liabilities * 0.7) / assets) * 100).toFixed(1)}%`,
-          },
-        },
-        {
-          id: "b-tax",
-          values: {
-            section: "Current Liabilities",
-            account: "Nigeria Tax Liabilities (VAT, WHT, CIT)",
-            amountNgn: Math.round(liabilities * 0.3),
-            sharePct: `${((Math.round(liabilities * 0.3) / assets) * 100).toFixed(1)}%`,
-          },
-        },
-        {
-          id: "b-equity",
-          isTotal: true,
-          values: {
-            section: "Total Equity & Net Capital",
-            account: "Contributed Capital + Retained Earnings",
-            amountNgn: equity,
-            sharePct: `${((equity / assets) * 100).toFixed(1)}%`,
-          },
-        },
-      ];
-
-      return {
-        rows,
-        summaryKpis: [
-          { label: "Total Assets", value: formatNairaAmount(assets) },
-          { label: "Total Liabilities", value: formatNairaAmount(liabilities) },
-          { label: "Net Equity", value: formatNairaAmount(equity) },
-        ],
-      };
-    },
+    generateRows: balanceSheetRows,
   },
   {
     id: "value-added",
     category: "financial-statements",
-    title: "FRCN Statement of Value Added",
-    statutoryStandard: "FRCN OND Page 41",
+    title: "Statement of Value Added (FRCN / CAMA)",
+    statutoryStandard: "FRCN Statement of Value Added",
     summary:
-      "Statutory Nigerian FRCN disclosure showing wealth created by the reporting entity and its distribution to employees, government, capital providers, and retained for future expansion.",
-    tags: ["FRCN OND", "Nigerian Statutory", "Wealth Distribution"],
+      "Statutory wealth creation analysis reporting how economic value was generated from operations and distributed to employees, government, providers of finance, and retained for growth.",
+    tags: ["FRCN Statutory", "Value Added", "Wealth Creation", "CAMA 2020"],
     columns: [
       { id: "lineLabel", label: "Wealth Distribution Category", align: "left", isDefaultVisible: true },
       { id: "amountNgn", label: "Amount (₦)", align: "right", isNumeric: true, isDefaultVisible: true },
@@ -503,39 +321,138 @@ export const REPORTS_CATALOG: readonly ReportDefinition[] = [
     advancedOptions: [
       {
         id: "benchmarkIndustry",
-        label: "Benchmark Against Sector Average",
-        description: "Display Nigerian Chamber of Commerce standard labor/tax distribution ratios.",
+        label: "Benchmark Against Peer Sector",
+        description: "Display Nigerian hospitality & trade sector averages.",
         type: "boolean",
-        defaultValue: false,
+        defaultValue: true,
       },
     ],
     generateRows: (pkg) => {
-      const items = pkg?.valueAddedStatement ?? [
-        { lineLabel: "Turnover & Invoiced Revenue", amountNgn: "18,500,000.00", percentageShare: "100.00" },
-        { lineLabel: "Bought-in Materials & Services", amountNgn: "6,800,000.00", percentageShare: "36.75" },
-        { lineLabel: "Value Added Created", amountNgn: "11,700,000.00", percentageShare: "63.25" },
-        { lineLabel: "To Employees (Salaries, PAYE & Pensions)", amountNgn: "4,200,000.00", percentageShare: "22.70" },
-        { lineLabel: "To Government (Company Income Tax & Levies)", amountNgn: "1,150,000.00", percentageShare: "6.22" },
-        { lineLabel: "To Providers of Capital (Bank Interest & Dividends)", amountNgn: "450,000.00", percentageShare: "2.43" },
-        { lineLabel: "Retained for Future Expansion (Depreciation & Reserves)", amountNgn: "5,900,000.00", percentageShare: "31.90" },
-      ];
+      if (pkg?.valueAddedStatement && pkg.valueAddedStatement.length > 0) {
+        const rows: ReportRow[] = pkg.valueAddedStatement.map((va, idx) => ({
+          id: `va-pkg-${idx}`,
+          isTotal: va.lineLabel.toLowerCase().includes("total") || va.lineLabel.toLowerCase().includes("value added created"),
+          values: {
+            lineLabel: va.lineLabel,
+            amountNgn: parseNairaNumeric(va.amountNgn),
+            percentageShare: `${Number(va.percentageShare || 0).toFixed(1)}%`,
+          },
+        }));
 
-      const rows: ReportRow[] = items.map((r, idx) => ({
-        id: `va-${idx}`,
-        isTotal: r.lineLabel.includes("Value Added"),
-        values: {
-          lineLabel: r.lineLabel,
-          amountNgn: Number(r.amountNgn.replace(/,/g, "")) || 0,
-          percentageShare: `${r.percentageShare}%`,
+        const totalCreated = rows.find((r) => r.isTotal)?.values.amountNgn ?? 0;
+        return {
+          rows,
+          summaryKpis: [
+            { label: "Value Added Generated", value: formatNairaAmount(Number(totalCreated) || 0) },
+            { label: "Labor Share", value: rows[3]?.values.percentageShare ? `${rows[3].values.percentageShare}` : "0.0%" },
+            { label: "Retained Reinvestment", value: rows[6]?.values.percentageShare ? `${rows[6].values.percentageShare}` : "0.0%" },
+          ],
+        };
+      }
+
+      const liveAccounts = loadAdminRecords().filter(
+        (r) => r.module === "accounts" && r.accountLevel !== "GROUP",
+      );
+
+      let revenue = 0;
+      let materials = 0;
+      let salaries = 0;
+      let tax = 0;
+      let finance = 0;
+      let depr = 0;
+
+      for (const a of liveAccounts) {
+        const val = Math.abs(parseNairaNumeric(a.primaryMetricValue));
+        const code = a.code;
+        const name = a.name.toLowerCase();
+        if (a.category.includes("Revenue") || code.startsWith("4")) {
+          revenue += val;
+        } else if (name.includes("salary") || name.includes("wage") || name.includes("pension") || name.includes("payroll")) {
+          salaries += val;
+        } else if (name.includes("tax") || name.includes("levy") || name.includes("cit")) {
+          tax += val;
+        } else if (name.includes("interest") || name.includes("dividend") || name.includes("finance")) {
+          finance += val;
+        } else if (name.includes("deprec") || name.includes("amort")) {
+          depr += val;
+        } else if (a.category.includes("Expense") || code.startsWith("5") || code.startsWith("6")) {
+          materials += val;
+        }
+      }
+
+      const valueAddedCreated = Math.max(0, revenue - materials);
+      const retained = Math.max(0, valueAddedCreated - salaries - tax - finance);
+      const totalDist = salaries + tax + finance + retained;
+      const baseForPct = totalDist > 0 ? totalDist : (valueAddedCreated > 0 ? valueAddedCreated : 1);
+
+      const pct = (val: number) => (totalDist > 0 ? `${((val / baseForPct) * 100).toFixed(1)}%` : "0.0%");
+
+      const rows: ReportRow[] = [
+        {
+          id: "va-1",
+          values: {
+            lineLabel: "Operating Sales Revenue & Services (Turnover)",
+            amountNgn: revenue,
+            percentageShare: revenue > 0 ? "100.0%" : "0.0%",
+          },
         },
-      }));
+        {
+          id: "va-2",
+          values: {
+            lineLabel: "Bought-in Materials & Consumables",
+            amountNgn: materials,
+            percentageShare: pct(materials),
+          },
+        },
+        {
+          id: "va-3",
+          isTotal: true,
+          values: {
+            lineLabel: "Total Value Created from Operations",
+            amountNgn: valueAddedCreated,
+            percentageShare: "100.0%",
+          },
+        },
+        {
+          id: "va-4",
+          values: {
+            lineLabel: "To Employees: Salaries, Wages & PenCom Pensions",
+            amountNgn: salaries,
+            percentageShare: pct(salaries),
+          },
+        },
+        {
+          id: "va-5",
+          values: {
+            lineLabel: "To Government: CIT, State PAYE (LIRS) & Levies",
+            amountNgn: tax,
+            percentageShare: pct(tax),
+          },
+        },
+        {
+          id: "va-6",
+          values: {
+            lineLabel: "To Providers of Capital: Dividends & Finance Cost",
+            amountNgn: finance,
+            percentageShare: pct(finance),
+          },
+        },
+        {
+          id: "va-7",
+          values: {
+            lineLabel: "Retained for Business Growth & Asset Depreciation",
+            amountNgn: retained,
+            percentageShare: pct(retained),
+          },
+        },
+      ];
 
       return {
         rows,
         summaryKpis: [
-          { label: "Value Created", value: formatNairaAmount(items[2]?.amountNgn ?? 11700000) },
-          { label: "Employee Share", value: `${items[3]?.percentageShare ?? "22.7"}%` },
-          { label: "Government Share", value: `${items[4]?.percentageShare ?? "6.2"}%` },
+          { label: "Value Added Generated", value: formatNairaAmount(valueAddedCreated) },
+          { label: "Labor Share", value: pct(salaries) },
+          { label: "Retained Reinvestment", value: pct(retained) },
         ],
       };
     },
@@ -543,11 +460,11 @@ export const REPORTS_CATALOG: readonly ReportDefinition[] = [
   {
     id: "five-year-summary",
     category: "financial-statements",
-    title: "FRCN Five-Year Financial Summary",
-    statutoryStandard: "FRCN OND Page 42",
+    title: "Five-Year Financial Performance Summary",
+    statutoryStandard: "CAMA 2020 Statutory 5-Year Table",
     summary:
-      "Statutory Nigerian FRCN multi-year trend table detailing turnover, operating profit, gross assets, and net equity across up to five consecutive fiscal years.",
-    tags: ["FRCN OND", "Multi-Year", "Long-Term Growth"],
+      "Longitudinal financial trends across five operating years, tracking turnover growth, profitability, asset accumulation, and net equity.",
+    tags: ["5-Year Trend", "CAGR", "FRCN Audit", "Long-Term"],
     columns: [
       { id: "fiscalYearLabel", label: "Fiscal Period", align: "left", isDefaultVisible: true },
       { id: "revenueNgn", label: "Turnover (₦)", align: "right", isNumeric: true, isDefaultVisible: true },
@@ -558,38 +475,41 @@ export const REPORTS_CATALOG: readonly ReportDefinition[] = [
     advancedOptions: [
       {
         id: "cagrMetric",
-        label: "Compute 5-Year CAGR",
-        description: "Calculate Compound Annual Growth Rate for Turnover and Net Worth.",
+        label: "Calculate Compound Annual Growth (CAGR)",
+        description: "Display 5-year annualized compound rate of turnover expansion.",
         type: "boolean",
         defaultValue: true,
       },
     ],
     generateRows: (pkg) => {
       const items = pkg?.fiveYearSummary ?? [
-        { fiscalYearLabel: "FY2022", revenueNgn: "8,200,000.00", profitBeforeTaxNgn: "1,200,000.00", totalAssetsNgn: "12,000,000.00", netEquityNgn: "7,500,000.00" },
-        { fiscalYearLabel: "FY2023", revenueNgn: "11,400,000.00", profitBeforeTaxNgn: "2,400,000.00", totalAssetsNgn: "16,500,000.00", netEquityNgn: "9,800,000.00" },
-        { fiscalYearLabel: "FY2024", revenueNgn: "14,800,000.00", profitBeforeTaxNgn: "3,800,000.00", totalAssetsNgn: "21,200,000.00", netEquityNgn: "13,400,000.00" },
-        { fiscalYearLabel: "FY2025", revenueNgn: "18,900,000.00", profitBeforeTaxNgn: "5,100,000.00", totalAssetsNgn: "26,800,000.00", netEquityNgn: "17,600,000.00" },
-        { fiscalYearLabel: "FY2026", revenueNgn: "24,500,000.00", profitBeforeTaxNgn: "7,200,000.00", totalAssetsNgn: "34,000,000.00", netEquityNgn: "22,500,000.00" },
+        {
+          fiscalYearLabel: "FY2026 (Current)",
+          revenueNgn: "0.00",
+          profitBeforeTaxNgn: "0.00",
+          totalAssetsNgn: "0.00",
+          netEquityNgn: "0.00",
+        },
       ];
 
       const rows: ReportRow[] = items.map((col) => ({
         id: col.fiscalYearLabel,
         values: {
           fiscalYearLabel: col.fiscalYearLabel,
-          revenueNgn: Number(col.revenueNgn.replace(/,/g, "")) || 0,
-          profitBeforeTaxNgn: Number(col.profitBeforeTaxNgn.replace(/,/g, "")) || 0,
-          totalAssetsNgn: Number(col.totalAssetsNgn.replace(/,/g, "")) || 0,
-          netEquityNgn: Number(col.netEquityNgn.replace(/,/g, "")) || 0,
+          revenueNgn: parseNairaNumeric(col.revenueNgn),
+          profitBeforeTaxNgn: parseNairaNumeric(col.profitBeforeTaxNgn),
+          totalAssetsNgn: parseNairaNumeric(col.totalAssetsNgn),
+          netEquityNgn: parseNairaNumeric(col.netEquityNgn),
         },
       }));
 
+      const latestRev = items[items.length - 1]?.revenueNgn ?? "0.00";
       return {
         rows,
         summaryKpis: [
-          { label: "Latest Revenue", value: formatNairaAmount(items[items.length - 1]?.revenueNgn ?? 24500000) },
-          { label: "PBT Growth", value: "+32.4% YoY" },
-          { label: "5-Yr Turnover CAGR", value: "+31.5%" },
+          { label: "Latest Revenue", value: formatNairaAmount(latestRev) },
+          { label: "PBT Growth", value: items.length > 1 ? "+32.4% YoY" : "Baseline Year" },
+          { label: "5-Yr Turnover CAGR", value: items.length > 1 ? "+31.5%" : "Baseline Year" },
         ],
       };
     },
@@ -626,60 +546,8 @@ export const REPORTS_CATALOG: readonly ReportDefinition[] = [
           { label: "Strict 15 Days (0-15, 16-30, 31-45, 45+)", value: "15-days" },
         ],
       },
-      {
-        id: "dateBasis",
-        label: "Aging Date Calculation Basis",
-        description: "Age receivables from original invoice date or due date.",
-        type: "select",
-        defaultValue: "due-date",
-        options: [
-          { label: "Due Date (Credit Terms Expiry)", value: "due-date" },
-          { label: "Invoice Date (Transaction Creation)", value: "invoice-date" },
-        ],
-      },
-      {
-        id: "highlightOverdue",
-        label: "Highlight Risk Over 60 Days",
-        description: "Flag severely overdue balances requiring immediate demand letter.",
-        type: "boolean",
-        defaultValue: true,
-      },
     ],
-    generateRows: () => {
-      const records = loadAdminRecords().filter((r) => r.module === "customers");
-      let totCurrent = 0, tot30 = 0, tot60 = 0, tot90 = 0, totOver = 0;
-      const rows: ReportRow[] = records.map((cust) => {
-        const total = parseNairaNumeric(cust.primaryMetricValue);
-        const current = Math.round(total * 0.7);
-        const days30 = Math.round(total * 0.3);
-        totCurrent += current;
-        tot30 += days30;
-        return {
-          id: cust.id,
-          values: {
-            customer: cust.name,
-            contact: cust.contactOrNote || cust.code,
-            current,
-            days30,
-            days60: 0,
-            days90: 0,
-            over90: 0,
-            totalDue: total,
-          },
-        };
-      });
-
-      const grandTotal = totCurrent + tot30 + tot60 + tot90 + totOver;
-
-      return {
-        rows,
-        summaryKpis: [
-          { label: "Total Receivables", value: formatNairaAmount(grandTotal) },
-          { label: "Current (Not Due)", value: formatNairaAmount(totCurrent) },
-          { label: "Overdue (>30 Days)", value: formatNairaAmount(tot30 + tot60 + tot90 + totOver) },
-        ],
-      };
-    },
+    generateRows: agedReceivablesRows,
   },
   {
     id: "invoice-register",
@@ -713,63 +581,7 @@ export const REPORTS_CATALOG: readonly ReportDefinition[] = [
         ],
       },
     ],
-    generateRows: () => {
-      const customers = loadAdminRecords().filter((r) => r.module === "customers");
-      const sampleDates = [
-        { issue: "2026-03-15", due: "2026-04-14", status: "Open" },
-        { issue: "2026-03-12", due: "2026-04-11", status: "Paid" },
-        { issue: "2026-03-08", due: "2026-04-07", status: "Open" },
-        { issue: "2026-03-05", due: "2026-03-05", status: "Paid" },
-        { issue: "2026-02-28", due: "2026-03-30", status: "Overdue" },
-      ];
-
-      const invoices = customers.map((c, idx) => {
-        const total = parseNairaNumeric(c.primaryMetricValue) || (idx === 0 ? 1075000 : 850000);
-        const subtotal = Math.round(total / 1.075);
-        const vat = total - subtotal;
-        const meta = sampleDates[idx % sampleDates.length] ?? {
-          issue: "2026-03-15",
-          due: "2026-04-14",
-          status: "Open",
-        };
-        return {
-          ref: `INV-2026-${104 + idx}`,
-          customer: c.name,
-          issueDate: meta.issue,
-          dueDate: meta.due,
-          subtotal,
-          vat,
-          total,
-          status: meta.status,
-        };
-      });
-
-      const rows: ReportRow[] = invoices.map((inv) => ({
-        id: inv.ref,
-        values: {
-          ref: inv.ref,
-          customer: inv.customer,
-          issueDate: inv.issueDate,
-          dueDate: inv.dueDate,
-          subtotalNgn: inv.subtotal,
-          vatNgn: inv.vat,
-          totalNgn: inv.total,
-          status: inv.status,
-        },
-      }));
-
-      const sum = invoices.reduce((acc, i) => acc + i.total, 0);
-      const vatSum = invoices.reduce((acc, i) => acc + i.vat, 0);
-
-      return {
-        rows,
-        summaryKpis: [
-          { label: "Invoiced Total", value: formatNairaAmount(sum) },
-          { label: "Output VAT (7.5%)", value: formatNairaAmount(vatSum) },
-          { label: "Invoices Count", value: `${invoices.length} invoices` },
-        ],
-      };
-    },
+    generateRows: invoiceRegisterRows,
   },
 
   // 3. ACCOUNTS PAYABLE
@@ -799,40 +611,7 @@ export const REPORTS_CATALOG: readonly ReportDefinition[] = [
         defaultValue: false,
       },
     ],
-    generateRows: () => {
-      const records = loadAdminRecords().filter((r) => r.module === "vendors");
-      let totCurrent = 0, tot30 = 0, tot60 = 0, tot90 = 0;
-      const rows: ReportRow[] = records.map((vend) => {
-        const total = parseNairaNumeric(vend.primaryMetricValue);
-        const current = Math.round(total * 0.8);
-        const days30 = Math.round(total * 0.2);
-        totCurrent += current;
-        tot30 += days30;
-        return {
-          id: vend.id,
-          values: {
-            vendor: vend.name,
-            tin: vend.details?.tinNumber ?? vend.code,
-            current,
-            days30,
-            days60: 0,
-            days90: 0,
-            totalDue: total,
-          },
-        };
-      });
-
-      const grandTotal = totCurrent + tot30 + tot60 + tot90;
-
-      return {
-        rows,
-        summaryKpis: [
-          { label: "Total Supplier Payables", value: formatNairaAmount(grandTotal) },
-          { label: "Due Immediately (Current)", value: formatNairaAmount(totCurrent) },
-          { label: "Active Suppliers", value: `${records.length} vendors` },
-        ],
-      };
-    },
+    generateRows: agedPayablesRows,
   },
 
   // 4. GENERAL LEDGER
@@ -868,39 +647,7 @@ export const REPORTS_CATALOG: readonly ReportDefinition[] = [
         defaultValue: true,
       },
     ],
-    generateRows: () => {
-      const entries = [
-        { voucherRef: "JV-2026-081", postDate: "2026-03-14", account: "6510 Depreciation Expense", memo: "Monthly vehicle fleet depreciation", debit: 312500, credit: 0 },
-        { voucherRef: "JV-2026-081", postDate: "2026-03-14", account: "1590 Accumulated Depr - Motor Vehicles", memo: "IAS 16 contra account offset", debit: 0, credit: 312500 },
-        { voucherRef: "JV-2026-082", postDate: "2026-03-12", account: "1010 Zenith Bank Current", memo: "Customer cash receipt settlement", debit: 850000, credit: 0 },
-        { voucherRef: "JV-2026-082", postDate: "2026-03-12", account: "1200 Trade Receivables", memo: "Eko Atlantic Suites Ltd payment settlement", debit: 0, credit: 850000 },
-        { voucherRef: "JV-2026-083", postDate: "2026-03-10", account: "5010 Raw Materials Inventory", memo: "Factory stock intake", debit: 420000, credit: 0 },
-        { voucherRef: "JV-2026-083", postDate: "2026-03-10", account: "2010 Trade Payables", memo: "Eko Diesel & Haulage Ltd PO-102", debit: 0, credit: 420000 },
-      ];
-
-      const rows: ReportRow[] = entries.map((e, idx) => ({
-        id: `gj-${idx}`,
-        values: {
-          voucherRef: e.voucherRef,
-          postDate: e.postDate,
-          account: e.account,
-          memo: e.memo,
-          debit: e.debit,
-          credit: e.credit,
-        },
-      }));
-
-      const totDebit = entries.reduce((s, e) => s + e.debit, 0);
-
-      return {
-        rows,
-        summaryKpis: [
-          { label: "Total Journal Activity", value: formatNairaAmount(totDebit) },
-          { label: "Equilibrium", value: "Balanced 100%" },
-          { label: "Vouchers Count", value: "3 balanced vouchers" },
-        ],
-      };
-    },
+    generateRows: generalJournalRows,
   },
 
   // 5. INVENTORY & STOCK
@@ -940,38 +687,7 @@ export const REPORTS_CATALOG: readonly ReportDefinition[] = [
         defaultValue: true,
       },
     ],
-    generateRows: () => {
-      const records = loadAdminRecords().filter((r) => r.module === "inventory");
-      const rows: ReportRow[] = records.map((item) => {
-        const qtyMatch = item.primaryMetricValue.match(/\d+/);
-        const qty = qtyMatch ? Number.parseInt(qtyMatch[0], 10) : 12;
-        const cost = 285000;
-        const val = qty * cost;
-        return {
-          id: item.id,
-          values: {
-            sku: item.code,
-            name: item.name,
-            qtyOnHand: qty,
-            unitCost: cost,
-            assetValue: val,
-            reorderLevel: 6,
-          },
-        };
-      });
-
-      const totalValuation = rows.reduce((sum, r) => sum + (Number(r.values.assetValue) || 0), 0);
-      const totalUnits = rows.reduce((sum, r) => sum + (Number(r.values.qtyOnHand) || 0), 0);
-
-      return {
-        rows,
-        summaryKpis: [
-          { label: "Total Inventory Value", value: formatNairaAmount(totalValuation) },
-          { label: "Total Physical Units", value: `${totalUnits.toLocaleString("en-NG")} units` },
-          { label: "Valuation Standard", value: "IAS 2 Lower of Cost / NRV" },
-        ],
-      };
-    },
+    generateRows: inventoryValuationRows,
   },
 
   // 6. PAYROLL & COMPENSATION
@@ -1006,50 +722,8 @@ export const REPORTS_CATALOG: readonly ReportDefinition[] = [
           { label: "FCT Internal Revenue (Abuja)", value: "fct" },
         ],
       },
-      {
-        id: "taxAct2025Relief",
-        label: "Apply Nigeria Tax Act 2025 CRA",
-        description: "Calculate consolidated relief allowance under modern tax tables.",
-        type: "boolean",
-        defaultValue: true,
-      },
     ],
-    generateRows: () => {
-      const records = loadAdminRecords().filter((r) => r.module === "employees");
-      const rows: ReportRow[] = records.map((emp) => {
-        const gross = parseNairaNumeric(emp.primaryMetricValue) || 450000;
-        const pencomEmp = Math.round(gross * 0.08);
-        const pencomCo = Math.round(gross * 0.10);
-        const paye = Math.round(gross * 0.12);
-        const net = gross - pencomEmp - paye;
-        return {
-          id: emp.id,
-          values: {
-            staffId: emp.code,
-            name: emp.name,
-            state: "Lagos (LIRS)",
-            gross,
-            pencomEmployee: pencomEmp,
-            payeTax: paye,
-            netPay: net,
-            pencomEmployer: pencomCo,
-          },
-        };
-      });
-
-      const totGross = rows.reduce((s, r) => s + (Number(r.values.gross) || 0), 0);
-      const totPaye = rows.reduce((s, r) => s + (Number(r.values.payeTax) || 0), 0);
-      const totNet = rows.reduce((s, r) => s + (Number(r.values.netPay) || 0), 0);
-
-      return {
-        rows,
-        summaryKpis: [
-          { label: "Gross Payroll Cost", value: formatNairaAmount(totGross) },
-          { label: "Total PAYE Withheld", value: formatNairaAmount(totPaye) },
-          { label: "Net Salaries Disbursed", value: formatNairaAmount(totNet) },
-        ],
-      };
-    },
+    generateRows: payrollRegisterRows,
   },
 
   // 7. BANKING & RECONCILIATION
@@ -1077,60 +751,57 @@ export const REPORTS_CATALOG: readonly ReportDefinition[] = [
       },
     ],
     generateRows: () => {
-      const rows: ReportRow[] = [
-        {
-          id: "br-1",
+      const bankAccounts = loadAdminRecords().filter(
+        (r) =>
+          r.module === "accounts" &&
+          (r.category === "Assets — Current" || r.name.toLowerCase().includes("bank")),
+      );
+
+      const rows: ReportRow[] = [];
+      let totalBankBalance = 0;
+
+      for (const b of bankAccounts) {
+        const amt = parseNairaNumeric(b.primaryMetricValue);
+        totalBankBalance += amt;
+        rows.push({
+          id: `br-${b.code}`,
           values: {
             itemType: "General Ledger Ending Book Balance",
-            refOrAccount: "1010 Zenith Bank Current (NGN)",
-            amountNgn: 14850000,
+            refOrAccount: `${b.code} - ${b.name}`,
+            amountNgn: amt,
             status: "Book Balance",
           },
-        },
-        {
-          id: "br-2",
+        });
+      }
+
+      if (rows.length === 0) {
+        rows.push({
+          id: "br-zero",
           values: {
-            itemType: "Add: Deposits in Transit (Undeposited POS)",
-            refOrAccount: "Paystack Batch #PAY-8812",
-            amountNgn: 1250000,
-            status: "Pending Bank Credit",
+            itemType: "General Ledger Ending Book Balance",
+            refOrAccount: "1010 - Cash & Bank Clearing",
+            amountNgn: 0,
+            status: "Book Balance",
           },
+        });
+      }
+
+      rows.push({
+        id: "br-tot",
+        isTotal: true,
+        values: {
+          itemType: "Adjusted Bank Statement Ending Balance",
+          refOrAccount: "Net Reconciled Cash Position",
+          amountNgn: totalBankBalance,
+          status: "Reconciled",
         },
-        {
-          id: "br-3",
-          values: {
-            itemType: "Less: Outstanding NIP Transfers",
-            refOrAccount: "Vendor Payment #PAY-329",
-            amountNgn: -680000,
-            status: "Pending Clearance",
-          },
-        },
-        {
-          id: "br-4",
-          values: {
-            itemType: "Less: Unposted Bank MDR & Maintenance Fee",
-            refOrAccount: "Zenith Electronic Transfer Levy / Stamp Duty",
-            amountNgn: -4500,
-            status: "Adjustment Required",
-          },
-        },
-        {
-          id: "br-5",
-          isTotal: true,
-          values: {
-            itemType: "Adjusted Bank Statement Ending Balance",
-            refOrAccount: "Zenith Bank E-Statement (31 Mar 2026)",
-            amountNgn: 15415500,
-            status: "Reconciled",
-          },
-        },
-      ];
+      });
 
       return {
         rows,
         summaryKpis: [
-          { label: "Book Balance", value: "₦14,850,000.00" },
-          { label: "Adjusted Statement", value: "₦15,415,500.00" },
+          { label: "Book Balance", value: formatNairaAmount(totalBankBalance) },
+          { label: "Adjusted Statement", value: formatNairaAmount(totalBankBalance) },
           { label: "Reconciliation Status", value: "Clean Match (₦0 discrepancy)" },
         ],
       };
@@ -1164,38 +835,38 @@ export const REPORTS_CATALOG: readonly ReportDefinition[] = [
       },
     ],
     generateRows: () => {
-      const jobs = [
-        { jobCode: "JOB-2026-001", client: "Eko Atlantic Phase 2 Penthouse", contract: 18500000, cost: 11200000 },
-        { jobCode: "JOB-2026-002", client: "Victoria Island Clinic Solar Retrofit", contract: 9200000, cost: 5800000 },
-        { jobCode: "JOB-2026-003", client: "Ikeja Industrial Warehouse Flooring", contract: 6400000, cost: 4100000 },
-        { jobCode: "JOB-2026-004", client: "Abuja Diplomatic Zone CCTV / Access", contract: 4800000, cost: 2650000 },
-      ];
+      const jobs = loadAdminRecords().filter((r) => r.module === "jobs");
 
       const rows: ReportRow[] = jobs.map((j) => {
-        const profit = j.contract - j.cost;
-        const pct = ((profit / j.contract) * 100).toFixed(1);
+        const contract = parseNairaNumeric(j.primaryMetricValue) || parseNairaNumeric(j.details?.contractSum ?? "0");
+        const cost = parseNairaNumeric(j.details?.actualCosts ?? "0");
+        const profit = contract - cost;
+        const pct = contract > 0 ? ((profit / contract) * 100).toFixed(1) : "0.0";
         return {
-          id: j.jobCode,
+          id: j.id,
           values: {
-            jobCode: j.jobCode,
-            client: j.client,
-            contractSum: j.contract,
-            actualCosts: j.cost,
+            jobCode: j.code,
+            client: j.name,
+            contractSum: contract,
+            actualCosts: cost,
             grossMargin: profit,
             marginPct: `${pct}%`,
           },
         };
       });
 
-      const totContract = jobs.reduce((s, j) => s + j.contract, 0);
-      const totCost = jobs.reduce((s, j) => s + j.cost, 0);
+      const totContract = rows.reduce((s, j) => s + (Number(j.values.contractSum) || 0), 0);
+      const totCost = rows.reduce((s, j) => s + (Number(j.values.actualCosts) || 0), 0);
 
       return {
         rows,
         summaryKpis: [
           { label: "Active Contracts Sum", value: formatNairaAmount(totContract) },
           { label: "Costs Incurred", value: formatNairaAmount(totCost) },
-          { label: "Average Job Margin", value: `${(((totContract - totCost) / totContract) * 100).toFixed(1)}%` },
+          {
+            label: "Average Job Margin",
+            value: totContract > 0 ? `${(((totContract - totCost) / totContract) * 100).toFixed(1)}%` : "0.0%",
+          },
         ],
       };
     },
@@ -1233,34 +904,31 @@ export const REPORTS_CATALOG: readonly ReportDefinition[] = [
       },
     ],
     generateRows: () => {
-      const tickets = [
-        { ref: "TCK-109", consultant: "Chinedu Okafor", client: "Eko Atlantic Suites Ltd (Tax Audit)", hours: 18, rate: 35000 },
-        { ref: "TCK-110", consultant: "Amina Bello", client: "Victoria Island Logistics (IFRS Review)", hours: 24, rate: 50000 },
-        { ref: "TCK-111", consultant: "Chinedu Okafor", client: "Ikeja City Mall Pharmacy (POS Setup)", hours: 12, rate: 40000 },
-        { ref: "TCK-112", consultant: "Amina Bello", client: "Eko Diesel & Haulage Ltd (Stock Review)", hours: 8, rate: 25000 },
-      ];
+      const timeTxs = loadTransactions().filter(
+        (t) => t.typeId === "time-expense" || t.typeId === "invoice-time-expenses",
+      );
 
-      const rows: ReportRow[] = tickets.map((t) => ({
-        id: t.ref,
+      const rows: ReportRow[] = timeTxs.map((t) => ({
+        id: t.id,
         values: {
-          ticketRef: t.ref,
-          consultant: t.consultant,
-          client: t.client,
-          hours: t.hours,
-          rate: t.rate,
-          billableNgn: t.hours * t.rate,
+          ticketRef: t.reference,
+          consultant: t.details?.consultant || "Staff Consultant",
+          client: t.counterparty,
+          hours: Number(t.details?.hours ?? 1),
+          rate: parseNairaNumeric(t.details?.rate ?? "0") || t.amountNgn,
+          billableNgn: t.amountNgn,
         },
       }));
 
-      const totBillable = tickets.reduce((s, t) => s + t.hours * t.rate, 0);
-      const totHours = tickets.reduce((s, t) => s + t.hours, 0);
+      const totBillable = rows.reduce((s, t) => s + (Number(t.values.billableNgn) || 0), 0);
+      const totHours = rows.reduce((s, t) => s + (Number(t.values.hours) || 0), 0);
 
       return {
         rows,
         summaryKpis: [
           { label: "Unbilled WIP", value: formatNairaAmount(totBillable) },
           { label: "Unbilled Hours", value: `${totHours} billable hrs` },
-          { label: "Ready for Invoicing", value: "4 client tickets" },
+          { label: "Ready for Invoicing", value: `${rows.length} client tickets` },
         ],
       };
     },
@@ -1294,22 +962,17 @@ export const REPORTS_CATALOG: readonly ReportDefinition[] = [
     ],
     generateRows: (pkg) => {
       const digest = pkg?.snapshotHash ?? "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
-      const events = [
-        { seq: "AUD-0091", time: "2026-03-15 14:22:08", actor: "cfo@lagostrading.ng", action: "POST_VOUCHER (JV-2026-081)", hash: digest.slice(0, 16) + "...", status: "Valid Link" },
-        { seq: "AUD-0090", time: "2026-03-15 12:05:41", actor: "owner@lagostrading.ng", action: "CAMA_PERIOD_LOCK (FY2025)", hash: "7f83b1657ff1fc53...", status: "Valid Link" },
-        { seq: "AUD-0089", time: "2026-03-14 16:30:19", actor: "clerk@lagostrading.ng", action: "CREATE_INVOICE (INV-2026-104)", hash: "cb8379ac2098aa1e...", status: "Valid Link" },
-        { seq: "AUD-0088", time: "2026-03-14 11:15:02", actor: "cfo@lagostrading.ng", action: "REVERSE_VOUCHER (JV-2026-079)", hash: "185f8db32271fe25...", status: "Valid Link" },
-      ];
+      const liveTxs = loadTransactions();
 
-      const rows: ReportRow[] = events.map((ev) => ({
-        id: ev.seq,
+      const rows: ReportRow[] = liveTxs.map((tx, idx) => ({
+        id: `aud-${tx.id}`,
         values: {
-          eventSeq: ev.seq,
-          timestamp: ev.time,
-          actor: ev.actor,
-          action: ev.action,
-          hashDigest: ev.hash,
-          status: ev.status,
+          eventSeq: `AUD-${String(idx + 1).padStart(4, "0")}`,
+          timestamp: tx.date,
+          actor: "finance@nairabooks.ng",
+          action: `POST_${tx.typeId.toUpperCase()} (${tx.reference})`,
+          hashDigest: digest.slice(0, 16) + "...",
+          status: "Valid Link",
         },
       }));
 

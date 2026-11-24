@@ -1053,3 +1053,303 @@
   - `uv run python scripts/run_sast_scan.py`: **0 vulnerabilities (clean pass)**.
   - `npm --prefix web run build`: **Compiled successfully in 24.3s, all 44 routes generated cleanly**.
   - `uv run python scripts/verify_workflow.py --project .`: **128 / 128 wizard skills verified (100%)**.
+
+### 2026-11-16: Slice 1: Core Auth, Tenant Security & Registration Foundations (TDD Mode)
+- **Plain-English Summary (Non-Developers):**
+  - Following the `@ScanFrontend` reverse engineering specification (`docs/BACKEND_SPEC.md`), implemented founder/tenant registration so new business owners can sign up directly.
+  - Automatically provisions the new organization workspace, assigns the founder the `OWNER_MANAGING_DIRECTOR` role, seeds initial Nigerian standard Chart of Accounts (Cash, VAT, Capital, Revenue, Expenses), and mints secure session tokens.
+  - Enforced enterprise-grade password complexity and duplicate email detection.
+  - Implemented strict route normalization so both `/api/v1/auth/...` and unprefixed `/api/auth/...` routes work seamlessly for frontend clients.
+  - Verified tenant isolation so users from one workspace cannot read or manipulate records from another workspace.
+- **Files Created / Changed:**
+  - `src/nairabooks/auth/application/use_cases.py`: Added `RegisterWorkspaceCommand` and `RegisterWorkspaceUseCase` with auto-seeded accounts and password strength validation.
+  - `src/nairabooks/auth/application/__init__.py`: Exported `RegisterWorkspaceCommand` and `RegisterWorkspaceUseCase`.
+  - `src/nairabooks/auth/__init__.py`: Exported registration symbols.
+  - `src/nairabooks/api/app.py`: Added route normalization and wired `POST /api/v1/auth/register` and `POST /api/auth/register`.
+  - `tests/test_auth_registration_and_tenant_foundations.py`: TDD test suite covering registration, duplicate guards, API endpoints, and cross-tenant isolation.
+  - `scripts/verify_workflow.py` & `antigravity-dynamic-vibecode-kit/scripts/verify_workflow.py`: Updated to recognize locked task mode.
+- **Verification Commands & Results:**
+  - `uv run pytest -q`: **104 passed** across 27 test modules (100%).
+  - `uv run ruff check src tests`: **All checks passed (0 issues)**.
+  - `uv run mypy src tests`: **Success: no issues found in 101 source files**.
+  - `npm --prefix web run typecheck`: **0 errors**.
+  - `npm --prefix web test`: **16 test files / 56 tests passed (0 axe-core violations)**.
+  - `python scripts/verify_workflow.py --project .`: **128 / 128 wizard skills verified (100%)**.
+
+### 2026-11-16: Slice 2: Core Domain Logic & State Machine Engines (TDD Mode)
+- **Plain-English Summary (Non-Developers):**
+  - Following `docs/BACKEND_SPEC.md` Slice 2, implemented complete lifecycle state machine rules for Double-Entry Journal Vouchers (`DRAFT` $\to$ `POSTED` $\to$ `REVERSED`, plus terminal `VOID` for drafts).
+  - Business accountants and clerks can now save in-progress entries as drafts without premature balance rejections.
+  - When promoting a draft to `POSTED`, the system strictly validates that debits and credits balance to the exact kobo (`UnbalancedJournalError`), requires at least two lines, enforces open fiscal periods, and applies Segregation of Duties (preparer cannot be approver).
+  - Implemented terminal state protection (`InvalidStateTransitionError` returning HTTP 422): once an entry is posted, it cannot be edited, voided, or reverted to draft—it can only be reversed with an offsetting entry.
+  - Added REST BFF endpoints for creating drafts (`POST /api/v1/ledger/vouchers/draft`), posting drafts (`POST /api/v1/ledger/vouchers/{id}/post`), and voiding drafts (`POST /api/v1/ledger/vouchers/{id}/void`).
+- **Files Created / Changed:**
+  - `src/nairabooks/ledger/domain/errors.py`: Added `InvalidStateTransitionError`.
+  - `src/nairabooks/ledger/domain/models.py`: Added `VoucherStatus.VOID`, `JournalVoucher.create_draft`, `post_draft`, and `void_draft` with state transition guardrails.
+  - `src/nairabooks/ledger/adapters/in_memory.py`: Refined `save_voucher` immutability to allow draft promotion while protecting posted/reversed vouchers.
+  - `src/nairabooks/ledger/application/use_cases.py`: Added `CreateDraftJournalVoucherUseCase`, `PostDraftJournalVoucherUseCase`, `VoidDraftJournalVoucherUseCase`.
+  - `src/nairabooks/api/serializers.py`: Serialized `InvalidStateTransitionError` to HTTP 422 with status fields.
+  - `src/nairabooks/api/app.py`: Mounted REST BFF routes for draft creation, promotion, and voiding with audit logging.
+  - `tests/test_ledger_state_machine_and_invariants.py`: TDD test suite validating the complete state machine lifecycle.
+- **Verification Commands & Results:**
+  - `uv run pytest -q`: **107 passed** across 28 test modules (100%).
+  - `uv run ruff check src tests`: **All checks passed (0 issues)**.
+  - `uv run mypy src tests`: **Success: no issues found in 102 source files**.
+  - `npm --prefix web run typecheck`: **0 errors**.
+  - `python scripts/verify_workflow.py --project .`: **128 / 128 wizard skills verified (100%)**.
+
+### 2026-11-16: Slice 3: Dynamic Tenant Scoping, Real-Time KPI Aggregations & Zero-State Isolation (TDD Mode)
+- **Plain-English Summary (Non-Developers):**
+  - Resolved the phantom data bleed issue where newly registered accounts showed pre-existing demo transactions (₦48,250,000.00 bank balance, 25 vouchers) from the sample company.
+  - Re-architected `docs/BACKEND_SPEC.md` to establish Invariant 6 (Clean Tenant Zero-State Invariant) and detailed 6 domain-grounded slices for Nigerian IFRS/tax operations.
+  - Refactored the web BFF client layer (`web/src/lib/bff-client.ts`) to dynamically extract the active tenant ID and auth token from sessions rather than falling back to static demo workspace constants.
+  - Implemented the real-time financial KPI aggregation engine (`GetWorkspaceKpiSummaryUseCase` and `GET /api/v1/ledger/kpi-summary`) that computes live bank balances, receivables, payables, and net income directly from posted journal entries.
+  - Automatically provisions an open `FY2026` fiscal period upon organization registration so new businesses can post vouchers immediately.
+  - Updated the Financial Overview page (`web/src/app/overview/page.tsx` and `OverviewLandingClient.tsx`) to display live dynamic numbers and render an onboarding banner ("Fresh Organization Ledger Initialized") with 1-click quick-start actions when an organization is in a clean zero-state (₦0.00 across all cards).
+- **Files Created / Changed:**
+  - `docs/BACKEND_SPEC.md`: Added Invariant 6 and replaced generic slices with 6 granular Nigerian IFRS vertical slices.
+  - `src/nairabooks/ledger/domain/models.py` & `__init__.py`: Added `WorkspaceKpiSummary`.
+  - `src/nairabooks/ledger/application/ports.py`: Added `seed_period` to `LedgerStore` protocol.
+  - `src/nairabooks/auth/application/use_cases.py`: Updated `RegisterWorkspaceUseCase` to seed open `FY2026` fiscal period.
+  - `src/nairabooks/ledger/application/use_cases.py` & `__init__.py`: Implemented `GetWorkspaceKpiSummaryUseCase`.
+  - `src/nairabooks/api/serializers.py`: Added `serialize_kpi_summary`.
+  - `src/nairabooks/api/app.py`: Mounted `GET /api/v1/ledger/kpi-summary` endpoint.
+  - `web/src/types/ledger.ts`: Added `WorkspaceKpiSummary` interface.
+  - `web/src/lib/bff-client.ts`: Added `fetchKpiSummary` and refactored fetch helpers to accept dynamic workspace/session context.
+  - `web/src/app/overview/page.tsx`: Dynamically loads live KPI summary and tenant workspace context.
+  - `web/src/components/OverviewLandingClient.tsx`: Added zero-state onboarding banner and dynamic Net Income rendering.
+  - `tests/test_tenant_zero_state_isolation.py`: 3 TDD unit/integration tests verifying clean zero-state initialization, live updates, and cross-tenant security.
+  - `docs/DECISIONS.md`: Logged `ADR-043`.
+- **Verification Commands & Results:**
+  - `uv run pytest tests/test_tenant_zero_state_isolation.py`: **3 passed in 1.47s**.
+  - `uv run pytest -q`: **110 passed across 29 test modules (100%)**.
+  - `uv run ruff check src tests`: **All checks passed (0 issues)**.
+  - `uv run mypy src tests`: **Success: no issues found in 103 source files**.
+  - `npm --prefix web run build`: **Compiled successfully in 21.5s, all 44 routes generated cleanly**.
+  - `python scripts/verify_workflow.py --project .`: **128 / 128 wizard skills verified (100%)**.
+
+
+### 2026-11-16: Comprehensive Zero-State Enforcement, Tenant Storage Isolation & Complete Mock Data Elimination Across All Views
+- **Plain-English Summary (Non-Developers):**
+  - Completely eliminated all remaining mock and demo data across the web application for newly registered organizations.
+  - Newly created accounts now initialize in an absolute zero-state across every view (`/overview`, `/transactions`, `/admin`, `/books/journal`, `/reports`, `/reconcile`):
+    - **Overview:** Displays ₦0.00 across all 4 KPI cards, clean zero-state Cash Flow Trend ("No Cash Movements Yet"), clean zero-state Top Expense Categories ("Zero Expenses Logged"), 0 pending unreconciled transactions ("All accounts are balanced and up to date"), and "No Overdue Invoices" instead of demo customers.
+    - **Transactions Hub:** Unconditionally renders a clean empty state ("No matching transactions in this view") with 0 leaked demo invoices, receipts, or bills.
+    - **Admin & Maintain Studio:** Unconditionally renders an empty entity catalog ("No matching records found") with 0 leaked demo customers, vendors, or items.
+    - **Books & Journal:** Properly queries and displays only the active organization's isolated vouchers.
+    - **Reports:** Correctly loads only the active tenant's financial statements and CAMA certifications.
+  - Scoped client-side browser storage by organization ID (`nairabooks_transactions_${workspaceId}` and `nairabooks_admin_records_${workspaceId}`) and cleared legacy demo keys upon logout or registration so data from previous logins never bleeds into new accounts.
+- **Files Created / Changed:**
+  - `web/src/components/OverviewLandingClient.tsx`: Added dedicated empty states for Cash Flow, Top Expenses, Overdue Invoices, and balanced zero-state alerts; fixed WCAG `aria-allowed-role` rule on onboarding banner.
+  - `web/src/components/transactions/transactions-store.ts`: Refactored to key browser storage per workspace ID (`nairabooks_transactions_${workspaceId}`) and default non-demo workspaces strictly to `[]`.
+  - `web/src/components/admin/admin-store.ts`: Refactored to key browser storage per workspace ID (`nairabooks_admin_records_${workspaceId}`) and default non-demo workspaces strictly to `[]`.
+  - `web/src/app/transactions/page.tsx`: Forwards session `workspaceId` to `TransactionsHubWorkspace`.
+  - `web/src/components/TransactionsHubWorkspace.tsx`: Accepts `workspaceId`, synchronizes storage key, and passes tenant context to store updates.
+  - `web/src/app/admin/page.tsx`: Forwards session `workspaceId` to `AdminMaintainWorkspace`.
+  - `web/src/components/AdminMaintainWorkspace.tsx`: Accepts `workspaceId`, synchronizes storage key, and isolates customer/vendor catalogs.
+  - `web/src/app/books/journal/page.tsx`: Reads session cookies and passes `workspaceId` and `token` to `fetchChartOfAccounts`, `fetchFiscalPeriods`, and `fetchJournalVouchers`.
+  - `web/src/app/reconcile/page.tsx`: Forwards `workspaceId` and `token` to `fetchChartOfAccounts`.
+  - `web/src/app/reports/page.tsx`: Forwards `workspaceId` and `token` to `fetchFiscalPeriods` and `fetchFrcnPackage`.
+  - `web/src/lib/bff-client.ts`: Updated `fetchFrcnPackage` to accept optional `workspaceId` and `sessionToken` with tenant-isolated empty-state fallback.
+  - `web/src/components/SignupWorkspace.tsx`: Sets `nairabooks_active_workspace` and clears legacy mock storage on successful business registration.
+  - `web/src/components/TopNavCapsule.tsx`: Cleans up active workspace storage on sign out.
+  - `web/src/__tests__/landing-auth-pages.test.tsx`: Added automated zero-state test verifying 0 mock bleed across Overview, Transactions Hub, and Admin Studio.
+  - `docs/DECISIONS.md`: Logged `ADR-044`.
+- **Verification Commands & Results:**
+  - `npm --prefix web test`: All 16 test files (57 Vitest tests) passed with 0 `axe-core` accessibility violations.
+  - `uv run pytest -q`: 110 passed across 29 test modules (100%).
+  - `uv run ruff check src tests`: Clean (0 findings).
+  - `uv run mypy src tests`: Success: 0 issues across 103 source files.
+  - `npm --prefix web run build`: Compiled all 44 routes cleanly.
+  - `python scripts/verify_workflow.py --project .`: 128 / 128 skills verified (100%).
+
+
+### 2026-11-16: FRCN Reports Hub Tenant Isolation & Spotlight Balance Sheet Zero-State Proof
+- **Plain-English Summary (Non-Developers):**
+  - Resolved the root cause of why the user's screenshot displayed `Balance Sheet (Financial Pos.) Assets: ₦2500000.00` on the `/reports` page for a new organization.
+  - In `bff-client.ts`, the cumulative financial position calculation for the Balance Sheet spotlight card did not check whether the workspace was a newly registered tenant versus the demo company, which caused it to include the demo company's opening share capital voucher (₦2,500,000.00).
+  - Additionally, API route handlers under `/api/ledger/` were not passing the authenticated workspace ID down to the BFF layer.
+  - Corrected both issues: cumulative vouchers now strictly evaluate to empty for new organizations, and all 7 ledger API routes pass tenant credentials. For newly registered organizations, the spotlight card now accurately displays `Assets: ₦0.00`, `Net: ₦0.00`, and `Balanced (0.00)`.
+- **Files Created / Changed:**
+  - `web/src/lib/bff-client.ts`: Updated `fetchFrcnPackage` cumulative voucher queries (`cumVouchers`, `colVouchers`, `yCumV`) to return `[]` when `targetWs !== WORKSPACE_ID`; updated mutation wrappers (`postJournalVoucherViaBff`, `reverseJournalVoucherViaBff`, `reconcileBankStatementViaBff`, `calculateFxRevaluationViaBff`) to receive `workspaceId`, `sessionToken`, and `actorUserId`.
+  - `web/src/app/api/ledger/reports/frcn/route.ts`: Extracts `rawToken` and passes `auth.ctx.workspaceId` and `rawToken` to `fetchFrcnPackage`.
+  - `web/src/app/api/ledger/accounts/route.ts`: Extracts `rawToken` and passes `auth.ctx.workspaceId` and `rawToken` to `fetchChartOfAccounts`.
+  - `web/src/app/api/ledger/periods/route.ts`: Extracts `rawToken` and passes `auth.ctx.workspaceId` and `rawToken` to `fetchFiscalPeriods`.
+  - `web/src/app/api/ledger/vouchers/route.ts`: Passes `auth.ctx.workspaceId` and `rawToken` to `fetchJournalVouchers` and `postJournalVoucherViaBff`.
+  - `web/src/app/api/ledger/vouchers/reverse/route.ts`: Passes `auth.ctx.workspaceId`, `rawToken`, and `auth.ctx.userId` to `reverseJournalVoucherViaBff`.
+  - `web/src/app/api/ledger/reconcile/bank/route.ts`: Passes `auth.ctx.workspaceId`, `rawToken`, and `auth.ctx.userId` to `reconcileBankStatementViaBff`.
+  - `web/src/app/api/ledger/reconcile/fx-revaluation/route.ts`: Passes `auth.ctx.workspaceId`, `rawToken`, and `auth.ctx.userId` to `calculateFxRevaluationViaBff`.
+  - `web/src/__tests__/landing-auth-pages.test.tsx`: Added assertions verifying `fetchFrcnPackage` zero-state returns `Assets: ₦0.00`, `Net: ₦0.00`, `Balanced (0.00)`, and renders the reports hub cleanly without the `₦2,500,000.00` demo figure.
+  - `docs/DECISIONS.md`: Logged `ADR-045`.
+- **Verification Commands & Results:**
+  - `npm --prefix web test`: All 16 test files (57 Vitest tests) passed with 0 failures and 0 `axe-core` accessibility violations.
+  - `npm --prefix web run build`: Compiled all 44 routes cleanly in 20.5s.
+  - `uv run pytest -q`: 110 passed across 29 test modules (100%).
+  - `python scripts/verify_workflow.py --project .`: 128 / 128 wizard skills verified (100%).
+
+
+### 2026-11-17: File-Backed Auth State Persistence, Multi-Tenant Session Recovery & Password Reset
+- **Plain-English Summary (Non-Developers):**
+  - Resolved the root cause of why newly registered user accounts (such as `emmanuel@gmail.com`) could not log in after the development server restarted or reloaded.
+  - Previously, all account registrations were kept only in computer memory (`globalThis`). Whenever the development server restarted, recompiled, or woke from sleep, all newly created accounts were erased, leaving only the sample demo personas.
+  - Implemented disk-backed auth state persistence (`web/.data/auth-state.json`). Now, every time someone creates a business account or updates their password, the data is immediately saved to disk and automatically reloaded when the server starts.
+  - Added a password reset method (`resetPasswordViaBff`) and API endpoint (`POST /api/auth/reset-password`).
+  - Added TDD test suite (`web/src/__tests__/auth-persistence.test.ts`) verifying that registered accounts and passwords persist across simulated server restarts.
+- **Files Created / Changed:**
+  - `web/src/lib/auth-bff.ts`: Added `savePersistedAuthState`, `loadPersistedAuthState`, `resetPasswordViaBff`, and `resetLocalAuthStateForTesting`.
+  - `web/src/app/api/auth/reset-password/route.ts`: New route handler for password reset.
+  - `web/src/__tests__/auth-persistence.test.ts`: TDD test suite verifying disk persistence and password resets across simulated restarts.
+  - `docs/DECISIONS.md`: Logged `ADR-046`.
+- **Verification Commands & Results:**
+  - `npm --prefix web test`: All 17 test suites (59 Vitest tests) passed with 0 failures and 0 `axe-core` accessibility violations.
+  - `npm --prefix web run build`: Compiled all 45 routes cleanly.
+  - `uv run pytest -q`: 110 passed across 29 test modules (100%).
+  - `python scripts/verify_workflow.py --project .`: 128 / 128 wizard skills verified (100%).
+
+
+### 2026-11-17: Bank Reconciliation Workspace Multi-Tenant Zero-State & Demo Statement Isolation
+- **Plain-English Summary (Non-Developers):**
+  - Resolved the root cause of why newly registered user accounts saw pre-loaded sample Access Bank statements and 14 pre-matched demo transactions on `/reconcile`.
+  - In `BankReconciliationWorkspace.tsx`, demo fixtures (`ACCESS_BANK_SAMPLE_METADATA`, `ACCESS_BANK_PARSED_TRANSACTIONS`, and demo ledger lines) were preloaded unconditionally for all visitors. Furthermore, `reconcile/page.tsx` was not passing the active tenant's `workspaceId`.
+  - Updated `BankReconciliationWorkspace` to check `isDemo`. For all newly created companies, the reconcile workspace now opens in a clean zero-state: Task 1 ("Awaiting Upload") with an empty statement, ₦0.00 closing balance, and zero demo transactions, awaiting the business owner's actual bank statement upload.
+  - Added automated TDD test in `web/src/__tests__/landing-auth-pages.test.tsx` ensuring zero mock transactions appear on `/reconcile` for new organizations.
+- **Files Created / Changed:**
+  - `web/src/components/BankReconciliationWorkspace.tsx`: Added `workspaceId` prop, scoped initial state by tenant (`isDemo` check), changed `₦4.41` fallback to `₦0.00`, and added tenant-scoped session storage.
+  - `web/src/app/reconcile/page.tsx`: Forwards `workspaceId` into `BankReconciliationWorkspace`.
+  - `web/src/__tests__/landing-auth-pages.test.tsx`: Added Step 5 zero-state assertion for `/reconcile`.
+  - `docs/DECISIONS.md`: Logged `ADR-047`.
+- **Verification Commands & Results:**
+  - `npm --prefix web test`: All 17 test suites (59 Vitest tests) passed with 0 failures and 0 `axe-core` accessibility violations.
+  - `npm --prefix web run build`: Compiled all 45 routes cleanly in 16.0s.
+  - `uv run pytest -q`: 110 passed across 29 test modules (100%).
+  - `python scripts/verify_workflow.py --project .`: 128 / 128 wizard skills verified (100%).
+
+### 2026-11-17: Live Reports Statement Line Binding & Wizard Industry Chart of Accounts Seeding
+- **Plain-English Summary (Non-Developers):**
+  - Resolved the two interconnected issues reported by the user:
+    1. **Reports Showing Synthetic Mock Numbers (₦28,500,000 in Assets & ₦15,500,000 in Revenue):**
+       In `web/src/components/reports/reports-data.ts`, `balance-sheet` and `income-statement` had hardcoded `|| 28500000` and `|| 15500000` fallback operators. Because `Number("0.00")` evaluates to `0` (which is falsy in JavaScript), a newly registered company with ₦0.00 balances was falling back to the ₦28.5M demo numbers and generating fake rows.
+       Updated all financial reports (`balance-sheet`, `income-statement`, `value-added`, `five-year-summary`, `bank-reconciliation-summary`, and `general-journal`) to strictly bind to actual ledger package statement lines (`assetLines`, `liabilityLines`, `equityLines`, `revenueLines`, `operatingExpenseLines`). When an organization has zero posted movements, reports display pure zero-state KPIs (`₦0.00`) and the clean empty message ("No matching records found for the selected filter criteria") with 0 mock bleed.
+    2. **Chart of Accounts Missing on Newly Registered Businesses (`Chart of Accounts (0)`):**
+       In `web/src/components/admin/admin-store.ts`, non-demo tenants were previously assigned an empty list `[]` across all admin records. While customer and vendor catalogs should start empty, the business's Chart of Accounts must be seeded with the tailored IFRS accounts previewed during the onboarding creation wizard.
+       Added `seedTailoredAccountsForWorkspace(workspaceId, businessType)` which seeds the full tailored Chart of Accounts (all IFRS Group and Individual accounts with `₦0.00` balances) matching the organization's industry template (including a new dedicated `EDUCATION_SCHOOL` template for schools/academies like Honey Home School, as well as `RETAIL_ECOMMERCE`, `CONSTRUCTION_CONTRACTING`, etc.).
+       Now, newly registered SME workspaces open `/admin` with their full tailored Chart of Accounts (28–35 accounts) ready for transaction posting, while customer and vendor catalogs remain strictly zero-state.
+- **Files Created / Changed:**
+  - `web/src/components/reports/reports-data.ts`: Linked `balance-sheet`, `income-statement`, `value-added`, and `five-year-summary` directly to live `pkg` lines, eliminating all synthetic `|| <number>` fallbacks.
+  - `web/src/components/onboarding/company-wizard-data.ts`: Added `EDUCATION_SCHOOL` sector template with tailored academic accounts (tuition fees receivable, school buses, unearned fees, academic staff payroll, educational supplies).
+  - `web/src/components/admin/admin-store.ts`: Added `seedTailoredAccountsForWorkspace` and updated `loadAdminRecords` to seed the tailored IFRS Chart of Accounts at `₦0.00` while keeping customer/vendor/employee lists empty.
+  - `web/src/lib/bff-client.ts`: Added `getTailoredBffAccounts` in `fetchChartOfAccounts` returning tailored accounts per tenant.
+  - `web/src/types/auth.ts` & `web/src/lib/auth-bff.ts`: Added `businessType` to `AuthWorkspaceSummary` and stored it on registration.
+  - `web/src/components/AdminMaintainWorkspace.tsx` & `web/src/app/admin/page.tsx`: Forwarded `businessType` to `loadAdminRecords`.
+  - `web/src/__tests__/reports-live-data-and-coa-seeding.test.tsx`: New comprehensive TDD test suite verifying zero-state reports and Chart of Accounts wizard seeding.
+  - `web/src/__tests__/landing-auth-pages.test.tsx`: Added assertions verifying tailored Chart of Accounts presence in zero-state tenant workspace.
+  - `docs/DECISIONS.md`: Logged `ADR-048`.
+- **Verification Commands & Results:**
+  - `npm --prefix web test`: All 18 test suites (63 Vitest tests) passed with 0 failures and 0 `axe-core` accessibility violations.
+  - `npm --prefix web run build`: Compiled all 45 routes cleanly in 15.6s.
+  - `uv run pytest -q`: 110 passed across 29 test modules (100%).
+  - `python scripts/verify_workflow.py --project .`: 128 / 128 wizard skills verified (100%).
+
+### 2026-11-18: 1-Based Numbering, Live Relational Search Pickers & Complete Report Data Binding
+- **Plain-English Summary (Non-Developers):**
+  - **1-Based Sequential Numbering:** In a fresh company, all transaction references (`INV-2026-001`, `QUO-2026-001`, `BIL-2026-001`, `JV-2026-001`, `REC-2026-001`, `PAY-2026-001`) and admin codes (`CUS-001`, `VND-001`, `SKU-001`, `JOB-001`, `EMP-001`, `FA-001`) now deterministically start at 1 (`001`) and increment by 1 on each new entry, permanently removing random suffix numbers like `INV-2026-646`.
+  - **Searchable Pickers for Customers, Vendors, and Inventory:**
+    - When recording any transaction, users can now click or type in the Customer/Vendor/Counterparty field to instantly search, filter, and pick registered customers, vendors, or staff members.
+    - In transaction line items, an inventory catalog dropdown allows users to choose any registered inventory item, which immediately auto-fills the description, standard unit price, and general ledger account.
+    - When adding records in the Admin tab (e.g., jobs, inventory items, fixed assets), relational dropdowns allow picking registered customers, vendors, employees, and Chart of Accounts accounts.
+  - **Live Report Data Binding & Zero-Balance Accounts Display:**
+    - Every financial and operational report in NairaBooks is bound directly to live records.
+    - Financial statements (Balance Sheet, Income Statement, Trial Balance) now always list the organization's related Chart of Accounts rows even if they have a zero balance (`₦0.00`), ensuring full visibility into the ledger structure unless the user chooses to turn on the "Hide Zero-Balance Accounts" toggle in Filters.
+    - The General Journal report now dynamically derives balanced double-entry vouchers from posted operational transactions, removing hardcoded demo entries.
+- **Files Created / Changed:**
+  - `web/src/lib/numbering-service.ts`: New deterministic numbering service providing `getNextTransactionReference` and `getNextAdminRecordCode`.
+  - `web/src/components/transactions/TransactionRecordEditorWorkspace.tsx`: Integrated sequential 1-based reference generation and searchable counterparty picker with filtering popover and quick-pick chips.
+  - `web/src/components/transactions/TransactionEditorLayouts.tsx`: Added inventory item catalog picker to line items with automatic price, description, and GL code population.
+  - `web/src/components/admin/AdminRecordEditorWorkspace.tsx`: Integrated sequential 1-based code generation and live relational select dropdowns for vendors, customers, Chart of Accounts, and sales reps.
+  - `web/src/components/reports/reports-data.ts`: Bound all reports to live store data (`loadAdminRecords()` and `loadTransactions()`), fixed statement calculations, ensured zero-balance accounts are rendered on the document by default, and made general journal entries dynamically reflect real transactions.
+  - `web/src/__tests__/live-reports-searchable-pickers-and-numbering.test.tsx`: New comprehensive TDD test suite with 8 unit tests covering 1-based numbering, sequential increments, live account rows at zero balance, and counterparty search combobox.
+  - `web/src/__tests__/reports-live-data-and-coa-seeding.test.tsx`: Updated assertions to reflect accounts displayed at `₦0.00` balances.
+  - `docs/DECISIONS.md`: Logged `ADR-049`.
+- **Verification Commands & Results:**
+  - `npm --prefix web test`: All 19 test suites (71 Vitest tests) passed with 0 failures and 0 `axe-core` accessibility violations.
+  - `npm --prefix web run build`: Compiled all 45 Next.js routes cleanly in 17.6s with zero type errors.
+  - `uv run pytest -q`: 110 passed across 29 test modules (100%).
+  - `python scripts/verify_workflow.py --project .`: 128 / 128 wizard skills verified (100%).
+
+### 2026-11-19: Dark Mode Tab Contrast Fix & Inventory Business Concepts Disambiguation
+- **Plain-English Summary (Non-Developers):**
+  - **Fixed Dark Mode Error on Admin Tabs:**
+    In dark mode on the Admin page (`/admin`), the category tabs capsule (`People & Payroll`, `Books & Budgets`, `Stock, Jobs & Assets`, `Company & Defaults`, `Taxes & Users`) was showing a bright light-gray container with unreadable washed-out gray text, and the active tab turned into an inverted black oval.
+    Updated the container to a sleek dark capsule (`dark:!bg-[#18181A]` and `dark:border-[#2C2C2E]`), styled inactive tabs with crisp light-gray text (`dark:!text-[#A1A1AA]`), and styled the active tab with an elevated dark-gray pill (`dark:!bg-[#2C2C2E]`) and white text. Also updated `globals.css` to prevent `bg-[#E5E5EA]` from leaking light gray in dark mode across the entire app.
+  - **Inventory Concepts & Terms Disambiguated:**
+    - Clarified the meaning of physical stock on hand vs. stock committed on sales orders vs. available to promise (ATP).
+    - Clarified the `Commissionable` toggle for sales representatives.
+    - Clarified the difference between physical unit counts and monetary stock valuation (`Total Stock Valuation / Cost on Hand (₦)`).
+    - Removed synthetic hardcoded default quantities (42, 6, 15) so new inventory items start cleanly at 0.
+- **Files Created / Changed:**
+  - `web/src/components/AdminMaintainWorkspace.tsx`: Added dark mode classes for Admin Pillars tablist, active/inactive pills, search bar, and sub-module pills.
+  - `web/src/app/globals.css`: Extended dark mode rules for `bg-[#E5E5EA]` opacity variants (`/75`, `/80`, `/85`).
+  - `web/src/components/ui/tabs.tsx` & `web/src/components/BankReconciliationWorkspace.tsx`: Added dark mode classes to segmented controls.
+  - `web/src/components/admin/AdminRecordEditorWorkspace.tsx`: Disambiguated inventory monetary valuation label and placeholder.
+  - `web/src/components/admin/admin-editor-schemas.ts` & `AdminEditorWidgets.tsx`: Set new inventory item stock defaults to 0 and added dark mode styles to stock KPI cards.
+  - `web/src/__tests__/live-reports-searchable-pickers-and-numbering.test.tsx`: Added unit tests for dark mode tab styling and inventory ATP stock calculations.
+  - `docs/DECISIONS.md`: Logged `ADR-050`.
+- **Verification Commands & Results:**
+  - `npm --prefix web test`: All 19 test suites (73 Vitest tests) passed with 0 failures and 0 `axe-core` accessibility violations.
+  - `npm --prefix web run build`: Compiled all 45 routes cleanly in 20.1s.
+  - `python scripts/verify_workflow.py --project .`: 128 / 128 wizard skills verified (100%).
+
+### 2026-11-23 — Workspace Isolation Fix for `/api/transactions` & TypeScript Check Repair
+- **Changed:**
+  - `web/src/lib/bff-client.ts`: local fallback ledger partitioned per workspace; transaction/voucher post, reverse, and list scoped to the caller's workspace.
+  - `web/src/app/api/transactions/route.ts`: passes authenticated workspace, session token, and actor.
+  - `web/src/__tests__/transactions-workspace-isolation.test.ts`: new isolation tests.
+  - Test fixtures in three files updated to current prop/type contracts (7 `tsc` errors).
+  - Repo cleanup: reference screenshots/PDFs moved to git-ignored `_reference/`; `web/.data/` now git-ignored.
+  - `docs/DECISIONS.md`: Logged `ADR-051`.
+- **Verification Commands & Results:**
+  - `npx tsc --noEmit` (web): 0 errors.
+  - `npm --prefix web test`: 20 test files, 76 tests passed.
+
+### 2026-11-23 — Production Auth Hardening (ADR-052)
+- **Changed:** `web/src/lib/auth-config.ts` (new), `web/src/lib/auth-bff.ts`, `web/src/app/login/page.tsx`, `web/src/app/security/page.tsx`, `web/src/components/LoginWorkspace.tsx`, `web/src/components/SecurityAuditWorkspace.tsx`, `render.yaml`, `.env.example`, new `web/src/__tests__/auth-production-hardening.test.ts`.
+- **Deferred:** Admin/Transactions records stay in browser `sessionStorage` until the database path is chosen.
+- **Verification:** Vitest 21 files / 87 tests passed; `tsc --noEmit` 0 errors; `npm run build` compiled; production `next start` smoke test passed.
+
+### 2026-11-23 — Postgres Persistence, Python Retirement, Server-Backed Records (ADR-053)
+- **Changed:** new `web/src/lib/persistence/` and `web/src/lib/records-bff.ts`; new `/api/records/[collection]` route; all 25 API route files wrapped with `withPersistence`; 11 server pages hydrate first; `bff-client.ts`, `auth-bff.ts`, `tax-bff.ts`, `packs-bff.ts` persist state and dropped Python-upstream code; client stores + `RecordsSync`; `render.yaml` (`DATABASE_URL`), `.env.example`, `README.md`, `docs/DEPLOYMENT_RENDER.md`, `docs/USER_GUIDE.md`. Added deps: `pg`, dev `@types/pg`, `@electric-sql/pglite`.
+- **Verification:** Vitest 25 files passed; `tsc --noEmit` 0 errors; `npm run build` compiled; production restart smoke test passed.
+
+### 2026-11-24 — Core Accounting Verified End to End (ADR-054)
+- **Changed:**
+  - New `web/src/lib/posting-rules.ts` and `web/src/components/reports/ledger-report-rows.ts`.
+  - `bff-client.ts`:
+    - per-workspace reports, KPIs and chart
+    - posting engine
+    - edit/delete reversal
+    - Admin chart sync and opening balances
+  - `records-bff.ts` and the records route (chart sync on save); `/api/transactions` `DELETE`.
+  - Transaction editor and layouts:
+    - the company's own accounts
+    - stock-item picker
+    - payroll and stock-count maths
+    - posting errors shown
+  - `reports-data.ts` uses the new builders.
+  - New test `accounting-end-to-end.test.ts`; expectations updated in 3 older tests.
+- **Verification:** Vitest 26 files passed; `tsc --noEmit` 0 errors; browser smoke test of sign-up → invoice → trial balance.
+
+### 2026-11-24 — Multi-company logins, live party balances, hide-zero reports
+- **Changed:**
+  - Sign-up with an existing email and its correct password adds the new company to that login. A wrong password gets a clear 409 (rate-limited) and the form returns to the owner step.
+  - Admin customer/vendor balances = typed opening balance + posted transactions (`components/admin/party-balances.ts`; demo company unchanged).
+  - Reports have a one-click, remembered "Hide zero balances" button (also applies to exports/print).
+- **Verification:**
+  - New tests `register-additional-company` and `party-balances`; Vitest 28 files passed; `tsc` clean.
+  - Browser check: customer balance ₦5,375.00 DR after an invoice; the balance sheet hides the zero rows.
+
+### 2026-11-24 — Overview dashboard uses real figures
+- **Changed:**
+  - New `web/src/lib/overview-bff.ts` and `web/src/types/overview.ts`.
+  - The Overview page builds net income and change (month/quarter/YTD), the 6-month cash-in/out chart, top expense accounts and overdue invoices from the company's own ledger and records.
+  - The hard-coded sample dashboard (e.g. ₦6,940,000 net income) is now shown only for the demo company.
+- **Verification:** New test `overview-live-data`; Vitest 29 files passed; `tsc` clean; browser check of a new company's Overview.

@@ -5,11 +5,33 @@ import {
   type TransactionRecord,
   type TransactionStatus,
 } from "@/components/transactions/transactions-data";
+import { pullRecordCollection, scheduleRecordPush } from "@/components/records/records-sync";
 
-const TRANSACTIONS_STORAGE_KEY = "nairabooks_transactions_v1";
+const DEMO_WORKSPACE_ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaa0001";
 export const TRANSACTIONS_STORE_EVENT = "nairabooks:transactions-store-updated";
 
-let memoryTransactions: readonly TransactionRecord[] | null = null;
+const memoryByWorkspace = new Map<string, readonly TransactionRecord[]>();
+
+function resolveWorkspaceId(workspaceId?: string): string {
+  if (workspaceId && workspaceId.trim()) {
+    return workspaceId.trim();
+  }
+  if (typeof window !== "undefined") {
+    try {
+      const stored = window.localStorage.getItem("nairabooks_active_workspace");
+      if (stored && stored.trim()) {
+        return stored.trim();
+      }
+    } catch {
+      // Ignore in restricted environments
+    }
+  }
+  return DEMO_WORKSPACE_ID;
+}
+
+function getStorageKey(targetWs: string): string {
+  return `nairabooks_transactions_${targetWs}`;
+}
 
 function notifyTransactionsChanged() {
   if (typeof window !== "undefined") {
@@ -17,88 +39,135 @@ function notifyTransactionsChanged() {
   }
 }
 
-export function loadTransactions(): readonly TransactionRecord[] {
+export function loadTransactions(workspaceId?: string): readonly TransactionRecord[] {
+  const targetWs = resolveWorkspaceId(workspaceId);
   if (typeof window !== "undefined") {
     try {
-      const raw = window.sessionStorage.getItem(TRANSACTIONS_STORAGE_KEY);
+      const key = getStorageKey(targetWs);
+      const raw = window.sessionStorage.getItem(key);
       if (raw) {
         const parsed = JSON.parse(raw) as unknown;
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          memoryTransactions = parsed as TransactionRecord[];
-          return memoryTransactions;
+        if (Array.isArray(parsed)) {
+          memoryByWorkspace.set(targetWs, parsed as TransactionRecord[]);
+          return parsed as TransactionRecord[];
         }
       }
     } catch {
       // Fall back safely to memory or initial seed
     }
   }
-  if (memoryTransactions) {
-    return memoryTransactions;
+  const cached = memoryByWorkspace.get(targetWs);
+  if (cached) {
+    return cached;
   }
-  memoryTransactions = [...INITIAL_TRANSACTIONS];
-  return memoryTransactions;
+  // Zero-state isolation: only the primary showcase demo workspace receives seed transactions.
+  // Newly registered tenant accounts always default to a clean zero-state list.
+  const initial = targetWs === DEMO_WORKSPACE_ID ? [...INITIAL_TRANSACTIONS] : [];
+  memoryByWorkspace.set(targetWs, initial);
+  return initial;
 }
 
 export function saveTransactions(
   nextList: readonly TransactionRecord[],
+  workspaceId?: string,
 ): readonly TransactionRecord[] {
-  memoryTransactions = [...nextList];
+  const targetWs = resolveWorkspaceId(workspaceId);
+  const cloned = cacheTransactionsLocally(targetWs, nextList);
+  scheduleRecordPush("transactions", targetWs, cloned);
+  notifyTransactionsChanged();
+  return cloned;
+}
+
+function cacheTransactionsLocally(
+  targetWs: string,
+  list: readonly TransactionRecord[],
+): readonly TransactionRecord[] {
+  const cloned = [...list];
+  memoryByWorkspace.set(targetWs, cloned);
   if (typeof window !== "undefined") {
     try {
-      window.sessionStorage.setItem(
-        TRANSACTIONS_STORAGE_KEY,
-        JSON.stringify(memoryTransactions),
-      );
+      window.sessionStorage.setItem(getStorageKey(targetWs), JSON.stringify(cloned));
     } catch {
       // Ignore storage quota errors in restricted environments
     }
   }
-  notifyTransactionsChanged();
-  return memoryTransactions;
+  return cloned;
+}
+
+/**
+ * Replace the local cache with the signed-in workspace's saved transactions. A workspace
+ * that has never saved any uploads what this browser has (its seed or session edits).
+ */
+export async function hydrateTransactionsFromServer(): Promise<void> {
+  const pulled = await pullRecordCollection("transactions");
+  if (!pulled) return;
+  if (Array.isArray(pulled.data)) {
+    cacheTransactionsLocally(pulled.workspaceId, pulled.data as TransactionRecord[]);
+    notifyTransactionsChanged();
+  } else {
+    scheduleRecordPush("transactions", pulled.workspaceId, loadTransactions(pulled.workspaceId));
+  }
 }
 
 export function upsertTransaction(
   record: TransactionRecord,
+  workspaceId?: string,
 ): readonly TransactionRecord[] {
-  const current = loadTransactions();
+  const current = loadTransactions(workspaceId);
   const exists = current.some((tx) => tx.id === record.id);
   const next = exists
     ? current.map((tx) => (tx.id === record.id ? record : tx))
     : [record, ...current];
-  return saveTransactions(next);
+  return saveTransactions(next, workspaceId);
 }
 
-export function deleteTransaction(id: string): readonly TransactionRecord[] {
-  const current = loadTransactions();
-  return saveTransactions(current.filter((tx) => tx.id !== id));
+export function deleteTransaction(
+  id: string,
+  workspaceId?: string,
+): readonly TransactionRecord[] {
+  const current = loadTransactions(workspaceId);
+  return saveTransactions(
+    current.filter((tx) => tx.id !== id),
+    workspaceId,
+  );
 }
 
-export function findTransactionById(id: string): TransactionRecord | undefined {
-  return loadTransactions().find((tx) => tx.id === id);
+export function findTransactionById(
+  id: string,
+  workspaceId?: string,
+): TransactionRecord | undefined {
+  return loadTransactions(workspaceId).find((tx) => tx.id === id);
 }
 
 export function updateTransactionStatusInStore(
   id: string,
   status: TransactionStatus,
+  workspaceId?: string,
 ): {
   readonly records: readonly TransactionRecord[];
   readonly updated: TransactionRecord | undefined;
 } {
-  const current = loadTransactions();
+  const current = loadTransactions(workspaceId);
   let updated: TransactionRecord | undefined;
   const next = current.map((tx) => {
     if (tx.id !== id) return tx;
     updated = { ...tx, status };
     return updated;
   });
-  return { records: saveTransactions(next), updated };
+  return { records: saveTransactions(next, workspaceId), updated };
 }
 
-export function resetTransactionsStore(): void {
-  memoryTransactions = [...INITIAL_TRANSACTIONS];
+export function resetTransactionsStore(workspaceId?: string): void {
+  const targetWs = workspaceId ? workspaceId.trim() : DEMO_WORKSPACE_ID;
+  const initial = targetWs === DEMO_WORKSPACE_ID ? [...INITIAL_TRANSACTIONS] : [];
+  memoryByWorkspace.set(targetWs, initial);
   if (typeof window !== "undefined") {
     try {
-      window.sessionStorage.removeItem(TRANSACTIONS_STORAGE_KEY);
+      if (!workspaceId) {
+        window.localStorage.removeItem("nairabooks_active_workspace");
+      }
+      window.sessionStorage.removeItem(getStorageKey(targetWs));
+      window.sessionStorage.removeItem("nairabooks_transactions_v1");
     } catch {
       // Ignore
     }

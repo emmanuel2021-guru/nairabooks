@@ -1,23 +1,21 @@
+- **Active Mandatory Skills:** `conductor-implement`, `workflow-patterns`, `full-stack-orchestration-full-stack-feature`, `backend-development-feature-development`, `tdd-orchestrator`, `tdd-workflows-tdd-cycle`, `tdd-workflows-tdd-red`, `tdd-workflows-tdd-green`, `tdd-workflows-tdd-refactor`, `typescript-pro`, `typescript-advanced-types`, `javascript-pro`, `modern-javascript-patterns`, `nextjs-app-router-patterns`, `frontend-developer`, `frontend-mobile-development-component-scaffold`, `react-state-management`, `react-modernization`, `nodejs-backend-patterns`, `error-handling-patterns`
+
 # Living Workspace State (`STATE.md`)
 
 - **Project:** NairaBooks (`ac`) — Zero-jargon Nigerian IFRS / Tax Act 2025 / CAMA 2020 accounting & business operations platform
-- **Active Stage:** **Phase 5 & 6 Polish: Laptop Naira Line-Wrap Resolution, Mobile Landing Page Optimization & Zero-Card Render Deployment**
+- **Active Stage:** **Phase 6 Core Build Loop: Dark Mode Tab Contrast Fix & Inventory Concepts Disambiguation**
 - **Wizard Skills Executed:** `128 / 128` (`100%`) — All 12 active phases verified with concrete deliverables, code, automated test suites, and documentation.
-- **Latest Milestone (2026-11-13):** **Laptop Naira Wrapping Fixed, Mobile Landing Page Optimized & Zero-Card Render Build:**
-  - **Laptop Screen Naira Sign Wrapping Fixed:** Resolved the issue where the Naira symbol (`₦`) broke onto line 1 while large figures (`48,250,000.00`) wrapped onto line 2 in the 4 top KPI cards on laptop displays (1280px–1440px). Changed `NairaSign` to inline rendering, bound the symbol and numeric text together using `inline-flex whitespace-nowrap`, and optimized font sizing (`xl:text-[22px] 2xl:text-[26px]`) to give 14-character balances ample room without wrapping.
-  - **Dark Mode Heading Readability:** Fixed the Financial Overview root container to use semantic `text-ink` instead of hardcoded charcoal hex values, guaranteeing bright near-white text in dark mode.
-  - **Public Landing Page Mobile Optimization:** Compacted navigation buttons ("Start Free" and "Sign In") with responsive labels to fit comfortably on 360px–390px mobile phone screens. Added `overflow-x-clip` to prevent horizontal scrolling. Scaled down the rotating gyroscope CTA orb (`h-28 w-28 sm:h-40 sm:w-40`) and repositioned it cleanly. Disabled mouse 3D tilt on mobile touch devices (`if (event.pointerType === "touch") return;`). Added responsive padding and `whitespace-nowrap` to cashflow split cards and transaction rows. Wrapped the Direct Comparison Table in an interactive swipe-to-scroll container (`overflow-x-auto min-w-[540px]`).
-  - **Zero-Card & Zero-Config Render Deployment:** Configured root `package.json` with `"postinstall": "npm --prefix web install"` and `"build": "npm --prefix web install && npm --prefix web run build"`, enabling builds to succeed automatically even if Render defaults to root `/`. Documented zero-card manual Web Service deployment path on Render Free Tier.
-  - **Verified Clean:** 16 Vitest test suites (56 tests, 0 `axe-core` accessibility violations), 100 Python pytest test cases, 0 SAST findings, and Next.js 44-route production build compiling cleanly in 24.3s.
+- **Update 4 (2026-11-24):** Core accounting verified end to end (ADR-054). Every transaction type posts correct double entry to the company's own ledger. Edits replace and deletes reverse vouchers, Admin accounts and opening balances reach the ledger, and all core reports read real data. Vitest 26 files, `tsc` clean. Next: commit, set `DATABASE_URL` on Render, relational schema migration.
+- **Update 3 (2026-11-23):** Postgres persistence live (ADR-053): set `DATABASE_URL` (Neon) on Render. Python package retired. Admin/Transactions records server-backed. Vitest 25 files, `tsc` clean, build OK. Next: relational schema migration, reports for non-demo workspaces, stop duplicate vouchers on transaction edits.
+- **Update 2 (2026-11-23):** Production auth hardened (ADR-052): required `NAIRABOOKS_SESSION_SECRET`, demo accounts opt-in via `NAIRABOOKS_DEMO_PASSWORD`, no anonymous owner fallback, password reset disabled in production, random one-time passwords for invites. Vitest 21 files / 87 tests, `tsc` clean, build OK. Deferred: Admin/Transactions persistence (awaiting database decision).
+- **Update (2026-11-23):** Fixed cross-tenant leak in `/api/transactions` (local ledger now per-workspace, ADR-051) and 7 `tsc --noEmit` errors in test fixtures. Verified: `tsc` clean, Vitest 20 files / 76 tests. Repo root cleaned (reference files in ignored `_reference/`). Open: no persistent storage on deploy; Python backend unused; session secret not required in production.
+- **Latest Milestone (2026-11-19):** **Dark Mode Tab Contrast Fix & Inventory Stock Concepts Disambiguation Verified:**
+  - **Fixed Dark Mode Error on Admin Tabs:** The category tab capsule (`People & Payroll`, `Books & Budgets`, `Stock, Jobs & Assets`, `Company & Defaults`, `Taxes & Users`) was rendering as a bright light-gray box with washed-out gray text in dark mode. Styled with dark background (`dark:!bg-[#18181A]`, `dark:border-[#2C2C2E]`), elevated active pill (`dark:!bg-[#2C2C2E]`), and crisp high-contrast text (`dark:!text-[#A1A1AA]` inactive, `dark:!text-white` active). Extended `globals.css` to blanket-cover all `bg-[#E5E5EA]` opacity variants.
+  - **Inventory Concepts & Stock Calculations Disambiguated:** Clarified Physical On Hand (42) minus Committed on Sales Orders (6) = Available to Promise (36). Clarified Reorder Status threshold logic and Commissionable sales toggle. Renamed confusing `Qty On Hand / Cost` to `Total Stock Valuation / Cost on Hand (₦)` and reset new item defaults to 0.
+  - **Verified Clean:** 110 Python pytest tests (100% pass), Next.js production build compiling all 45 routes cleanly in 20.1s, 19 Vitest test suites (73 tests, 0 axe-core violations), and workflow verification passing at 100%.
 - **Baseline Verified Working:**
-  - `npm --prefix web run build`: Compiled successfully in 16.4s, all 44 routes generated cleanly.
-  - `uv run pytest -q`: `100 passed` across 26 test modules in 100%.
-  - `uv run ruff check src tests` & `uv run mypy src tests` (`100` source files): clean (0 issues).
-  - `web`: `npm run typecheck` (0 errors), `npm test` (`16` test files, `56` vitest tests, `0` axe-core violations), and Next.js 44-route production build passing cleanly.
-  - `uv run python scripts/audit_seo.py`: 100% SEO gates passed cleanly.
-  - `uv run python scripts/detect_seo_cannibalization.py`: 0 cannibalization conflicts detected across all 18 keywords.
-  - `uv run python scripts/run_sast_scan.py`: 0 vulnerabilities (clean pass).
-  - `uv run python scripts/compliance_check.py`: 100% compliance gates passed.
-  - `uv run python scripts/audit_dependencies.py`: 100% permissive licenses verified.
-  - `uv run python scripts/verify_workflow.py --project .`: `128 / 128` wizard skills verified (`executed=128`, 100%).
-- **Project Status:** **Fully Shipped & Production Ready.** All 128 wizard skills verified, statutory invariants enforced, zero float math, authentic Nigerian cultural theme active, WCAG 2.2 AA accessibility satisfied, Cupertino aesthetics preserved, dark mode contrast perfected, mobile bottom navigation active, and live on cloud.
+  - `uv run pytest -q`: `110 passed` across 29 test modules (100%).
+  - `uv run ruff check src tests` & `uv run mypy src tests` (`103` source files): clean (0 issues).
+  - `web`: `npm run build` (all 45 routes compiled cleanly), `npm test` (`19` test files, `73` vitest tests, `0` axe-core violations).
+  - `python scripts/verify_workflow.py --project .`: `128 / 128` wizard skills verified (`executed=128`, 100%).
+- **Project Status:** **Dark Mode Tab Contrast & Inventory Concepts Disambiguated.** Server running on port 3000. Ready for next operational feature slices.

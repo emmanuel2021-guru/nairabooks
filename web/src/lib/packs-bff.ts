@@ -1,4 +1,5 @@
 import { formatKobo, parseMoneyToKobo } from "@/lib/decimal";
+import { readDocument, writeDocument } from "@/lib/persistence";
 import type { MutationError } from "@/types/ledger";
 import type {
   FlagshipPackCode,
@@ -653,21 +654,21 @@ const DEFAULT_INITIAL_PROFILE = (() => {
   return res.profile;
 })();
 
-const globalForPacks = globalThis as typeof globalThis & {
-  __nairabooksPackProfile?: WorkspaceIndustryProfile;
-};
+const DEFAULT_PACK_WORKSPACE_ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaa0001";
 
-function getStoredProfile(): WorkspaceIndustryProfile {
-  if (!globalForPacks.__nairabooksPackProfile) {
-    globalForPacks.__nairabooksPackProfile = DEFAULT_INITIAL_PROFILE;
-  }
-  return globalForPacks.__nairabooksPackProfile;
+function packDocumentKey(workspaceId: string): string {
+  return `packs:${workspaceId}`;
 }
 
-function getUpstreamBaseUrl(): string | null {
-  const configured = process.env.NAIRABOOKS_API_URL?.trim();
-  return configured && configured.length > 0 ? configured.replace(/\/$/, "") : null;
+/** Per-workspace industry pack profile (stored document, or the default composition). */
+function getStoredProfile(workspaceId: string = DEFAULT_PACK_WORKSPACE_ID): WorkspaceIndustryProfile {
+  return readDocument<WorkspaceIndustryProfile>(packDocumentKey(workspaceId)) ?? DEFAULT_INITIAL_PROFILE;
 }
+
+function setStoredProfile(workspaceId: string, profile: WorkspaceIndustryProfile): void {
+  writeDocument(packDocumentKey(workspaceId), profile);
+}
+
 
 function upstreamHeaders(): Record<string, string> {
   return {
@@ -677,43 +678,15 @@ function upstreamHeaders(): Record<string, string> {
   };
 }
 
-export async function fetchPackWorkspace(): Promise<{
+export async function fetchPackWorkspace(workspaceId?: string): Promise<{
   status: number;
   body: PackWorkspacePayload | MutationError;
 }> {
-  const upstream = getUpstreamBaseUrl();
-  if (upstream) {
-    const [primRes, profRes] = await Promise.all([
-      fetch(`${upstream}/api/v1/packs/primitives`, {
-        method: "GET",
-        headers: upstreamHeaders(),
-        cache: "no-store",
-      }),
-      fetch(`${upstream}/api/v1/packs/profile`, {
-        method: "GET",
-        headers: upstreamHeaders(),
-        cache: "no-store",
-      }),
-    ]);
-    if (!profRes.ok) {
-      return { status: profRes.status, body: (await profRes.json()) as MutationError };
-    }
-    const primJson = (await primRes.json()) as { items: PrimitiveCapabilitySpec[] };
-    const profileJson = (await profRes.json()) as WorkspaceIndustryProfile;
-    return {
-      status: 200,
-      body: {
-        primitives: primJson.items,
-        profile: profileJson,
-      },
-    };
-  }
-
   return {
     status: 200,
     body: {
       primitives: [...PRIMITIVE_CATALOG],
-      profile: getStoredProfile(),
+      profile: getStoredProfile(workspaceId),
     },
   };
 }
@@ -721,17 +694,6 @@ export async function fetchPackWorkspace(): Promise<{
 export async function composePackPreviewViaBff(
   rawBody: string,
 ): Promise<{ status: number; body: WorkspaceIndustryProfile | MutationError }> {
-  const upstream = getUpstreamBaseUrl();
-  if (upstream) {
-    const res = await fetch(`${upstream}/api/v1/packs/compose-preview`, {
-      method: "POST",
-      headers: upstreamHeaders(),
-      body: rawBody,
-      cache: "no-store",
-    });
-    return { status: res.status, body: (await res.json()) as WorkspaceIndustryProfile | MutationError };
-  }
-
   let parsed: Record<string, unknown>;
   try {
     parsed = JSON.parse(rawBody) as Record<string, unknown>;
@@ -747,28 +709,8 @@ export async function composePackPreviewViaBff(
 
 export async function configureIndustryPackViaBff(
   rawBody: string,
+  workspaceId: string = DEFAULT_PACK_WORKSPACE_ID,
 ): Promise<{ status: number; body: PackWorkspacePayload | MutationError }> {
-  const upstream = getUpstreamBaseUrl();
-  if (upstream) {
-    const res = await fetch(`${upstream}/api/v1/packs/configure`, {
-      method: "POST",
-      headers: upstreamHeaders(),
-      body: rawBody,
-      cache: "no-store",
-    });
-    const json = (await res.json()) as WorkspaceIndustryProfile | MutationError;
-    if (!res.ok) {
-      return { status: res.status, body: json as MutationError };
-    }
-    return {
-      status: 200,
-      body: {
-        primitives: [...PRIMITIVE_CATALOG],
-        profile: json as WorkspaceIndustryProfile,
-      },
-    };
-  }
-
   let parsed: Record<string, unknown>;
   try {
     parsed = JSON.parse(rawBody) as Record<string, unknown>;
@@ -779,7 +721,7 @@ export async function configureIndustryPackViaBff(
   if (!composed.ok) {
     return { status: 400, body: composed.error };
   }
-  globalForPacks.__nairabooksPackProfile = composed.profile;
+  setStoredProfile(workspaceId, composed.profile);
   return {
     status: 200,
     body: {
@@ -938,42 +880,13 @@ export async function fetchFlagshipsViaBff(): Promise<{
   status: number;
   body: { items: FlagshipPackPreset[] } | MutationError;
 }> {
-  const upstream = getUpstreamBaseUrl();
-  if (upstream) {
-    const res = await fetch(`${upstream}/api/v1/packs/flagships`, {
-      method: "GET",
-      headers: upstreamHeaders(),
-      cache: "no-store",
-    });
-    return { status: res.status, body: (await res.json()) as { items: FlagshipPackPreset[] } | MutationError };
-  }
   return { status: 200, body: { items: [...FLAGSHIP_PACK_CATALOG] } };
 }
 
 export async function applyFlagshipPackViaBff(
   rawBody: string,
+  workspaceId: string = DEFAULT_PACK_WORKSPACE_ID,
 ): Promise<{ status: number; body: PackWorkspacePayload | MutationError }> {
-  const upstream = getUpstreamBaseUrl();
-  if (upstream) {
-    const res = await fetch(`${upstream}/api/v1/packs/flagships/apply`, {
-      method: "POST",
-      headers: upstreamHeaders(),
-      body: rawBody,
-      cache: "no-store",
-    });
-    const json = (await res.json()) as WorkspaceIndustryProfile | MutationError;
-    if (!res.ok) {
-      return { status: res.status, body: json as MutationError };
-    }
-    return {
-      status: 200,
-      body: {
-        primitives: [...PRIMITIVE_CATALOG],
-        profile: json as WorkspaceIndustryProfile,
-      },
-    };
-  }
-
   let parsed: Record<string, unknown>;
   try {
     parsed = JSON.parse(rawBody) as Record<string, unknown>;
@@ -1000,50 +913,13 @@ export async function applyFlagshipPackViaBff(
       primitives: preset.recommendedPrimitives,
       terminologyOverrides: overrides,
     }),
+    workspaceId,
   );
 }
 
 export async function postPackOperationViaBff(
   rawBody: string,
 ): Promise<{ status: number; body: PackOperationPostResult | MutationError }> {
-  const upstream = getUpstreamBaseUrl();
-  if (upstream) {
-    const res = await fetch(`${upstream}/api/v1/packs/operations/post`, {
-      method: "POST",
-      headers: upstreamHeaders(),
-      body: rawBody,
-      cache: "no-store",
-    });
-    const json = (await res.json()) as {
-      voucher?: { reference?: string; postingDate?: string; lines?: { accountCode: string; accountName: string; debitAmount: string; creditAmount: string; memo?: string }[] };
-      summary?: string;
-      metrics?: Record<string, string>;
-    } & Partial<MutationError>;
-    if (!res.ok) {
-      return { status: res.status, body: json as MutationError };
-    }
-    const opTypeForUpstream = (
-      JSON.parse(rawBody) as { operationType?: PackOperationType }
-    ).operationType ?? "RETAIL_POS_CASHUP";
-    return {
-      status: res.status,
-      body: {
-        operationType: opTypeForUpstream,
-        reference: json.voucher?.reference ?? "",
-        postingDate: json.voucher?.postingDate ?? "",
-        summary: json.summary ?? "",
-        metrics: json.metrics ?? {},
-        lines: (json.voucher?.lines ?? []).map((l) => ({
-          accountCode: l.accountCode,
-          accountName: l.accountName,
-          debitNgn: l.debitAmount,
-          creditNgn: l.creditAmount,
-          memo: l.memo ?? "",
-        })),
-      },
-    };
-  }
-
   let body: Record<string, unknown>;
   try {
     body = JSON.parse(rawBody) as Record<string, unknown>;

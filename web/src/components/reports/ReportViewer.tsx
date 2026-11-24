@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useId, useMemo, useState } from "react";
+import React, { useEffect, useId, useMemo, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   ArrowDown,
@@ -51,6 +51,8 @@ interface ReportViewerProps {
   readonly workspaceRc?: string;
 }
 
+const HIDE_ZERO_KEY = "nairabooks_reports_hide_zero";
+
 export function ReportViewer({
   report,
   pkg,
@@ -82,7 +84,23 @@ export function ReportViewer({
 
   // 3. Filter Options State
   const [searchQuery, setSearchQuery] = useState("");
-  const [hideZeroBalances, setHideZeroBalances] = useState(false);
+  // Remembered per browser so zero-balance ledgers stay hidden across reports and visits.
+  const [hideZeroBalances, setHideZeroBalancesState] = useState(false);
+  useEffect(() => {
+    try {
+      setHideZeroBalancesState(window.localStorage.getItem(HIDE_ZERO_KEY) === "1");
+    } catch {
+      // Storage unavailable: default to showing everything
+    }
+  }, []);
+  const setHideZeroBalances = (next: boolean) => {
+    setHideZeroBalancesState(next);
+    try {
+      window.localStorage.setItem(HIDE_ZERO_KEY, next ? "1" : "0");
+    } catch {
+      // Ignore storage errors
+    }
+  };
   const [minAmount, setMinAmount] = useState("");
   const [maxAmount, setMaxAmount] = useState("");
 
@@ -336,7 +354,6 @@ export function ReportViewer({
 
   const isFilterActive =
     searchQuery.trim().length > 0 ||
-    hideZeroBalances ||
     minAmount.length > 0 ||
     maxAmount.length > 0;
 
@@ -509,6 +526,20 @@ export function ReportViewer({
                 !
               </span>
             )}
+          </button>
+
+          {/* Hide zero-balance ledgers (one click, remembered) */}
+          <button
+            type="button"
+            aria-pressed={hideZeroBalances}
+            onClick={() => setHideZeroBalances(!hideZeroBalances)}
+            className={`inline-flex min-h-[38px] items-center gap-1.5 rounded-full border px-3.5 text-xs font-semibold transition ${
+              hideZeroBalances
+                ? "border-[#006838] bg-[#006838] text-white"
+                : "border-[#D1D1D6] bg-white text-[#1C1C1E] hover:bg-[#F2F2F7]"
+            }`}
+          >
+            <span>{hideZeroBalances ? "Zero balances hidden" : "Hide zero balances"}</span>
           </button>
 
           {/* B. Columns Button */}

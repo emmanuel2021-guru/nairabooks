@@ -167,6 +167,25 @@ export const SECTOR_TEMPLATES: readonly [SectorTemplateOption, ...SectorTemplate
       { code: "5430", simpleName: "Field Stipends & Community Logistics", accountName: "Field Operations & Beneficiary Aid", group: "Expenses" },
     ]),
   },
+  {
+    code: "EDUCATION_SCHOOL",
+    title: "School & Education",
+    subtitle: "Tuition fees, terms, and academic staff",
+    sampleCity: "Ikeja · Abuja · Port Harcourt",
+    iconKey: "briefcase",
+    enabledBooks: ["Term Tuition Schedule", "School Bus Log", "Teacher Payroll", "Uniform & Books Store"],
+    accounts: mergeAccounts([
+      { code: "1120", simpleName: "Unpaid Tuition & Term Fees", accountName: "Student Tuition Fees Receivable", group: "Assets" },
+      { code: "1240", simpleName: "Books, Uniforms & Stationery", accountName: "School Books & Uniform Inventory", group: "Assets" },
+      { code: "1530", simpleName: "School Buses & Science Labs", accountName: "School Buses & Laboratory Equipment", group: "Assets" },
+      { code: "2160", simpleName: "School Fees Paid in Advance", accountName: "Unearned Term Fees Liability", group: "Liabilities" },
+      { code: "4700", simpleName: "Term Tuition & Exam Fees", accountName: "Tuition & Academic Term Revenue", group: "Income" },
+      { code: "4720", simpleName: "School Bus & Boarding Fees", accountName: "Transport & Ancillary School Income", group: "Income" },
+      { code: "5450", simpleName: "Teacher & Academic Staff Wages", accountName: "Teaching & Academic Staff Payroll", group: "Expenses" },
+      { code: "5470", simpleName: "Textbooks, Chalk & Lab Consumables", accountName: "Classroom & Educational Supplies", group: "Expenses" },
+      { code: "6135", simpleName: "School Bus Diesel & Maintenance", accountName: "Student Transport Vehicle Operating Expense", group: "Expenses" },
+    ]),
+  },
 ];
 
 export const COMPOSABLE_MODULES: readonly ComposableModuleOption[] = [

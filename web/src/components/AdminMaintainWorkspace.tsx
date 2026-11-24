@@ -44,6 +44,13 @@ import {
   saveCompanySettingsInStore,
   toggleAdminRecordActiveInStore,
 } from "@/components/admin/admin-store";
+import { withLivePartyBalances } from "@/components/admin/party-balances";
+import {
+  loadTransactions,
+  TRANSACTIONS_STORE_EVENT,
+} from "@/components/transactions/transactions-store";
+
+const DEMO_WORKSPACE_ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaa0001";
 
 function renderMetricWithSide(label: string, value: string, side?: "DR" | "CR") {
   const detectedSide =
@@ -73,16 +80,40 @@ function renderMetricWithSide(label: string, value: string, side?: "DR" | "CR") 
 }
 
 export function AdminMaintainWorkspace({
+  workspaceId,
   workspaceName,
   workspaceRc,
+  businessType,
   initialModule,
 }: {
+  readonly workspaceId?: string;
   readonly workspaceName: string;
   readonly workspaceRc: string;
+  readonly businessType?: string;
   readonly initialModule?: AdminModuleId;
 }) {
   const { mode } = useWorkspaceMode();
   const prefersReduced = useReducedMotion();
+
+  const effectiveWsId =
+    workspaceId ??
+    (workspaceName === "Lagos Trading & Hospitality Ltd"
+      ? "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaa0001"
+      : undefined);
+
+  useEffect(() => {
+    if (effectiveWsId && typeof window !== "undefined") {
+      try {
+        window.localStorage.setItem("nairabooks_active_workspace", effectiveWsId);
+        if (businessType) {
+          window.localStorage.setItem(`nairabooks_workspace_business_type_${effectiveWsId}`, businessType);
+          window.sessionStorage.setItem(`nairabooks_workspace_business_type_${effectiveWsId}`, businessType);
+        }
+      } catch {
+        // Ignore
+      }
+    }
+  }, [effectiveWsId, businessType]);
 
   const resolvedInitialMeta =
     ADMIN_MODULES.find((m) => m.id === initialModule) ?? ADMIN_MODULES[0];
@@ -90,9 +121,34 @@ export function AdminMaintainWorkspace({
   const [activePillar, setActivePillar] = useState<AdminPillarId>(resolvedInitialMeta.pillar);
   const [activeModule, setActiveModule] = useState<AdminModuleId>(resolvedInitialMeta.id);
   const [searchQuery, setSearchQuery] = useState("");
-  const [records, setRecords] = useState<readonly AdminRecord[]>(() => loadAdminRecords());
+  const [storedRecords, setRecords] = useState<readonly AdminRecord[]>(() =>
+    loadAdminRecords(effectiveWsId, businessType),
+  );
+  const [transactions, setTransactions] = useState(() => loadTransactions(effectiveWsId));
+  useEffect(() => {
+    function syncTransactions() {
+      setTransactions(loadTransactions(effectiveWsId));
+    }
+    syncTransactions();
+    window.addEventListener(TRANSACTIONS_STORE_EVENT, syncTransactions);
+    return () => window.removeEventListener(TRANSACTIONS_STORE_EVENT, syncTransactions);
+  }, [effectiveWsId]);
+  // Customers and vendors show their opening balance plus every posted transaction.
+  // (The demo company's sample balances already include its sample history.)
+  const records = useMemo(() => {
+    let wsId = effectiveWsId;
+    if (!wsId && typeof window !== "undefined") {
+      try {
+        wsId = window.localStorage.getItem("nairabooks_active_workspace") ?? undefined;
+      } catch {
+        // Storage unavailable
+      }
+    }
+    const isDemoCompany = !wsId || wsId === DEMO_WORKSPACE_ID;
+    return isDemoCompany ? storedRecords : withLivePartyBalances(storedRecords, transactions);
+  }, [storedRecords, transactions, effectiveWsId]);
   const [companySettings, setCompanySettings] = useState<CompanySettingsBundle>(() =>
-    loadCompanySettings(workspaceName, workspaceRc),
+    loadCompanySettings(workspaceName, workspaceRc, effectiveWsId),
   );
 
   const [ifrsFilter, setIfrsFilter] = useState<"All" | IfrsElement>("All");
@@ -103,13 +159,13 @@ export function AdminMaintainWorkspace({
 
   useEffect(() => {
     function syncFromStore() {
-      setRecords(loadAdminRecords());
-      setCompanySettings(loadCompanySettings(workspaceName, workspaceRc));
+      setRecords(loadAdminRecords(effectiveWsId, businessType));
+      setCompanySettings(loadCompanySettings(workspaceName, workspaceRc, effectiveWsId));
     }
     syncFromStore();
     window.addEventListener(ADMIN_STORE_EVENT, syncFromStore);
     return () => window.removeEventListener(ADMIN_STORE_EVENT, syncFromStore);
-  }, [workspaceName, workspaceRc]);
+  }, [effectiveWsId, workspaceName, workspaceRc, businessType]);
 
   const currentModuleMeta =
     ADMIN_MODULES.find((m) => m.id === activeModule) ?? ADMIN_MODULES[0];
@@ -125,7 +181,10 @@ export function AdminMaintainWorkspace({
   );
 
   const inactiveRecordsCount = records.length - activeRecordsCount;
-  const setupHealthPct = Math.min(100, 82 + Math.min(18, activeRecordsCount - 20));
+  const setupHealthPct =
+    records.length === 0
+      ? 0
+      : Math.min(100, Math.max(10, 82 + Math.min(18, activeRecordsCount - 20)));
 
   const visibleRecords = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -235,7 +294,7 @@ export function AdminMaintainWorkspace({
   }
 
   function handleToggleRecordActive(recordId: string) {
-    const { records: nextRecords, updated } = toggleAdminRecordActiveInStore(recordId);
+    const { records: nextRecords, updated } = toggleAdminRecordActiveInStore(recordId, effectiveWsId);
     setRecords(nextRecords);
     setRecentlySavedId(recordId);
     if (updated) {
@@ -256,7 +315,7 @@ export function AdminMaintainWorkspace({
 
   function handleSaveCompanySettings(e: React.FormEvent, sectionLabel: string) {
     e.preventDefault();
-    saveCompanySettingsInStore(companySettings);
+    saveCompanySettingsInStore(companySettings, effectiveWsId);
     setToastMessage(`Saved ${sectionLabel} for ${companySettings.legalName}.`);
   }
 
@@ -318,7 +377,7 @@ export function AdminMaintainWorkspace({
               <div
                 role="tablist"
                 aria-label="Admin Pillars"
-                className="flex flex-wrap items-center gap-1 rounded-[18px] border border-[#E5E5EA] bg-[#E5E5EA]/75 p-1"
+                className="flex flex-wrap items-center gap-1 rounded-[18px] border border-[#E5E5EA] dark:border-[#2C2C2E] bg-[#E5E5EA]/75 dark:!bg-[#18181A] p-1 shadow-xs"
               >
                 {ADMIN_PILLARS.map((pillar) => {
                   const selected = activePillar === pillar.id;
@@ -331,15 +390,15 @@ export function AdminMaintainWorkspace({
                       onClick={() => handleSelectPillar(pillar.id)}
                       className={`relative min-h-[44px] rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
                         selected
-                          ? "text-[#1C1C1E]"
-                          : "text-[#5E5E64] hover:text-[#1C1C1E]"
+                          ? "text-[#1C1C1E] dark:!text-white"
+                          : "text-[#5E5E64] dark:!text-[#A1A1AA] hover:text-[#1C1C1E] dark:hover:!text-white"
                       }`}
                     >
                       {selected && (
                         <motion.span
                           layoutId="admin-pillar-pill"
                           transition={{ type: "spring", stiffness: 360, damping: 28 }}
-                          className="absolute inset-0 rounded-full bg-white shadow-[0_2px_8px_rgba(0,0,0,0.08)]"
+                          className="absolute inset-0 rounded-full bg-white dark:!bg-[#2C2C2E] dark:border dark:border-[#3A3A3C] shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
                         />
                       )}
                       <span className="relative z-10">
@@ -352,7 +411,7 @@ export function AdminMaintainWorkspace({
 
               <div className="relative w-full lg:w-72">
                 <Search
-                  className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5E5E64]"
+                  className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5E5E64] dark:text-[#A1A1AA]"
                   aria-hidden="true"
                 />
                 <label htmlFor="admin-search" className="sr-only">
@@ -364,7 +423,7 @@ export function AdminMaintainWorkspace({
                   placeholder={`Search ${currentModuleMeta.label.toLowerCase()}...`}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="min-h-[44px] w-full rounded-full border border-[#D1D1D6] bg-white pl-10 pr-4 text-xs text-[#1C1C1E] placeholder:text-[#636369] focus:border-[#006838] focus:outline-none focus:ring-2 focus:ring-[#006838]/20"
+                  className="min-h-[44px] w-full rounded-full border border-[#D1D1D6] dark:border-[#38383A] bg-white dark:bg-[#1C1C1E] pl-10 pr-4 text-xs text-[#1C1C1E] dark:text-[#F2F2F7] placeholder:text-[#636369] dark:placeholder:text-[#8E8E93] focus:border-[#006838] focus:outline-none focus:ring-2 focus:ring-[#006838]/20"
                 />
               </div>
             </div>
@@ -388,7 +447,7 @@ export function AdminMaintainWorkspace({
                     className={`inline-flex min-h-[44px] items-center gap-2 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition ${
                       isModActive
                         ? "border-[#006838] bg-[#006838] text-white shadow-[0_4px_12px_rgba(0,104,56,0.22)]"
-                        : "border-[#E5E5EA] bg-white text-[#1C1C1E] hover:bg-[#FAFAFC]"
+                        : "border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#1C1C1E] text-[#1C1C1E] dark:text-[#F2F2F7] hover:bg-[#FAFAFC] dark:hover:bg-[#2C2C2E]"
                     }`}
                   >
                     <span>{mod.label}</span>
@@ -397,7 +456,7 @@ export function AdminMaintainWorkspace({
                         className={`rounded-full px-2 py-0.5 font-mono text-[10px] ${
                           isModActive
                             ? "bg-white/20 text-white"
-                            : "bg-[#F2F2F7] text-[#5E5E64]"
+                            : "bg-[#F2F2F7] dark:bg-[#2C2C2E] text-[#5E5E64] dark:text-[#A1A1AA]"
                         }`}
                       >
                         {count}

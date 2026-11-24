@@ -12,6 +12,7 @@ import {
   ADMIN_MODULES,
   type AdminModuleId,
 } from "@/components/admin/admin-maintain-data";
+import { ensureHydrated } from "@/lib/persistence";
 
 export const dynamic = "force-dynamic";
 
@@ -26,6 +27,7 @@ export default async function AdminMaintainPage({
 }: {
   searchParams?: Promise<{ module?: string }>;
 }) {
+  await ensureHydrated();
   const cookieStore = await cookies();
   const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
   const activeSession = getOptionalSessionFromToken(token);
@@ -46,8 +48,10 @@ export default async function AdminMaintainPage({
     <>
       <TopNavCapsule activeTab="admin" />
       <AdminMaintainWorkspace
+        workspaceId={activeSession?.workspace?.id}
         workspaceName={workspaceName}
         workspaceRc={workspaceRc}
+        businessType={activeSession?.workspace?.businessType}
         initialModule={initialModule}
       />
     </>

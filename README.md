@@ -7,7 +7,14 @@
   - **6 Flagship Reference Packs**: Retail & E-commerce, Wholesale & Distribution, Manufacturing (Light / Small Scale), Construction & Trades, Professional Services, and Non-Profit Organizations.
   - **Universal Custom / Composable Pack Builder**: Mix and configure modules dynamically for Hospitality/Hotels (USALI), Diners/Restaurants, Healthcare, Logistics, and hybrid multi-unit entities.
 
-## Quickstart (`uv` + Python 3.11+)
+> **Architecture (2026-11-23):** the running product is the Next.js app in `web/`. Its server code
+> (`web/src/lib/*-bff.ts`) is the only ledger/auth/tax/packs implementation, and it stores data in
+> Postgres via `DATABASE_URL` (Neon in production). The Python package `src/nairabooks` is a
+> **retired reference specification**: it is not deployed and nothing calls it.
+
+> **What works today and what doesn't:** see [`docs/CAPABILITIES.md`](docs/CAPABILITIES.md).
+
+## Python reference package (`uv` + Python 3.11+)
 
 ```bash
 uv sync

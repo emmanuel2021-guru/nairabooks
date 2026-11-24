@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authorizeApiRequest } from "@/lib/auth-bff";
+import { authorizeApiRequest, extractSessionToken } from "@/lib/auth-bff";
 import { fetchFrcnPackage } from "@/lib/bff-client";
+import { withPersistence } from "@/lib/persistence";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(request: NextRequest): Promise<NextResponse> {
+async function handleGET(request: NextRequest): Promise<NextResponse> {
   const auth = await authorizeApiRequest(request, "LEDGER_READ");
   if (!auth.ok) {
     return NextResponse.json(auth.body, { status: auth.status });
@@ -21,6 +22,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       { status: 400 },
     );
   }
-  const result = await fetchFrcnPackage(periodId);
+  const rawToken = extractSessionToken(request) ?? undefined;
+  const result = await fetchFrcnPackage(periodId, auth.ctx.workspaceId, rawToken);
   return NextResponse.json(result.body, { status: result.status });
 }
+
+export const GET = withPersistence(handleGET);

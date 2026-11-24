@@ -15,7 +15,7 @@ build/
 .env.local
 .env.*.local
 
-# Node / Next.js (future frontend)
+# Node / Next.js
 node_modules/
 .next/
 out/
@@ -24,3 +24,10 @@ out/
 .DS_Store
 Thumbs.db
 Screenshot_*.png
+
+# Local runtime data (auth state with password hashes — never commit)
+.data/
+web/.data/
+
+# Local reference material (screenshots, PDFs, Sage 50 captures) kept off git
+_reference/

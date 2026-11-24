@@ -183,13 +183,34 @@ export function SignupWorkspace() {
       });
       const body = (await res.json()) as {
         message?: string;
-        workspace?: { legalName: string };
+        field?: string | null;
+        workspace?: { id?: string; legalName: string };
       };
       if (!res.ok) {
         setErrorMessage(body.message ?? "Unable to create business account.");
+        if (body.field === "email" || body.field === "password" || body.field === "fullName") {
+          // Show the owner details step, where the email and password can be fixed.
+          setDirection(-1);
+          setStep(2);
+        }
         return;
       }
       redirecting = true;
+      if (typeof window !== "undefined") {
+        try {
+          if (body.workspace?.id) {
+            window.localStorage.setItem("nairabooks_active_workspace", body.workspace.id);
+            window.localStorage.setItem(`nairabooks_workspace_business_type_${body.workspace.id}`, formState.businessType);
+            window.sessionStorage.setItem(`nairabooks_workspace_business_type_${body.workspace.id}`, formState.businessType);
+          }
+          // Clear legacy un-scoped session storage keys
+          window.sessionStorage.removeItem("nairabooks_transactions_v1");
+          window.sessionStorage.removeItem("nairabooks_admin_records_v1");
+          window.sessionStorage.removeItem("nairabooks_admin_company_v1");
+        } catch {
+          // Ignore storage restrictions
+        }
+      }
       setStatusMessage(
         `Created ${body.workspace?.legalName ?? formState.workspaceName} with Nigerian IFRS & Tax Act 2025 defaults.`,
       );

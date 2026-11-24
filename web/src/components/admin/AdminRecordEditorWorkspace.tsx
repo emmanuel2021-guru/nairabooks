@@ -38,6 +38,7 @@ import {
   loadAdminRecords,
   upsertAdminRecord,
 } from "@/components/admin/admin-store";
+import { getNextAdminRecordCode } from "@/lib/numbering-service";
 
 export type CreationDetailMode = "simple" | "full";
 
@@ -98,7 +99,10 @@ function createInitialFormState(
   existing?: AdminRecord,
 ): EditorFormState {
   const blueprint = MODULE_EDITOR_BLUEPRINTS[moduleId];
-  const randomSuffix = Math.floor(200 + Math.random() * 700);
+  const nextCode =
+    mode === "edit" && existing
+      ? existing.code
+      : getNextAdminRecordCode(moduleId, undefined, existing?.parentGroupCode);
   const parsedMetric = existing
     ? stripDrCrSuffix(existing.primaryMetricValue)
     : { amount: blueprint.supportsDebitCreditBalance ? "₦0.00" : "" };
@@ -107,13 +111,9 @@ function createInitialFormState(
     id:
       mode === "edit" && existing
         ? existing.id
-        : `${moduleId}-${Date.now()}-${randomSuffix}`,
+        : `${moduleId}-${Date.now()}`,
     name: existing?.name ?? "",
-    code:
-      existing?.code ??
-      (moduleId === "accounts"
-        ? "1535"
-        : `${blueprint.idPrefix}${randomSuffix}`),
+    code: nextCode,
     category:
       existing?.category ??
       (moduleId === "accounts" ? "Assets — Non-Current" : "Standard"),
@@ -322,6 +322,12 @@ export function AdminRecordEditorWorkspace({
     const inputId = `${idPrefix}-${field.key}`;
     const value = form.details[field.key] ?? "";
 
+    const liveVendors = allRecords.filter((r) => r.module === "vendors");
+    const liveCustomers = allRecords.filter((r) => r.module === "customers");
+    const liveAccounts = allRecords.filter((r) => r.module === "accounts" && r.accountLevel !== "GROUP");
+    const liveEmployees = allRecords.filter((r) => r.module === "employees");
+    const liveInventory = allRecords.filter((r) => r.module === "inventory");
+
     return (
       <div
         key={field.key}
@@ -330,7 +336,95 @@ export function AdminRecordEditorWorkspace({
         <label htmlFor={inputId} className="block text-xs font-semibold text-[#1C1C1E]">
           {field.label}
         </label>
-        {field.type === "select" ? (
+        {field.key === "preferredVendor" || field.key === "vendor" ? (
+          <div className="mt-1.5 space-y-1">
+            <select
+              id={inputId}
+              value={value}
+              onChange={(e) => updateDetail(field.key, e.target.value)}
+              className="min-h-[44px] w-full rounded-[14px] border border-[#D1D1D6] bg-[#FAFAFC] px-3 text-sm text-[#1C1C1E] focus:border-[#006838] focus:outline-none focus:ring-2 focus:ring-[#006838]/20"
+            >
+              <option value="">-- Pick Vendor ({liveVendors.length} registered) --</option>
+              {liveVendors.map((v) => (
+                <option key={v.id} value={v.name}>
+                  {v.code} — {v.name}
+                </option>
+              ))}
+            </select>
+            <input
+              type="text"
+              value={value}
+              onChange={(e) => updateDetail(field.key, e.target.value)}
+              placeholder="Or type custom vendor name..."
+              className="min-h-[36px] w-full rounded-[10px] border border-[#E5E5EA] bg-white px-3 text-xs text-[#1C1C1E]"
+            />
+          </div>
+        ) : field.key === "customer" ? (
+          <div className="mt-1.5 space-y-1">
+            <select
+              id={inputId}
+              value={value}
+              onChange={(e) => updateDetail(field.key, e.target.value)}
+              className="min-h-[44px] w-full rounded-[14px] border border-[#D1D1D6] bg-[#FAFAFC] px-3 text-sm text-[#1C1C1E] focus:border-[#006838] focus:outline-none focus:ring-2 focus:ring-[#006838]/20"
+            >
+              <option value="">-- Pick Customer ({liveCustomers.length} registered) --</option>
+              {liveCustomers.map((c) => (
+                <option key={c.id} value={c.name}>
+                  {c.code} — {c.name}
+                </option>
+              ))}
+            </select>
+            <input
+              type="text"
+              value={value}
+              onChange={(e) => updateDetail(field.key, e.target.value)}
+              placeholder="Or type custom customer name..."
+              className="min-h-[36px] w-full rounded-[10px] border border-[#E5E5EA] bg-white px-3 text-xs text-[#1C1C1E]"
+            />
+          </div>
+        ) : (field.key.toLowerCase().includes("account") || field.key === "salesGlAccount" || field.key === "expenseGlAccount") && liveAccounts.length > 0 ? (
+          <select
+            id={inputId}
+            value={value}
+            onChange={(e) => updateDetail(field.key, e.target.value)}
+            className="mt-1.5 min-h-[44px] w-full rounded-[14px] border border-[#D1D1D6] bg-[#FAFAFC] px-3 text-sm text-[#1C1C1E] focus:border-[#006838] focus:outline-none focus:ring-2 focus:ring-[#006838]/20"
+          >
+            <option value="">-- Pick Chart of Account ({liveAccounts.length} accounts) --</option>
+            {liveAccounts.map((acc) => (
+              <option key={acc.id} value={`${acc.code} ${acc.name}`}>
+                {acc.code} — {acc.name} ({acc.category})
+              </option>
+            ))}
+          </select>
+        ) : field.key === "salesRep" && liveEmployees.length > 0 ? (
+          <select
+            id={inputId}
+            value={value}
+            onChange={(e) => updateDetail(field.key, e.target.value)}
+            className="mt-1.5 min-h-[44px] w-full rounded-[14px] border border-[#D1D1D6] bg-[#FAFAFC] px-3 text-sm text-[#1C1C1E] focus:border-[#006838] focus:outline-none focus:ring-2 focus:ring-[#006838]/20"
+          >
+            <option value="">-- Pick Sales Rep / Employee ({liveEmployees.length}) --</option>
+            {liveEmployees.map((emp) => (
+              <option key={emp.id} value={emp.name}>
+                {emp.code} — {emp.name}
+              </option>
+            ))}
+          </select>
+        ) : field.key === "itemId" && liveInventory.length > 0 ? (
+          <select
+            id={inputId}
+            value={value}
+            onChange={(e) => updateDetail(field.key, e.target.value)}
+            className="mt-1.5 min-h-[44px] w-full rounded-[14px] border border-[#D1D1D6] bg-[#FAFAFC] px-3 text-sm text-[#1C1C1E] focus:border-[#006838] focus:outline-none focus:ring-2 focus:ring-[#006838]/20"
+          >
+            <option value="">-- Pick Inventory Item ({liveInventory.length}) --</option>
+            {liveInventory.map((item) => (
+              <option key={item.id} value={item.code}>
+                {item.code} — {item.name}
+              </option>
+            ))}
+          </select>
+        ) : field.type === "select" ? (
           <select
             id={inputId}
             value={value}
@@ -691,21 +785,23 @@ export function AdminRecordEditorWorkspace({
                   <div className="sm:col-span-6">
                     <label
                       htmlFor="editor-balance-amount"
-                      className="block text-xs font-semibold text-[#1C1C1E]"
+                      className="block text-xs font-semibold text-[#1C1C1E] dark:text-[#F2F2F7]"
                     >
                       {blueprint.supportsDebitCreditBalance
                         ? "Current / Opening Balance (₦)"
-                        : moduleMeta.metricLabel}
+                        : moduleId === "inventory"
+                          ? "Total Stock Valuation / Cost on Hand (₦)"
+                          : moduleMeta.metricLabel}
                     </label>
                     <div className="mt-1.5 flex flex-wrap items-center gap-2">
                       <input
                         id="editor-balance-amount"
                         value={form.balanceAmount}
-                        placeholder="e.g. ₦1,450,000"
+                        placeholder={moduleId === "inventory" ? "e.g. ₦1,450,000 (total inventory value)" : "e.g. ₦1,450,000"}
                         onChange={(e) =>
                           setForm((f) => ({ ...f, balanceAmount: e.target.value }))
                         }
-                        className="min-h-[44px] flex-1 rounded-[14px] border border-[#D1D1D6] bg-[#FAFAFC] px-3.5 font-mono text-sm text-[#1C1C1E]"
+                        className="min-h-[44px] flex-1 rounded-[14px] border border-[#D1D1D6] dark:border-[#38383A] bg-[#FAFAFC] dark:bg-[#1C1C1E] px-3.5 font-mono text-sm text-[#1C1C1E] dark:text-[#F2F2F7]"
                       />
                       {blueprint.supportsDebitCreditBalance && (
                         <div

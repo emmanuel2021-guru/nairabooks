@@ -39,7 +39,8 @@ const DEMO_PERSONAS: readonly {
   },
 ];
 
-export function LoginWorkspace() {
+/** `demoPassword` is null when the server has no demo accounts; the demo drawer is then hidden. */
+export function LoginWorkspace({ demoPassword = null }: { readonly demoPassword?: string | null } = {}) {
   const prefersReduced = useReducedMotion();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -95,8 +96,9 @@ export function LoginWorkspace() {
   }
 
   function handleSelectDemoPersona(persona: (typeof DEMO_PERSONAS)[number]) {
+    if (!demoPassword) return;
     setEmail(persona.email);
-    setPassword("NairaBooks#2026");
+    setPassword(demoPassword);
     setErrorMessage(null);
     setStatusMessage(`Filled ${persona.label} credentials — ready to sign in.`);
   }
@@ -243,7 +245,8 @@ export function LoginWorkspace() {
             </div>
           </section>
 
-          {/* Quiet Collapsible Demo Role Drawer — Keeps Main Card Calm & Minimalist */}
+          {/* Quiet Collapsible Demo Role Drawer — only when the server has demo accounts */}
+          {demoPassword ? (
           <div className="mt-5 flex flex-col items-center">
             <button
               type="button"
@@ -273,7 +276,7 @@ export function LoginWorkspace() {
                 <div className="border-b border-[#E5E5EA] bg-[#FAFAFC] px-4 py-2.5 text-left">
                   <p className="text-[11px] font-medium text-[#5E5E64]">
                     Tap any role to auto-fill credentials (password:{" "}
-                    <code className="font-mono font-semibold text-[#1C1C1E]">NairaBooks#2026</code>)
+                    <code className="font-mono font-semibold text-[#1C1C1E]">{demoPassword}</code>)
                   </p>
                 </div>
                 <div className="divide-y divide-[#E5E5EA]">
@@ -312,6 +315,7 @@ export function LoginWorkspace() {
               </motion.div>
             )}
           </div>
+          ) : null}
         </motion.div>
       </main>
     </MotionConfig>

@@ -202,42 +202,44 @@ export function AdminEditorTabWidget({
   }
 
   if (widget === "inventory-stock-kpi") {
-    const onHand = Number(details.qtyOnHand ?? 42) || 0;
-    const onSo = Number(details.qtyOnSo ?? 6) || 0;
-    const minStock = Number(details.minStock ?? 15) || 0;
+    const onHand = Number(details.qtyOnHand ?? 0) || 0;
+    const onSo = Number(details.qtyOnSo ?? 0) || 0;
+    const minStock = Number(details.minStock ?? 0) || 0;
     const available = Math.max(0, onHand - onSo);
-    const lowStock = available <= minStock;
+    const lowStock = minStock > 0 && available <= minStock;
 
     return (
       <div className="mb-5 grid gap-3 sm:grid-cols-3">
-        <div className="rounded-[18px] border border-[#E5E5EA] bg-[#FAFAFC] p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-[#5E5E64]">
+        <div className="rounded-[18px] border border-[#E5E5EA] dark:border-[#38383A] bg-[#FAFAFC] dark:bg-[#1C1C1E] p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-[#5E5E64] dark:text-[#A1A1AA]">
             Qty on Hand (Physical)
           </p>
-          <p className="mt-1 font-mono text-lg font-bold tabular-nums text-[#1C1C1E]">
+          <p className="mt-1 font-mono text-lg font-bold tabular-nums text-[#1C1C1E] dark:text-[#F2F2F7]">
             {onHand} units
           </p>
         </div>
-        <div className="rounded-[18px] border border-[#E5E5EA] bg-[#FAFAFC] p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-[#5E5E64]">
+        <div className="rounded-[18px] border border-[#E5E5EA] dark:border-[#38383A] bg-[#FAFAFC] dark:bg-[#1C1C1E] p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-[#5E5E64] dark:text-[#A1A1AA]">
             Qty Available to Promise
           </p>
-          <p className="mt-1 font-mono text-lg font-bold tabular-nums text-[#00582E]">
+          <p className="mt-1 font-mono text-lg font-bold tabular-nums text-[#00582E] dark:text-emerald-400">
             {available} units
           </p>
         </div>
-        <div className="rounded-[18px] border border-[#E5E5EA] bg-[#FAFAFC] p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-[#5E5E64]">
+        <div className="rounded-[18px] border border-[#E5E5EA] dark:border-[#38383A] bg-[#FAFAFC] dark:bg-[#1C1C1E] p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-[#5E5E64] dark:text-[#A1A1AA]">
             Reorder Status
           </p>
           <p
             className={`mt-1 text-sm font-bold ${
-              lowStock ? "text-[#B45309]" : "text-[#00582E]"
+              lowStock ? "text-[#B45309] dark:text-amber-400" : "text-[#00582E] dark:text-emerald-400"
             }`}
           >
-            {lowStock
-              ? `Low Stock (Min ${minStock})`
-              : `Healthy Buffer (Min ${minStock})`}
+            {minStock === 0 && onHand === 0
+              ? "Zero Initial Stock"
+              : lowStock
+                ? `Low Stock (Min ${minStock})`
+                : `Healthy Buffer (Min ${minStock})`}
           </p>
         </div>
       </div>

@@ -156,8 +156,11 @@
 }
 
 .dark .bg-\[\#E5E5EA\]\/70,
+.dark .bg-\[\#E5E5EA\]\/75,
+.dark .bg-\[\#E5E5EA\]\/80,
+.dark .bg-\[\#E5E5EA\]\/85,
 .dark .bg-\[\#E5E5EA\] {
-  background-color: #2C2C2E !important;
+  background-color: #242426 !important;
 }
 
 .dark .border-\[\#E5E5EA\],

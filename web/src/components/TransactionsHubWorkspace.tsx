@@ -83,16 +83,28 @@ function getQuickStatusActionLabel(status: TransactionStatus): string {
 }
 
 export function TransactionsHubWorkspace({
+  workspaceId,
   initialPillar,
   initialType,
   initialChoice,
 }: {
+  readonly workspaceId?: string;
   readonly initialPillar?: TransactionPillarId;
   readonly initialType?: TransactionTypeId;
   readonly initialChoice?: TransactionsWorkspaceView;
 }) {
   const { mode } = useWorkspaceMode();
   const prefersReduced = useReducedMotion();
+
+  useEffect(() => {
+    if (workspaceId && typeof window !== "undefined") {
+      try {
+        window.localStorage.setItem("nairabooks_active_workspace", workspaceId);
+      } catch {
+        // Ignore
+      }
+    }
+  }, [workspaceId]);
 
   const resolvedTypeMeta = initialType
     ? getTransactionTypeMeta(initialType)
@@ -117,18 +129,18 @@ export function TransactionsHubWorkspace({
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"All" | TransactionStatus>("All");
   const [transactions, setTransactions] = useState<readonly TransactionRecord[]>(() =>
-    loadTransactions(),
+    loadTransactions(workspaceId),
   );
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   useEffect(() => {
     function sync() {
-      setTransactions(loadTransactions());
+      setTransactions(loadTransactions(workspaceId));
     }
     sync();
     window.addEventListener(TRANSACTIONS_STORE_EVENT, sync);
     return () => window.removeEventListener(TRANSACTIONS_STORE_EVENT, sync);
-  }, []);
+  }, [workspaceId]);
 
   const currentPillarMeta = getTransactionPillarMeta(activePillar);
 
@@ -238,7 +250,7 @@ export function TransactionsHubWorkspace({
 
   function handleQuickStatusCycle(tx: TransactionRecord) {
     const nextStatus = getNextQuickStatus(tx.status);
-    const { records } = updateTransactionStatusInStore(tx.id, nextStatus);
+    const { records } = updateTransactionStatusInStore(tx.id, nextStatus, workspaceId);
     setTransactions(records);
     setToastMessage(`Updated ${tx.reference} (${tx.counterparty}) to ${nextStatus}.`);
   }

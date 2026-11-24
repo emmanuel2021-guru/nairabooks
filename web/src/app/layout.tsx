@@ -5,6 +5,7 @@ import { RouteLoaderOverlay } from "@/components/RouteLoaderOverlay";
 import { WorkspaceModeProvider } from "@/state/workspace-mode";
 import { ThemeModeProvider } from "@/state/theme-mode";
 import { NigerianArtBackground } from "@/components/theme/NigerianArtBackground";
+import { RecordsSync } from "@/components/records/RecordsSync";
 import "./globals.css";
 
 const interSans = Inter({
@@ -49,6 +50,7 @@ export default function RootLayout({ children }: { readonly children: ReactNode 
         </a>
         <ThemeModeProvider>
           <WorkspaceModeProvider>
+            <RecordsSync />
             <RouteLoaderOverlay>{children}</RouteLoaderOverlay>
           </WorkspaceModeProvider>
         </ThemeModeProvider>

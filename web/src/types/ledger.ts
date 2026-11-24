@@ -252,6 +252,8 @@ export interface FrcnFinancialStatementPackage {
   readonly isBalanced: boolean;
   readonly snapshotHash: string;
   readonly trialBalanceCsv: string;
+  /** Every voucher posted in the period (newest first), for journal registers. */
+  readonly journalVouchers?: readonly JournalVoucher[];
   readonly generatedAt: string;
 }
 
@@ -306,4 +308,15 @@ export interface FxRevaluationReport {
   readonly revaluedNgn: DecimalMoneyString;
   readonly unrealizedGainLossNgn: DecimalMoneyString;
   readonly isGain: boolean;
+}
+
+export interface WorkspaceKpiSummary {
+  readonly workspaceId: string;
+  readonly bankBalanceNgn: string;
+  readonly receivablesNgn: string;
+  readonly payablesNgn: string;
+  readonly netIncomeNgn: string;
+  readonly accountCount: number;
+  readonly voucherCount: number;
+  readonly isZeroState: boolean;
 }

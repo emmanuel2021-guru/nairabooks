@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import React from "react";
 import Link from "next/link";
 import { LoginWorkspace } from "@/components/LoginWorkspace";
+import { resolveAuthRuntimeConfig } from "@/lib/auth-config";
 
 export const metadata: Metadata = {
   title: "Sign In | NairaBooks",
@@ -9,7 +10,10 @@ export const metadata: Metadata = {
     "Sign in cleanly to your NairaBooks workspace for Nigerian double-entry bookkeeping and Tax Act 2025 compliance.",
 };
 
+export const dynamic = "force-dynamic";
+
 export default function LoginPage() {
+  const demoPassword = resolveAuthRuntimeConfig().demoPassword;
   return (
     <div className="min-h-screen bg-[#F2F2F7] text-[#1C1C1E]">
       {/* Featherweight Minimalist Cupertino Header */}
@@ -34,7 +38,7 @@ export default function LoginPage() {
         </div>
       </header>
 
-      <LoginWorkspace />
+      <LoginWorkspace demoPassword={demoPassword} />
     </div>
   );
 }
